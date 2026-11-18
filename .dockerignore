@@ -1,0 +1,8 @@
+.venv
+.git
+media
+staticfiles
+.env
+__pycache__
+*.pdf
+lighthouse
