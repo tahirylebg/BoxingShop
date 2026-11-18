@@ -1,0 +1,11 @@
+{% extends "admin/base_site.html" %}
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="{% url 'admin:index' %}">Accueil</a> › <a href="{% url 'admin:orders_order_changelist' %}">Commandes</a> › Export comptable</div>{% endblock %}
+{% block content %}
+<p class="bs-help">Exporte toutes les commandes <strong>payées</strong> (payée, en préparation, expédiée, livrée) dont la date de paiement est comprise dans la période. Le fichier s'ouvre directement dans Excel ou LibreOffice (séparateur point-virgule, montants à virgule).</p>
+<form method="get" class="bs-export-form">
+  {% if form.non_field_errors %}<div class="errornote">{{ form.non_field_errors }}</div>{% endif %}
+  <label>{{ form.start.label }} {{ form.start }}</label>
+  <label>{{ form.end.label }} {{ form.end }}</label>
+  <input type="submit" class="default" value="Télécharger le CSV">
+</form>
+{% endblock %}

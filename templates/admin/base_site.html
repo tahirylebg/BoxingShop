@@ -1,0 +1,10 @@
+{% extends "admin/base.html" %}
+{% load static %}
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | Boxing Shop admin{% endblock %}
+{% block dark-mode-vars %}{# thème unique aux couleurs de la charte #}{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'css/admin-theme.css' %}">{% endblock %}
+{% block branding %}
+<div id="site-name"><a href="{% url 'admin:index' %}">Boxing Shop <span class="bs-tag">Back-office</span></a></div>
+
+{% endblock %}
+{% block nav-global %}<a class="bs-viewsite" href="/" target="_blank" rel="noopener">Voir la boutique ↗</a>{% endblock %}

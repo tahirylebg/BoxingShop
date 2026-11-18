@@ -1,0 +1,31 @@
+{% extends "admin/index.html" %}
+{% load shop %}
+{% block content %}
+<div class="bs-dashboard">
+  <ul class="bs-kpis">
+    <li><a href="{% url 'admin:orders_order_changelist' %}?status__in=paid,preparing"><span class="bs-kpi__value">{{ to_prepare }}</span><span class="bs-kpi__label">commandes à préparer / expédier</span></a></li>
+    <li><a href="{% url 'admin:catalog_variant_changelist' %}?stock_bas=1"{% if low_stock_count %} class="bs-alert"{% endif %}><span class="bs-kpi__value">{{ low_stock_count }}</span><span class="bs-kpi__label">SKU sous le seuil critique</span></a></li>
+    <li><a href="{% url 'admin:accounts_customer_changelist' %}?club_status__exact=pending"><span class="bs-kpi__value">{{ club_requests }}</span><span class="bs-kpi__label">demandes Club / Coach</span></a></li>
+    <li><a href="{% url 'admin:orders_order_export' %}"><span class="bs-kpi__value">{{ revenue_30d|money }}</span><span class="bs-kpi__label">CA TTC 30 jours ({{ orders_30d }} commandes)</span></a></li>
+  </ul>
+  {% if stock_issues %}<p class="errornote">{{ stock_issues }} commande(s) annulée(s) pour rupture au paiement ces 30 derniers jours (remboursement automatique).</p>{% endif %}
+
+  <div class="module bs-lowstock">
+    <h2>Alertes stock — sous le seuil critique</h2>
+    {% if low_stock %}
+      <table>
+        <thead><tr><th scope="col">SKU</th><th scope="col">Produit</th><th scope="col">Déclinaison</th><th scope="col">Stock</th><th scope="col">Seuil</th></tr></thead>
+        <tbody>
+          {% for v in low_stock %}
+            <tr><td><a href="{% url 'admin:catalog_variant_change' v.pk %}">{{ v.sku }}</a></td><td>{{ v.product.name }}</td><td>{{ v.label }}</td><td><strong class="bs-low">{% if v.stock == 0 %}RUPTURE{% else %}{{ v.stock }}{% endif %}</strong></td><td>{{ v.low_stock_threshold }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if low_stock_count > low_stock|length %}<p><a href="{% url 'admin:catalog_variant_changelist' %}?stock_bas=1">Voir les {{ low_stock_count }} alertes</a></p>{% endif %}
+    {% else %}
+      <p>Aucune déclinaison sous le seuil. 👊</p>
+    {% endif %}
+  </div>
+</div>
+{{ block.super }}
+{% endblock %}

@@ -119,13 +119,29 @@ class ProductAdmin(admin.ModelAdmin):
         form.instance.disciplines.add(form.instance.discipline)
 
 
+class VariantStockFilter(admin.SimpleListFilter):
+    title = "alerte stock"
+    parameter_name = "stock_bas"
+
+    def lookups(self, request, model_admin):
+        return [("1", "Sous le seuil critique (rupture incluse)"), ("0", "Rupture uniquement")]
+
+    def queryset(self, request, queryset):
+        if self.value() == "1":
+            return queryset.low_stock()
+        if self.value() == "0":
+            return queryset.filter(stock=0)
+        return queryset
+
+
 @admin.register(Variant)
 class VariantAdmin(admin.ModelAdmin):
     list_display = ("sku", "product", "color", "weight_oz", "size", "price", "stock", "low_stock_threshold",
                     "alert", "is_active")
     list_editable = ("stock", "low_stock_threshold", "price")
-    list_filter = ("is_active", "product__category", "product__discipline")
+    list_filter = (VariantStockFilter, "is_active", "product__category", "product__discipline")
     search_fields = ("sku", "product__name")
+    ordering = ("stock", "product__name")
     list_select_related = ("product",)
     autocomplete_fields = ("product",)
 

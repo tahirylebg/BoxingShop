@@ -1,0 +1,5 @@
+{% extends "admin/change_list.html" %}
+{% block object-tools-items %}
+  <li><a href="{% url 'admin:orders_order_export' %}">Export comptable CSV par période</a></li>
+  {{ block.super }}
+{% endblock %}
