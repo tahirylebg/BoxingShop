@@ -1,0 +1,8 @@
+{% extends "emails/_layout.html" %}
+{% block body %}
+<h1 style="font-family:Impact,Arial Narrow,sans-serif;text-transform:uppercase;font-weight:400;font-size:30px;margin:0 0 12px">Colis expédié</h1>
+<p>Bonjour {{ order.first_name }},</p>
+<p>Votre commande <strong style="font-family:Courier New,monospace">{{ order.number }}</strong> a été remise à {{ order.carrier|default:"Colissimo" }}.</p>
+<p>N° de suivi : <strong style="font-family:Courier New,monospace">{{ order.tracking_number }}</strong>{% if order.tracking_url %} — <a href="{{ order.tracking_url }}" style="color:#C81E1E">suivre le colis</a>{% endif %}</p>
+<p style="margin:24px 0"><a href="{{ SITE_URL }}{{ order.get_absolute_url }}" style="background:#0D0D0D;color:#F4F3EF;padding:12px 20px;text-decoration:none;font-family:Courier New,monospace;font-weight:bold;text-transform:uppercase">Voir ma commande</a></p>
+{% endblock %}

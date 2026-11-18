@@ -1,0 +1,28 @@
+{% extends "accounts/base_account.html" %}
+{% load shop %}
+{% block title %}Mes commandes | Boxing Shop{% endblock %}
+{% block account_title %}Commandes &amp; factures{% endblock %}
+{% block account_content %}
+{% if orders %}
+  <div class="table-wrap">
+    <table class="table">
+      <caption class="visually-hidden">Historique de vos commandes</caption>
+      <thead><tr><th scope="col">N°</th><th scope="col">Date</th><th scope="col">Statut</th><th scope="col">Suivi</th><th scope="col" class="text-right">Total</th><th scope="col">Facture</th></tr></thead>
+      <tbody>
+        {% for o in orders %}
+          <tr>
+            <td class="mono"><a href="{{ o.get_absolute_url }}">{{ o.number }}</a></td>
+            <td class="mono">{{ o.created_at|date:"d/m/Y" }}</td>
+            <td>{{ o.get_status_display }}</td>
+            <td class="mono">{% if o.tracking_number %}{% if o.tracking_url %}<a href="{{ o.tracking_url }}" target="_blank" rel="noopener noreferrer">{{ o.tracking_number }}</a>{% else %}{{ o.tracking_number }}{% endif %}{% else %}—{% endif %}</td>
+            <td class="mono text-right nowrap">{{ o.total|money }}</td>
+            <td>{% if o.is_paid and o.invoice %}<a href="{% url 'orders:invoice' o.number o.access_token %}">PDF<span class="visually-hidden"> facture {{ o.invoice.number }}</span></a>{% else %}—{% endif %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p>Aucune commande pour le moment.</p>
+{% endif %}
+{% endblock %}

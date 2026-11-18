@@ -1,0 +1,7 @@
+{% autoescape off %}Bonjour {{ customer.first_name|default:customer.email }},
+
+{% if customer.club_status == "approved" %}Votre compte {{ customer.club_name }} est validé : la grille tarifaire clubs s'applique désormais automatiquement à vos paniers.
+{{ SITE_URL }}/compte/club/{% else %}Nous n'avons pas pu valider votre demande de statut Club / Coach pour le moment. Répondez à cet e-mail avec un justificatif (affiliation, SIRET) et nous l'étudierons à nouveau.{% endif %}
+
+— L'équipe Boxing Shop
+{% endautoescape %}

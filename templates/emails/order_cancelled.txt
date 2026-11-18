@@ -1,0 +1,9 @@
+{% autoescape off %}{% load shop %}Bonjour {{ order.first_name }},
+
+Un article de votre commande {{ order.number }} est passé en rupture de stock pendant votre paiement.
+Nous avons annulé la commande et remboursé intégralement {{ order.total|money }} (délai bancaire : 5 à 10 jours).
+
+Toutes nos excuses. Contact : {{ SHOP.email }}
+
+— L'équipe Boxing Shop
+{% endautoescape %}

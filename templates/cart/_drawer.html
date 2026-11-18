@@ -1,0 +1,15 @@
+<div class="drawer__body" data-cart-total-count="{{ quote.item_count }}">
+  {% if quote.is_empty %}
+    <p class="mt-4">Votre panier est vide.</p>
+    <p class="mt-4"><a class="btn btn--ghost" href="{% url 'catalog:shop' %}">Voir l'équipement</a></p>
+  {% else %}
+    {% include "cart/_lines.html" with prefix="d" %}
+  {% endif %}
+</div>
+{% if not quote.is_empty %}
+  <div class="drawer__foot">
+    {% include "cart/_totals.html" %}
+    <a class="btn btn--blood btn--lg btn--block" href="{% url 'orders:checkout' %}">Commander</a>
+    <a class="btn btn--ghost btn--block" href="{% url 'cart:detail' %}">Voir le panier / code promo</a>
+  </div>
+{% endif %}

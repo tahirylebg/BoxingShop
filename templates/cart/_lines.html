@@ -1,0 +1,23 @@
+{% load shop %}
+<ul class="line-items">
+  {% for line in quote.lines %}
+    {% with v=line.variant p=line.variant.product %}
+    <li class="line-item">
+      {% responsive_img p.images.all.0 sizes="80px" alt="" %}
+      <div>
+        <p class="line-item__title"><a href="{{ p.get_absolute_url }}?sku={{ v.sku }}">{{ p.name }}</a></p>
+        <p class="line-item__meta">{{ v.label }} · {{ v.sku }}</p>
+        {% if line.quantity > v.stock %}<p class="stock-note stock-note--low">Plus que {{ v.stock }} en stock</p>{% elif v.is_low_stock %}<p class="stock-note stock-note--low">Stock faible</p>{% endif %}
+        <form class="qty-form" method="post" action="{% url 'cart:update' line.item_id %}" data-cart-line>
+          {% csrf_token %}
+          <label class="visually-hidden" for="qty-{{ prefix }}{{ line.item_id }}">Quantité pour {{ p.name }}</label>
+          <input id="qty-{{ prefix }}{{ line.item_id }}" type="number" name="quantity" value="{{ line.quantity }}" min="0" max="99" inputmode="numeric">
+          <button class="btn-link" type="submit" name="action" value="update">Modifier</button>
+          <button class="btn-link" type="submit" name="action" value="remove">Retirer<span class="visually-hidden"> {{ p.name }}</span></button>
+        </form>
+      </div>
+      <p class="price">{{ line.total|money }}</p>
+    </li>
+    {% endwith %}
+  {% endfor %}
+</ul>

@@ -1,0 +1,20 @@
+{% extends "accounts/base_account.html" %}
+{% block title %}Carnet d'adresses | Boxing Shop{% endblock %}
+{% block account_title %}Carnet d'adresses{% endblock %}
+{% block account_content %}
+<p><a class="btn" href="{% url 'accounts:address_add' %}">Ajouter une adresse</a></p>
+<ul class="card-list mt-5">
+  {% for a in addresses %}
+    <li>
+      <p class="kicker">{{ a.label|default:"Adresse" }}{% if a.is_default %} · <span class="badge badge--ink">Par défaut</span>{% endif %}</p>
+      <p>{{ a.first_name }} {{ a.last_name }}<br>{{ a.line1 }}{% if a.line2 %}<br>{{ a.line2 }}{% endif %}<br>{{ a.postal_code }} {{ a.city }}</p>
+      <div class="cluster">
+        <a class="btn-link" href="{% url 'accounts:address_edit' a.pk %}">Modifier<span class="visually-hidden"> l'adresse {{ a.line1 }}</span></a>
+        <form method="post" action="{% url 'accounts:address_delete' a.pk %}">{% csrf_token %}<button class="btn-link" type="submit">Supprimer<span class="visually-hidden"> l'adresse {{ a.line1 }}</span></button></form>
+      </div>
+    </li>
+  {% empty %}
+    <li><p>Aucune adresse enregistrée.</p></li>
+  {% endfor %}
+</ul>
+{% endblock %}

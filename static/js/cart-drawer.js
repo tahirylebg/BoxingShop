@@ -81,7 +81,7 @@ if (dialog && content) {
     const formEl = event.target;
     const submitter = event.submitter;
     const isAdd = formEl.matches("[data-add-to-cart]") && submitter?.value !== "preview";
-    const isLine = formEl.matches("[data-cart-line]");
+    const isLine = formEl.matches("[data-cart-line]") && dialog.contains(formEl);
     if (!isAdd && !isLine) return;
     event.preventDefault();
     const wasDisabled = submitter?.disabled;

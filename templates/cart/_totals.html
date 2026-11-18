@@ -1,0 +1,16 @@
+{% load shop %}
+{% if quote.remaining_for_free_shipping > 0 %}
+  <div class="free-shipping-meter">
+    <p>Plus que <strong>{{ quote.remaining_for_free_shipping|money }}</strong> pour la livraison offerte</p>
+    <progress max="100" value="{{ quote.free_shipping_progress }}" aria-label="Progression vers la livraison offerte">{{ quote.free_shipping_progress }} %</progress>
+  </div>
+{% else %}
+  <p class="free-shipping-meter"><strong>Livraison offerte</strong> ✓</p>
+{% endif %}
+<dl class="totals">
+  <div><dt>Sous-total ({{ quote.item_count }} article{{ quote.item_count|pluralize }})</dt><dd>{{ quote.subtotal|money }}</dd></div>
+  {% if quote.club_discount %}<div class="totals__discount"><dt>Remise club (−{{ quote.club_percent|floatformat:"-2" }} %)</dt><dd>−{{ quote.club_discount|money }}</dd></div>{% endif %}
+  {% if quote.promo_discount %}<div class="totals__discount"><dt>Code {{ quote.promo_code }}</dt><dd>−{{ quote.promo_discount|money }}</dd></div>{% endif %}
+  <div><dt>Livraison</dt><dd>{% if quote.shipping %}{{ quote.shipping|money }}{% else %}Offerte{% endif %}</dd></div>
+  <div class="totals__grand"><dt>Total TTC</dt><dd>{{ quote.total|money }}</dd></div>
+</dl>

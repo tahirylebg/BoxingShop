@@ -1,0 +1,11 @@
+{% extends "accounts/base_account.html" %}
+{% block title %}Supprimer mon compte | Boxing Shop{% endblock %}
+{% block account_title %}Supprimer mon compte{% endblock %}
+{% block account_content %}
+<p class="message message--error">Cette action est définitive.</p>
+<form method="post" class="form-grid">
+  {% csrf_token %}
+  {% include "partials/form_fields.html" %}
+  <div class="cluster"><button class="btn btn--blood" type="submit">Supprimer définitivement</button><a class="btn btn--ghost" href="{% url 'accounts:privacy' %}">Annuler</a></div>
+</form>
+{% endblock %}

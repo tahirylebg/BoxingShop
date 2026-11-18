@@ -1,0 +1,22 @@
+{% extends "accounts/base_account.html" %}
+{% load static %}
+{% block title %}Adresse | Boxing Shop{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'js/address-autocomplete.js' %}"></script>{% endblock %}
+{% block account_title %}{% if address %}Modifier l'adresse{% else %}Nouvelle adresse{% endif %}{% endblock %}
+{% block account_content %}
+<form method="post" class="form-grid form-grid--2" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="span-2">{{ form.non_field_errors }}</div>{% endif %}
+  {% for field in form %}
+    {% if field.name == "is_default" %}
+      <div class="span-2"><label class="check">{{ field }}<span>{{ field.label|capfirst }}</span></label></div>
+    {% else %}
+      <div class="field{% if field.name == 'line1' or field.name == 'line2' %} span-2{% endif %}{% if field.name == 'line1' %} autocomplete{% endif %}"{% if field.name == "line1" %} data-autocomplete-root data-api-url="{{ address_api_url }}"{% endif %}>
+        <label for="{{ field.id_for_label }}">{{ field.label|capfirst }}{% if not field.field.required %} <span class="muted">(facultatif)</span>{% endif %}</label>
+        {{ field }}{{ field.errors }}
+      </div>
+    {% endif %}
+  {% endfor %}
+  <div class="span-2 cluster"><button class="btn" type="submit">Enregistrer</button><a class="btn btn--ghost" href="{% url 'accounts:addresses' %}">Annuler</a></div>
+</form>
+{% endblock %}

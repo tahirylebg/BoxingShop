@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load shop %}
+{% block title %}Commande {{ order.number }} | Boxing Shop{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<div class="container">
+  <header class="page-head">
+    {% if user.is_authenticated %}<p><a class="btn-link" href="{% url 'accounts:orders' %}">← Mes commandes</a></p>{% endif %}
+    <p class="kicker mt-4">Commande du {{ order.created_at|date:"d/m/Y" }}</p>
+    <h1 class="mono">{{ order.number }}</h1>
+    <p class="mt-3"><span class="badge{% if order.status == 'cancelled' %} badge--blood{% else %} badge--ink{% endif %}">{{ order.get_status_display }}</span></p>
+  </header>
+
+  {% if order.status != "pending" and order.status != "cancelled" %}
+    <ol class="steps" aria-label="Avancement de la commande">
+      {% for step in order.progress_steps %}<li class="{% if step.current %}is-current{% elif step.done %}is-done{% endif %}"{% if step.current %} aria-current="step"{% endif %}>{{ step.label }}</li>{% endfor %}
+    </ol>
+  {% endif %}
+  {% if order.stock_issue %}<p class="message message--error mt-5">Un article est passé en rupture pendant votre paiement : la commande a été annulée et intégralement remboursée.</p>{% endif %}
+
+  <div class="two-col mt-6">
+    <section aria-labelledby="items-title">
+      <h2 id="items-title">Articles</h2>
+      <div class="table-wrap mt-4">
+        <table class="table">
+          <thead><tr><th scope="col">Article</th><th scope="col">SKU</th><th scope="col">Qté</th><th scope="col" class="text-right">Total</th></tr></thead>
+          <tbody>
+            {% for item in items %}<tr><td>{{ item.product_name }}<br><span class="muted">{{ item.variant_label }}</span></td><td class="mono">{{ item.sku }}</td><td class="mono">{{ item.quantity }}</td><td class="mono text-right nowrap">{{ item.line_total|money }}</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <dl class="totals mt-4">
+        <div><dt>Sous-total</dt><dd>{{ order.subtotal|money }}</dd></div>
+        {% if order.club_discount %}<div class="totals__discount"><dt>Remise club</dt><dd>−{{ order.club_discount|money }}</dd></div>{% endif %}
+        {% if order.promo_discount %}<div class="totals__discount"><dt>Code {{ order.promo_code }}</dt><dd>−{{ order.promo_discount|money }}</dd></div>{% endif %}
+        <div><dt>Livraison</dt><dd>{% if order.shipping_cost %}{{ order.shipping_cost|money }}{% else %}Offerte{% endif %}</dd></div>
+        <div class="totals__grand"><dt>Total TTC</dt><dd>{{ order.total|money }}</dd></div>
+      </dl>
+    </section>
+    <aside class="stack">
+      <div class="panel">
+        <h2>Livraison</h2>
+        <p class="mt-3">{{ order.full_name }}<br>{{ order.line1 }}{% if order.line2 %}<br>{{ order.line2 }}{% endif %}<br>{{ order.postal_code }} {{ order.city }}</p>
+        {% if order.tracking_number %}
+          <dl class="data-list mt-4">
+            <dt>Transporteur</dt><dd>{{ order.carrier|default:"Colissimo" }}</dd>
+            <dt>N° de suivi</dt><dd class="mono">{% if order.tracking_url %}<a href="{{ order.tracking_url }}" target="_blank" rel="noopener noreferrer">{{ order.tracking_number }}</a>{% else %}{{ order.tracking_number }}{% endif %}</dd>
+            {% if order.shipped_at %}<dt>Expédiée le</dt><dd>{{ order.shipped_at|date:"d/m/Y" }}</dd>{% endif %}
+          </dl>
+        {% endif %}
+      </div>
+      {% if order.is_paid and order.invoice %}
+        <a class="btn btn--block" href="{% url 'orders:invoice' order.number order.access_token %}">Télécharger la facture {{ order.invoice.number }} (PDF)</a>
+      {% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}

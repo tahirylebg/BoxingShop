@@ -1,0 +1,10 @@
+{% autoescape off %}Bonjour {{ order.first_name }},
+
+Votre commande {{ order.number }} a été remise à {{ order.carrier|default:"Colissimo" }}.
+N° de suivi : {{ order.tracking_number }}{% if order.tracking_url %}
+Suivre le colis : {{ order.tracking_url }}{% endif %}
+
+Votre commande : {{ SITE_URL }}{{ order.get_absolute_url }}
+
+— L'équipe Boxing Shop
+{% endautoescape %}

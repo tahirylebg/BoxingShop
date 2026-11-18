@@ -1,0 +1,16 @@
+{% extends "accounts/base_account.html" %}
+{% block title %}Mes données | Boxing Shop{% endblock %}
+{% block account_title %}Mes données personnelles{% endblock %}
+{% block account_content %}
+<section class="panel stack">
+  <h2>Télécharger mes données</h2>
+  <p>Exportez au format JSON votre profil, vos adresses, vos commandes et vos avis (droit d'accès et de portabilité).</p>
+  <p><a class="btn" href="{% url 'accounts:export' %}" download>Télécharger (JSON)</a></p>
+</section>
+<section class="panel stack mt-5">
+  <h2>Supprimer mon compte</h2>
+  <p>Votre compte, vos adresses et votre panier seront supprimés et vos avis anonymisés. Vos factures sont conservées 10 ans pour respecter nos obligations comptables, sans lien avec un compte.</p>
+  <p><a class="btn btn--ghost" href="{% url 'accounts:delete' %}">Supprimer mon compte</a></p>
+</section>
+<p class="mt-5">Durées de conservation détaillées : <a href="{% url 'core:legal' 'confidentialite' %}">politique de confidentialité</a>.</p>
+{% endblock %}

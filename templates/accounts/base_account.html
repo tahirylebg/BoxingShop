@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<div class="container">
+  <header class="page-head">
+    <p class="kicker">Mon compte{% if user.is_club %} · <span class="badge badge--leather">Club / Coach</span>{% endif %}</p>
+    <h1>{% block account_title %}{% endblock %}</h1>
+  </header>
+  <div class="two-col two-col--sidebar">
+    <nav class="account-nav" aria-label="Espace client">
+      <ul>
+        <li><a href="{% url 'accounts:dashboard' %}"{% if section == "dashboard" %} aria-current="page"{% endif %}>Tableau de bord</a></li>
+        <li><a href="{% url 'accounts:orders' %}"{% if section == "orders" %} aria-current="page"{% endif %}>Commandes &amp; factures</a></li>
+        <li><a href="{% url 'accounts:addresses' %}"{% if section == "addresses" %} aria-current="page"{% endif %}>Carnet d'adresses</a></li>
+        <li><a href="{% url 'accounts:profile' %}"{% if section == "profile" %} aria-current="page"{% endif %}>Profil</a></li>
+        <li><a href="{% url 'accounts:club_request' %}"{% if section == "club" %} aria-current="page"{% endif %}>Offre Club / Coach</a></li>
+        <li><a href="{% url 'accounts:privacy' %}"{% if section == "privacy" %} aria-current="page"{% endif %}>Mes données (RGPD)</a></li>
+      </ul>
+      <form method="post" action="{% url 'accounts:logout' %}" class="mt-4">{% csrf_token %}<button class="btn btn--ghost btn--block" type="submit">Se déconnecter</button></form>
+    </nav>
+    <div class="stack">{% block account_content %}{% endblock %}</div>
+  </div>
+</div>
+{% endblock %}

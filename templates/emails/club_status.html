@@ -1,0 +1,11 @@
+{% extends "emails/_layout.html" %}
+{% block body %}
+<h1 style="font-family:Impact,Arial Narrow,sans-serif;text-transform:uppercase;font-weight:400;font-size:30px;margin:0 0 12px">Statut Club / Coach</h1>
+<p>Bonjour {{ customer.first_name|default:customer.email }},</p>
+{% if customer.club_status == "approved" %}
+<p>Bonne nouvelle : votre compte <strong>{{ customer.club_name }}</strong> est validé. La grille tarifaire clubs s'applique désormais automatiquement à vos paniers, selon la quantité commandée.</p>
+<p style="margin:24px 0"><a href="{{ SITE_URL }}/compte/club/" style="background:#B45309;color:#ffffff;padding:12px 20px;text-decoration:none;font-family:Courier New,monospace;font-weight:bold;text-transform:uppercase">Voir mes tarifs club</a></p>
+{% else %}
+<p>Nous n'avons pas pu valider votre demande de statut Club / Coach pour le moment. Répondez simplement à cet e-mail avec un justificatif (affiliation fédérale, SIRET du club) et nous l'étudierons à nouveau.</p>
+{% endif %}
+{% endblock %}

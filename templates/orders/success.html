@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load shop %}
+{% block title %}Merci pour votre commande | Boxing Shop{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<div class="container section">
+  <p class="kicker">Étape 3 / 3</p>
+  <h1 class="hero__title mt-4">Merci.</h1>
+  <p class="lead mt-5">Votre commande <strong class="mono">{{ order.number }}</strong> d'un montant de <span class="mono">{{ order.total|money }}</span> est enregistrée.</p>
+  {% if order.status == "pending" %}
+    <p class="panel mt-5" role="status">Le paiement est en cours de confirmation par notre banque. Vous recevrez un e-mail de confirmation à <strong>{{ order.email }}</strong> dans quelques instants.</p>
+  {% else %}
+    <p class="mt-4">Un e-mail de confirmation a été envoyé à <strong>{{ order.email }}</strong>.</p>
+  {% endif %}
+  <div class="cluster mt-6">
+    <a class="btn" href="{{ order.get_absolute_url }}">Suivre ma commande</a>
+    <a class="btn btn--ghost" href="{% url 'catalog:shop' %}">Continuer mes achats</a>
+  </div>
+  {% if not user.is_authenticated %}<p class="mt-5 muted">Conservez le lien de suivi reçu par e-mail : il donne aussi accès à votre facture.</p>{% endif %}
+</div>
+{% endblock %}

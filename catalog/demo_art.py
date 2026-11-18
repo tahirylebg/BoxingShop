@@ -8,7 +8,7 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
-ASSETS = Path(__file__).parent / "demo_assets"
+ASSETS = Path(__file__).resolve().parent.parent / "assets" / "fonts"
 SIZE = 1200
 SS = 2  # suréchantillonnage pour l'anticrénelage
 INK = (13, 13, 13)

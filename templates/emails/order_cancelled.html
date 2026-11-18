@@ -1,0 +1,7 @@
+{% extends "emails/_layout.html" %}{% load shop %}
+{% block body %}
+<h1 style="font-family:Impact,Arial Narrow,sans-serif;text-transform:uppercase;font-weight:400;font-size:30px;margin:0 0 12px">Commande annulée</h1>
+<p>Bonjour {{ order.first_name }},</p>
+<p>Un article de votre commande <strong style="font-family:Courier New,monospace">{{ order.number }}</strong> est passé en rupture de stock pendant votre paiement. Nous avons annulé la commande et <strong>remboursé intégralement {{ order.total|money }}</strong> sur votre moyen de paiement (délai bancaire : 5 à 10 jours).</p>
+<p>Toutes nos excuses. Notre équipe reste disponible à {{ SHOP.email }}.</p>
+{% endblock %}

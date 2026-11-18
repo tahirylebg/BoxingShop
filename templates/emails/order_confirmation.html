@@ -1,0 +1,14 @@
+{% extends "emails/_layout.html" %}{% load shop %}
+{% block body %}
+<h1 style="font-family:Impact,Arial Narrow,sans-serif;text-transform:uppercase;font-weight:400;font-size:30px;margin:0 0 12px">Commande confirmée</h1>
+<p>Bonjour {{ order.first_name }},</p>
+<p>Merci pour votre commande <strong style="font-family:Courier New,monospace">{{ order.number }}</strong>. Le paiement est confirmé et nous préparons votre colis.</p>
+<table role="presentation" width="100%" cellpadding="6" cellspacing="0" style="border-collapse:collapse;margin:16px 0">
+{% for item in items %}<tr><td style="border-bottom:1px solid #0D0D0D">{{ item.quantity }} × {{ item.product_name }}<br><span style="color:#4a4945;font-size:13px">{{ item.variant_label }} — {{ item.sku }}</span></td><td align="right" style="border-bottom:1px solid #0D0D0D;font-family:Courier New,monospace;white-space:nowrap">{{ item.line_total|money }}</td></tr>{% endfor %}
+{% if order.discount_total %}<tr><td>Remises</td><td align="right" style="font-family:Courier New,monospace;color:#C81E1E">−{{ order.discount_total|money }}</td></tr>{% endif %}
+<tr><td>Livraison</td><td align="right" style="font-family:Courier New,monospace">{% if order.shipping_cost %}{{ order.shipping_cost|money }}{% else %}Offerte{% endif %}</td></tr>
+<tr><td style="border-top:2px solid #0D0D0D;font-weight:bold">Total TTC</td><td align="right" style="border-top:2px solid #0D0D0D;font-family:Courier New,monospace;font-weight:bold">{{ order.total|money }}</td></tr>
+</table>
+<p>Livraison à : {{ order.full_name }}, {{ order.line1 }}, {{ order.postal_code }} {{ order.city }}</p>
+<p style="margin:24px 0"><a href="{{ SITE_URL }}{{ order.get_absolute_url }}" style="background:#0D0D0D;color:#F4F3EF;padding:12px 20px;text-decoration:none;font-family:Courier New,monospace;font-weight:bold;text-transform:uppercase">Suivre ma commande et ma facture</a></p>
+{% endblock %}

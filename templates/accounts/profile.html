@@ -1,0 +1,12 @@
+{% extends "accounts/base_account.html" %}
+{% block title %}Profil | Boxing Shop{% endblock %}
+{% block account_title %}Profil{% endblock %}
+{% block account_content %}
+<form method="post" class="form-grid form-grid--2">
+  {% csrf_token %}
+  <div class="field span-2"><label for="email-ro">E-mail (identifiant)</label><input id="email-ro" class="input" value="{{ user.email }}" readonly></div>
+  {% include "partials/form_fields.html" %}
+  <div class="span-2"><button class="btn" type="submit">Enregistrer</button></div>
+</form>
+<p class="mt-5"><a class="btn-link" href="{% url 'accounts:password_reset' %}">Changer de mot de passe</a></p>
+{% endblock %}

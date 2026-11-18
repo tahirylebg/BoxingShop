@@ -1,0 +1,73 @@
+{% load shop %}<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Facture {{ invoice.number }}</title>
+<style>
+  @font-face { font-family: "Anton"; src: url("{{ fonts_dir }}/Anton-Regular.ttf"); }
+  @font-face { font-family: "JBMono"; src: url("{{ fonts_dir }}/JetBrainsMono-Regular.ttf"); }
+  @font-face { font-family: "JBMono"; font-weight: 700; src: url("{{ fonts_dir }}/JetBrainsMono-Bold.ttf"); }
+  @page { size: A4; margin: 18mm 16mm 22mm;
+    @bottom-left { content: "{{ SHOP.legal_name }} — SIRET {{ SHOP.siret }} — TVA {{ SHOP.vat_number }}"; font: 7.5pt "JBMono"; color: #4a4945; }
+    @bottom-right { content: "Page " counter(page) " / " counter(pages); font: 7.5pt "JBMono"; color: #4a4945; } }
+  body { font-family: "DejaVu Sans", Arial, sans-serif; font-size: 9.5pt; color: #0d0d0d; }
+  h1, .brand { font-family: "Anton", Impact, sans-serif; text-transform: uppercase; font-weight: 400; margin: 0; }
+  .brand { font-size: 26pt; line-height: 1; }
+  h1 { font-size: 20pt; }
+  .mono { font-family: "JBMono", monospace; }
+  .head { display: flex; justify-content: space-between; border-bottom: 2px solid #0d0d0d; padding-bottom: 6mm; }
+  .meta { text-align: right; }
+  .parties { display: flex; gap: 10mm; margin: 8mm 0; }
+  .parties > div { flex: 1; border-top: 1px solid #0d0d0d; padding-top: 2mm; }
+  .label { font-family: "JBMono"; font-weight: 700; font-size: 7.5pt; text-transform: uppercase; letter-spacing: .06em; color: #4a4945; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #0d0d0d; color: #f4f3ef; font-family: "JBMono"; font-size: 7.5pt; text-transform: uppercase; text-align: left; padding: 2mm; }
+  td { border-bottom: 1px solid #0d0d0d; padding: 2mm; vertical-align: top; }
+  .num { text-align: right; font-family: "JBMono"; white-space: nowrap; }
+  .totals { width: 45%; margin: 6mm 0 0 auto; }
+  .totals td { border-bottom: 1px solid #c9c6bc; }
+  .grand td { border-top: 2px solid #0d0d0d; border-bottom: 0; font-weight: 700; font-size: 11pt; }
+  .note { margin-top: 10mm; font-size: 8pt; color: #4a4945; }
+  .paid { display: inline-block; border: 1.5px solid #c81e1e; color: #c81e1e; font-family: "JBMono"; font-weight: 700; padding: 1mm 3mm; margin-top: 2mm; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <div>
+      <p class="brand">Boxing Shop</p>
+      <p>{{ SHOP.legal_name }}<br>{{ SHOP.address }}<br>{{ SHOP.email }}</p>
+    </div>
+    <div class="meta">
+      <h1>Facture</h1>
+      <p class="mono">N° {{ invoice.number }}<br>Date : {{ invoice.issued_at|date:"d/m/Y" }}<br>Commande : {{ order.number }}</p>
+      <span class="paid">ACQUITTÉE — CARTE BANCAIRE</span>
+    </div>
+  </div>
+
+  <div class="parties">
+    <div><p class="label">Facturé à</p><p>{{ order.full_name }}<br>{{ order.email }}</p></div>
+    <div><p class="label">Livré à</p><p>{{ order.full_name }}<br>{{ order.line1 }}{% if order.line2 %}<br>{{ order.line2 }}{% endif %}<br>{{ order.postal_code }} {{ order.city }} — {{ order.country }}</p></div>
+  </div>
+
+  <table>
+    <thead><tr><th>Désignation</th><th>Référence</th><th class="num">P.U. TTC</th><th class="num">Qté</th><th class="num">Total TTC</th></tr></thead>
+    <tbody>
+      {% for item in items %}
+        <tr><td>{{ item.product_name }}<br><small>{{ item.variant_label }}</small></td><td class="mono">{{ item.sku }}</td><td class="num">{{ item.unit_price|money }}</td><td class="num">{{ item.quantity }}</td><td class="num">{{ item.line_total|money }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table class="totals">
+    <tr><td>Sous-total articles</td><td class="num">{{ order.subtotal|money }}</td></tr>
+    {% if order.club_discount %}<tr><td>Remise club</td><td class="num">−{{ order.club_discount|money }}</td></tr>{% endif %}
+    {% if order.promo_discount %}<tr><td>Code promo {{ order.promo_code }}</td><td class="num">−{{ order.promo_discount|money }}</td></tr>{% endif %}
+    <tr><td>Livraison</td><td class="num">{{ order.shipping_cost|money }}</td></tr>
+    <tr><td>Total HT</td><td class="num">{{ vat.total_ht|money }}</td></tr>
+    <tr><td>TVA {{ vat.rate }} %</td><td class="num">{{ vat.vat|money }}</td></tr>
+    <tr class="grand"><td>Total TTC</td><td class="num">{{ order.total|money }}</td></tr>
+  </table>
+
+  <p class="note">Facture acquittée le {{ order.paid_at|date:"d/m/Y" }}. Pas d'escompte pour paiement anticipé. En cas de retard de paiement : pénalités au taux légal et indemnité forfaitaire de 40 € pour frais de recouvrement (professionnels). Droit de rétractation : voir nos CGV.</p>
+</body>
+</html>

@@ -1,10 +1,12 @@
 from django.urls import path
 
-from core.stub import coming_soon
+from . import views
 
 app_name = "cart"
 urlpatterns = [
-    path("", coming_soon, name="detail"),
-    path("tiroir/", coming_soon, name="drawer"),
-    path("ajouter/", coming_soon, name="add"),
+    path("", views.detail, name="detail"),
+    path("tiroir/", views.drawer, name="drawer"),
+    path("ajouter/", views.add, name="add"),
+    path("ligne/<int:item_id>/", views.update, name="update"),
+    path("code-promo/", views.apply_promo, name="promo"),
 ]

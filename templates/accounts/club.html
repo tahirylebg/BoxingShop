@@ -1,0 +1,27 @@
+{% extends "accounts/base_account.html" %}
+{% block title %}Offre Club / Coach | Boxing Shop{% endblock %}
+{% block account_title %}Offre Club / Coach{% endblock %}
+{% block account_content %}
+<p class="lead">Clubs, salles et coachs : équipez vos adhérents à tarif dégressif. Une fois votre statut validé, la remise s'applique automatiquement au panier selon la quantité totale d'articles.</p>
+<table class="table mt-5">
+  <caption>Grille tarifaire clubs</caption>
+  <thead><tr><th scope="col">Quantité dans le panier</th><th scope="col">Remise</th></tr></thead>
+  <tbody>{% for t in tiers %}<tr><td class="mono">≥ {{ t.min_quantity }} articles</td><td class="mono"><strong>−{{ t.discount_percent|floatformat:"-2" }} %</strong></td></tr>{% endfor %}</tbody>
+</table>
+
+<div class="panel mt-6">
+  <p class="kicker">Votre statut</p>
+  <p class="mt-3"><strong>{{ user.get_club_status_display }}</strong>{% if user.club_name %} — {{ user.club_name }}{% endif %}</p>
+  {% if user.club_status == "pending" %}<p class="mt-3">Demande envoyée le {{ user.club_requested_at|date:"d/m/Y" }} : notre équipe vous répond sous 48 h ouvrées.</p>{% endif %}
+  {% if user.is_club %}<p class="mt-3">Validé le {{ user.club_validated_at|date:"d/m/Y" }}. Vos remises s'appliquent automatiquement.</p>{% endif %}
+</div>
+
+{% if can_request %}
+  <h2 class="mt-6">Faire une demande</h2>
+  <form method="post" class="form-grid form-grid--2 mt-4">
+    {% csrf_token %}
+    {% include "partials/form_fields.html" with wide=True %}
+    <div class="span-2"><button class="btn" type="submit">Envoyer ma demande</button></div>
+  </form>
+{% endif %}
+{% endblock %}

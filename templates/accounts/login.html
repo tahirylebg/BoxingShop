@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Connexion | Boxing Shop{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<div class="container">
+  <header class="page-head"><p class="kicker">Espace client</p><h1>Connexion</h1></header>
+  <div class="two-col">
+    <form method="post" class="form-grid">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+      {% if form.errors %}<p class="message message--error" role="alert">E-mail ou mot de passe incorrect.</p>{% endif %}
+      <div class="field"><label for="{{ form.username.id_for_label }}">E-mail</label>{{ form.username }}</div>
+      <div class="field"><label for="{{ form.password.id_for_label }}">Mot de passe</label>{{ form.password }}</div>
+      <button class="btn btn--lg" type="submit">Se connecter</button>
+      <a class="btn-link" href="{% url 'accounts:password_reset' %}">Mot de passe oublié ?</a>
+    </form>
+    <aside class="panel stack">
+      <h2>Nouveau client ?</h2>
+      <p>Créez un compte pour suivre vos commandes, télécharger vos factures et demander le statut Club / Coach.</p>
+      <a class="btn" href="{% url 'accounts:signup' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Créer un compte</a>
+      <p class="field-help">Vous pouvez aussi commander sans compte.</p>
+    </aside>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Créer un compte | Boxing Shop{% endblock %}
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
+{% block content %}
+<div class="container">
+  <header class="page-head"><p class="kicker">Espace client</p><h1>Créer un compte</h1></header>
+  <form method="post" class="form-grid form-grid--2 legal" novalidate>
+    {% csrf_token %}
+    {% include "partials/form_fields.html" %}
+    <p class="span-2 field-help">Vos données servent uniquement à gérer votre compte et vos commandes. Voir notre <a href="{% url 'core:legal' 'confidentialite' %}">politique de confidentialité</a>.</p>
+    <div class="span-2"><button class="btn btn--lg" type="submit">Créer mon compte</button></div>
+  </form>
+</div>
+{% endblock %}

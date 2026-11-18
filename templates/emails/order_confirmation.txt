@@ -1,0 +1,15 @@
+{% autoescape off %}{% load shop %}Bonjour {{ order.first_name }},
+
+Merci pour votre commande {{ order.number }}. Le paiement est confirmé et nous préparons votre colis.
+
+{% for item in items %}- {{ item.quantity }} x {{ item.product_name }} ({{ item.variant_label }}, {{ item.sku }}) : {{ item.line_total|money }}
+{% endfor %}{% if order.discount_total %}Remises : -{{ order.discount_total|money }}
+{% endif %}Livraison : {% if order.shipping_cost %}{{ order.shipping_cost|money }}{% else %}offerte{% endif %}
+Total TTC : {{ order.total|money }}
+
+Livraison à : {{ order.full_name }}, {{ order.line1 }}, {{ order.postal_code }} {{ order.city }}
+
+Suivi de commande et facture : {{ SITE_URL }}{{ order.get_absolute_url }}
+
+— L'équipe Boxing Shop
+{% endautoescape %}
