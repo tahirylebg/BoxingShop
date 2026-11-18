@@ -18,7 +18,7 @@
 {% endif %}{% endwith %}
 {% if products %}
   <ul class="product-grid">
-    {% for product in products %}<li>{% include "catalog/_card.html" %}</li>{% endfor %}
+    {% for product in products %}<li>{% include "catalog/_card.html" with eager=forloop.counter|add:"0" priority=forloop.first %}</li>{% endfor %}
   </ul>
   {% if page.has_other_pages %}
     <nav class="pagination" aria-label="Pagination">

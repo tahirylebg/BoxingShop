@@ -1,8 +1,8 @@
 from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
-from django.urls import include, path
+from django.urls import include, path, re_path
+from django.views.static import serve
 from django.views.decorators.cache import cache_page
 
 from core.sitemaps import SITEMAPS
@@ -22,8 +22,9 @@ urlpatterns = [
     path("commande/", include("orders.urls")),
     path("compte/", include("accounts.urls")),
 ]
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG or settings.SERVE_MEDIA:
+    # En production, /media/ est servi par Nginx ; SERVE_MEDIA ne sert qu'aux audits locaux en mode prod.
+    urlpatterns += [re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT})]
 
 # Attrape-tout catalogue (/<discipline>/<type>/<produit>/) : TOUJOURS en dernier.
 urlpatterns += [path("", include("catalog.urls"))]

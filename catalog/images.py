@@ -1,4 +1,9 @@
-"""Conversion automatique des images produits en WebP multi-tailles (srcset)."""
+"""Conversion automatique des images produits en WebP multi-tailles (srcset).
+
+Les noms de fichiers contiennent une empreinte du contenu source : ils peuvent être servis avec un cache
+« immutable » d'un an (cf. configuration Nginx) sans risque d'afficher une ancienne image.
+"""
+import hashlib
 from io import BytesIO
 from pathlib import PurePosixPath
 
@@ -12,7 +17,10 @@ WEBP_QUALITY = 80
 def build_renditions(product_image):
     """Crée une version WebP par largeur de ProductImage.RENDITION_WIDTHS (sans agrandir la source)."""
     src = product_image.image
+    previous = set((product_image.renditions or {}).values())
     src.open("rb")
+    digest = hashlib.sha256(src.read()).hexdigest()[:10]
+    src.seek(0)
     try:
         with Image.open(src) as img:
             img = ImageOps.exif_transpose(img)
@@ -29,11 +37,14 @@ def build_renditions(product_image):
                 resized = img.resize((width, height), Image.Resampling.LANCZOS) if width != img.width else img
                 buffer = BytesIO()
                 resized.save(buffer, "WEBP", quality=WEBP_QUALITY, method=6)
-                path = f"products/webp/{product_image.product_id}/{stem}-{width}.webp"
+                path = f"products/webp/{product_image.product_id}/{stem}-{digest}-{width}.webp"
                 if default_storage.exists(path):
                     default_storage.delete(path)
                 renditions[str(width)] = default_storage.save(path, ContentFile(buffer.getvalue()))
     finally:
         src.close()
+    for old in previous - set(renditions.values()):
+        if default_storage.exists(old):
+            default_storage.delete(old)
     product_image.renditions = renditions
     return renditions
