@@ -1,5 +1,6 @@
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
 from django.views.decorators.http import require_GET
 
 from catalog.filters import listing_queryset
@@ -25,7 +26,7 @@ def guide_detail(request, slug):
     article_ld = {
         "@context": "https://schema.org", "@type": "Article", "headline": guide.title,
         "description": guide.excerpt, "datePublished": guide.published_at.isoformat(),
-        "dateModified": guide.updated_at.date().isoformat(),
+        "dateModified": timezone.localdate(guide.updated_at).isoformat(),
         "author": {"@type": "Organization", "name": "Boxing Shop"},
         "publisher": {"@type": "Organization", "name": "Boxing Shop"},
     }

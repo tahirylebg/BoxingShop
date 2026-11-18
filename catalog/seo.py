@@ -1,6 +1,7 @@
 """Données structurées Schema.org (JSON-LD)."""
 from django.conf import settings
 from django.core.files.storage import default_storage
+from django.utils import timezone
 
 
 def _abs(path):
@@ -59,7 +60,7 @@ def product_jsonld(request, product, variants, images, rating, reviews):
                 "reviewRating": {"@type": "Rating", "ratingValue": r.rating, "bestRating": "5"},
                 "name": r.title,
                 "reviewBody": r.body,
-                "datePublished": r.created_at.date().isoformat(),
+                "datePublished": timezone.localdate(r.created_at).isoformat(),
             }
             for r in reviews[:5]
         ]

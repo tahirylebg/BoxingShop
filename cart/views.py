@@ -26,6 +26,8 @@ def _respond(request, *, ok=True, message="", fallback="cart:detail"):
         quote = quote_for(request)
         return JsonResponse({"ok": ok, "message": message, "count": quote.item_count,
                              "html": _drawer_html(request, quote)}, status=200 if ok else 400)
+    if ok:
+        quote_for(request)  # met à jour le compteur du header en session
     if message:
         (messages.success if ok else messages.error)(request, message)
     return redirect(fallback)

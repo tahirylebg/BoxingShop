@@ -136,6 +136,7 @@ class StripeEvent(models.Model):
 
     class Meta:
         verbose_name = "événement Stripe"
+        verbose_name_plural = "événements Stripe"
 
     def __str__(self):
         return f"{self.type} ({self.event_id})"

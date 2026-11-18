@@ -28,6 +28,8 @@ class OrderItemInline(admin.TabularInline):
 
 
 class OrderAdminForm(forms.ModelForm):
+    tracking_url = forms.URLField(label="lien de suivi", required=False, assume_scheme="https")
+
     class Meta:
         model = Order
         fields = "__all__"
