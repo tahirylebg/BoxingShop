@@ -12,10 +12,10 @@ SEO_FIELDSET = ("Référencement (SEO)", {
 
 @admin.register(Discipline)
 class DisciplineAdmin(admin.ModelAdmin):
-    list_display = ("name", "slug", "position")
+    list_display = ("name", "short_name", "slug", "position")
     list_editable = ("position",)
     prepopulated_fields = {"slug": ("name",)}
-    fieldsets = ((None, {"fields": ("name", "slug", "tagline", "description", "position")}), SEO_FIELDSET)
+    fieldsets = ((None, {"fields": ("name", "short_name", "slug", "tagline", "description", "position")}), SEO_FIELDSET)
 
 
 @admin.register(Category)

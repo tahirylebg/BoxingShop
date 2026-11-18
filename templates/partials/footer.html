@@ -1,0 +1,37 @@
+<footer class="site-footer">
+  <div class="container">
+    <p class="footer-manifesto" aria-hidden="true">Protège.<br>Frappe.<br>Recommence.</p>
+    <div class="footer-grid">
+      <section>
+        <h2>Disciplines</h2>
+        <ul>{% for d in nav_disciplines %}<li><a href="{{ d.get_absolute_url }}">{{ d.name }}</a></li>{% endfor %}</ul>
+      </section>
+      <section>
+        <h2>Équipement</h2>
+        <ul>{% for c in nav_categories %}<li><a href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>{% endfor %}</ul>
+      </section>
+      <section>
+        <h2>Aide</h2>
+        <ul>
+          <li><a href="{% url 'content:guides' %}">Guides techniques</a></li>
+          <li><a href="{% url 'orders:track' %}">Suivre une commande</a></li>
+          <li><a href="{% url 'accounts:dashboard' %}">Mon compte</a></li>
+          <li><a href="{% url 'accounts:club_request' %}">Offre clubs &amp; coachs</a></li>
+        </ul>
+      </section>
+      <section>
+        <h2>Informations</h2>
+        <ul>
+          <li><a href="{% url 'core:legal' 'cgv' %}">Conditions générales de vente</a></li>
+          <li><a href="{% url 'core:legal' 'mentions-legales' %}">Mentions légales</a></li>
+          <li><a href="{% url 'core:legal' 'confidentialite' %}">Politique de confidentialité</a></li>
+          <li><a href="{% url 'core:cookies' %}">Gestion des cookies</a></li>
+        </ul>
+      </section>
+    </div>
+    <div class="footer-legal">
+      <p>© {% now "Y" %} {{ SHOP.legal_name }} — {{ SHOP.address }}</p>
+      <p>Prix TTC, TVA {{ SHOP.vat_rate }} % incluse</p>
+    </div>
+  </div>
+</footer>

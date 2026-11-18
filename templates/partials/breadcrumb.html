@@ -1,0 +1,8 @@
+<nav class="breadcrumb" aria-label="Fil d'Ariane">
+  <ol>
+    <li><a href="{% url 'core:home' %}">Accueil</a></li>
+    {% for name, url in crumbs %}
+      <li>{% if url %}<a href="{{ url }}">{{ name }}</a>{% else %}<span aria-current="page">{{ name }}</span>{% endif %}</li>
+    {% endfor %}
+  </ol>
+</nav>

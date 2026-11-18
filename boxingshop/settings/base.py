@@ -76,7 +76,8 @@ DATABASES = {"default": env.db("DATABASE_URL")}
 DATABASES["default"]["ATOMIC_REQUESTS"] = False
 DATABASES["default"]["CONN_MAX_AGE"] = env.int("DB_CONN_MAX_AGE", default=60)
 
-CACHES = {"default": env.cache("CACHE_URL", default="locmemcache://boxingshop")}
+# Cache partagé entre processus (workers Gunicorn) : table PostgreSQL par défaut, Redis possible.
+CACHES = {"default": env.cache("CACHE_URL", default="dbcache://boxingshop_cache")}
 CATALOG_CACHE_TIMEOUT = env.int("CATALOG_CACHE_TIMEOUT", default=600)
 
 AUTH_USER_MODEL = "accounts.Customer"
@@ -166,6 +167,7 @@ SHOP = {
 
 # --- Rate limiting (core.ratelimit) -------------------------------------------
 RATELIMIT_ENABLED = env.bool("RATELIMIT_ENABLED", default=True)
+RATELIMIT_TRUST_PROXY = env.bool("RATELIMIT_TRUST_PROXY", default=False)
 
 LOGGING = {
     "version": 1,

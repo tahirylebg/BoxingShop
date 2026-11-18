@@ -22,7 +22,7 @@ services:
       DJANGO_SETTINGS_MODULE: boxingshop.settings.dev
       DATABASE_URL: postgres://${POSTGRES_USER:-boxingshop}:${POSTGRES_PASSWORD:-boxingshop}@db:5432/${POSTGRES_DB:-boxingshop}
     command: >
-      sh -c "python manage.py migrate --noinput &&
+      sh -c "python manage.py migrate --noinput && python manage.py createcachetable &&
              python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"

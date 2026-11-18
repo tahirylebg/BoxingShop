@@ -1,17 +1,17 @@
 """Jeu de données de démonstration (utilisé par `manage.py seed_demo`)."""
 
 DISCIPLINES = [
-    ("boxe-anglaise", "Boxe anglaise", "Le noble art : gants, casques et tenues de ring.",
+    ("boxe-anglaise", "Boxe anglaise", "Boxe", "Le noble art : gants, casques et tenues de ring.",
      "Du premier sac au combat officiel, l'équipement du boxeur anglais doit protéger les mains et respecter la "
      "règle. Gants lacés ou à scratch, casques homologués, shorts de gala."),
-    ("muay-thai-kickboxing", "Muay Thaï & Kickboxing", "Huit armes, une exigence : protéger tibias, coudes et mains.",
+    ("muay-thai-kickboxing", "Muay Thaï & Kickboxing", "Muay Thaï", "Huit armes, une exigence : protéger tibias, coudes et mains.",
      "Gants à manchette longue pour le clinch, protège-tibias cuir et shorts traditionnels pour les disciplines "
      "pieds-poings."),
-    ("mma-grappling", "MMA & Grappling", "Frapper, projeter, soumettre : un matériel polyvalent.",
+    ("mma-grappling", "MMA & Grappling", "MMA", "Frapper, projeter, soumettre : un matériel polyvalent.",
      "Gants à doigts ouverts, rashguards de compression et shorts hybrides pensés pour la cage et le sol."),
-    ("jiu-jitsu-bresilien", "Jiu-Jitsu Brésilien", "Kimonos tissés et rashguards pour le tatami.",
+    ("jiu-jitsu-bresilien", "Jiu-Jitsu Brésilien", "JJB", "Kimonos tissés et rashguards pour le tatami.",
      "Des kimonos à la trame robuste, conformes aux règles IBJJF, et des tenues No-Gi qui résistent aux saisies."),
-    ("entrainement-sacs-de-frappe", "Entraînement & Sacs de frappe", "Le matériel de salle qui encaisse.",
+    ("entrainement-sacs-de-frappe", "Entraînement & Sacs de frappe", "Entraînement", "Le matériel de salle qui encaisse.",
      "Sacs lourds, pattes d'ours, paos et cordes à sauter : l'équipement de travail quotidien des clubs."),
 ]
 

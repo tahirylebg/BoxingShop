@@ -1,0 +1,52 @@
+<header class="site-header">
+  <div class="container site-header__inner">
+    <details class="menu-mobile">
+      <summary class="icon-btn" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </summary>
+      <nav class="menu-mobile__panel" aria-label="Menu principal (mobile)">
+        <form action="{% url 'catalog:shop' %}" method="get" role="search" class="field">
+          <label for="q-mobile">Rechercher</label>
+          <input id="q-mobile" type="search" name="q" placeholder="Gant cuir, protège-tibias…">
+        </form>
+        <p class="kicker">Disciplines</p>
+        <ul>
+          {% for d in nav_disciplines %}<li><a href="{{ d.get_absolute_url }}">{{ d.name }}<span class="mono" aria-hidden="true">→</span></a></li>{% endfor %}
+        </ul>
+        <p class="kicker">Équipement</p>
+        <ul>
+          {% for c in nav_categories %}<li><a href="{{ c.get_absolute_url }}">{{ c.name }}<span class="mono" aria-hidden="true">→</span></a></li>{% endfor %}
+          <li><a href="{% url 'content:guides' %}">Guides techniques<span class="mono" aria-hidden="true">→</span></a></li>
+        </ul>
+      </nav>
+    </details>
+
+    <a class="logo" href="{% url 'core:home' %}" aria-label="Boxing Shop, accueil">
+      <span class="logo__word">Boxing Shop</span><span class="logo__est" aria-hidden="true">EST. 2026</span>
+    </a>
+
+    <nav class="nav-main" aria-label="Disciplines">
+      <ul>
+        {% for d in nav_disciplines %}
+          <li><a href="{{ d.get_absolute_url }}"{% if request.path == d.get_absolute_url %} aria-current="page"{% endif %}>{{ d.short_name|default:d.name }}</a></li>
+        {% endfor %}
+        <li><a href="{% url 'content:guides' %}"{% if request.resolver_match.app_name == 'content' %} aria-current="page"{% endif %}>Guides</a></li>
+      </ul>
+    </nav>
+
+    <form class="search-form" action="{% url 'catalog:shop' %}" method="get" role="search">
+      <label class="visually-hidden" for="q">Rechercher un produit</label>
+      <input id="q" type="search" name="q" placeholder="Rechercher…" value="{{ request.GET.q|default:'' }}">
+    </form>
+
+    <div class="header-actions">
+      <a class="icon-btn" href="{% if user.is_authenticated %}{% url 'accounts:dashboard' %}{% else %}{% url 'accounts:login' %}{% endif %}" aria-label="{% if user.is_authenticated %}Mon compte{% else %}Se connecter{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+      </a>
+      <a class="icon-btn" href="{% url 'cart:detail' %}" data-cart-open aria-haspopup="dialog" aria-controls="cart-drawer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 7h14l-1.5 13h-11z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>
+        <span class="visually-hidden">Panier, </span><span class="cart-count" data-cart-count data-count="{{ cart_count }}">{{ cart_count }}</span><span class="visually-hidden"> article(s)</span>
+      </a>
+    </div>
+  </div>
+</header>

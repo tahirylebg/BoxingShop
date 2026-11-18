@@ -4,6 +4,7 @@ from .base import env
 DEBUG = False
 
 # HTTPS forcé (derrière Nginx / un PaaS qui termine TLS)
+RATELIMIT_TRUST_PROXY = env.bool("RATELIMIT_TRUST_PROXY", default=True)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=True)
 SECURE_HSTS_SECONDS = env.int("SECURE_HSTS_SECONDS", default=31536000)

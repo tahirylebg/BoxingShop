@@ -1,0 +1,9 @@
+<dialog class="cart-drawer" id="cart-drawer" aria-labelledby="cart-drawer-title" data-drawer-url="{% url 'cart:drawer' %}">
+  <div class="drawer__head">
+    <h2 id="cart-drawer-title">Panier</h2>
+    <button class="icon-btn" type="button" data-drawer-close aria-label="Fermer le panier">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+    </button>
+  </div>
+  <div class="drawer__content" data-drawer-content aria-live="polite"></div>
+</dialog>

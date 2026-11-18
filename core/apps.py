@@ -8,6 +8,11 @@ class CoreConfig(AppConfig):
     name = "core"
     verbose_name = "Paramètres boutique"
 
+    def ready(self):
+        from . import signals
+
+        signals.connect()
+
 
 class BoxingAdminConfig(admin_apps.AdminConfig):
     """Remplace le site admin par défaut par le back-office habillé Boxing Shop."""

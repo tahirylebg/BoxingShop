@@ -1,0 +1,11 @@
+<section class="cookie-banner" aria-labelledby="cookie-title">
+  <h2 id="cookie-title">Cookies</h2>
+  <p>Nous utilisons uniquement les cookies nécessaires au panier, à la connexion et à la sécurité. Avec votre accord, nous mesurerions aussi l'audience de façon anonyme. Refuser n'a aucune conséquence sur vos achats.</p>
+  <form method="post" action="{% url 'core:cookie_consent' %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <button class="btn btn--ghost" type="submit" name="choice" value="refused">Tout refuser</button>
+    <button class="btn" type="submit" name="choice" value="accepted">Tout accepter</button>
+    <a class="btn-link cookie-banner__more" href="{% url 'core:cookies' %}">Personnaliser / en savoir plus</a>
+  </form>
+</section>

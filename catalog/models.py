@@ -10,6 +10,7 @@ from core.models import SEOFields
 
 class Discipline(SEOFields):
     name = models.CharField("nom", max_length=80)
+    short_name = models.CharField("nom court (menu)", max_length=20, blank=True)
     slug = models.SlugField(unique=True)
     tagline = models.CharField("accroche", max_length=160, blank=True)
     description = models.TextField(blank=True)

@@ -88,9 +88,9 @@ class Command(BaseCommand):
 
     def _disciplines(self):
         out = {}
-        for i, (slug, name, tagline, desc) in enumerate(data.DISCIPLINES):
-            out[slug] = Discipline.objects.create(slug=slug, name=name, tagline=tagline, description=desc,
-                                                  position=i)
+        for i, (slug, name, short, tagline, desc) in enumerate(data.DISCIPLINES):
+            out[slug] = Discipline.objects.create(slug=slug, name=name, short_name=short, tagline=tagline,
+                                                  description=desc, position=i)
         return out
 
     def _categories(self):
