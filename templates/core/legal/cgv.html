@@ -1,0 +1,25 @@
+{% extends "core/legal/base_legal.html" %}
+{% load shop %}
+{% block legal %}
+<p class="panel">Modèle de conditions générales de vente à faire valider par un professionnel du droit avant la mise en ligne.</p>
+<h2>1. Objet</h2>
+<p>Les présentes conditions régissent les ventes d'équipements de sports de combat conclues sur le site Boxing Shop entre {{ SHOP.legal_name }} et toute personne (« le client ») passant commande, avec ou sans compte.</p>
+<h2>2. Prix</h2>
+<p>Les prix sont indiqués en euros toutes taxes comprises (TVA {{ SHOP.vat_rate }} %). Les frais de livraison sont précisés avant la validation de la commande ; ils sont offerts à partir de {{ shipping_settings.free_shipping_threshold|money }} d'achats (après remises).</p>
+<h2>3. Commande</h2>
+<p>La commande est définitive après confirmation du paiement par notre prestataire Stripe. Un e-mail récapitulatif est alors envoyé. Le stock est réservé au moment de la confirmation du paiement ; en cas de rupture survenue entre-temps, la commande est annulée et intégralement remboursée.</p>
+<h2>4. Codes promotionnels et tarifs clubs</h2>
+<p>Un seul code promotionnel est utilisable par commande, dans les conditions affichées. Les comptes « Club / Coach » validés bénéficient d'une remise dégressive selon la quantité d'articles commandés ; elle se cumule avec un code promotionnel, appliqué ensuite.</p>
+<h2>5. Paiement</h2>
+<p>Le paiement s'effectue par carte bancaire, Apple Pay ou Google Pay via Stripe. Boxing Shop n'a jamais accès à vos données de carte.</p>
+<h2>6. Livraison</h2>
+<p>Les commandes sont expédiées sous 48 h ouvrées en France métropolitaine. Un numéro de suivi est communiqué par e-mail et dans l'espace client dès l'expédition.</p>
+<h2>7. Droit de rétractation</h2>
+<p>Vous disposez de 14 jours à compter de la réception pour vous rétracter (article L221-18 du Code de la consommation) ; Boxing Shop étend ce délai à 30 jours. Les produits doivent être retournés neufs, non utilisés, dans leur emballage d'origine. Pour des raisons d'hygiène, les protège-dents et coquilles descellés ne peuvent être repris.</p>
+<h2>8. Garanties</h2>
+<p>Les produits bénéficient de la garantie légale de conformité (articles L217-3 et suivants du Code de la consommation) et de la garantie des vices cachés (articles 1641 et suivants du Code civil).</p>
+<h2>9. Factures</h2>
+<p>Une facture est émise pour chaque commande payée et téléchargeable au format PDF depuis l'espace client ou le lien de suivi de commande.</p>
+<h2>10. Litiges</h2>
+<p>Les présentes conditions sont soumises au droit français. En cas de litige, une solution amiable sera recherchée avant toute action ; le client peut recourir au médiateur indiqué dans les mentions légales.</p>
+{% endblock %}

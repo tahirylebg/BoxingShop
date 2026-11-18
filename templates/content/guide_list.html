@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load shop %}
+{% block head_extra %}{% jsonld breadcrumb_ld %}{% endblock %}
+{% block og_title %}Guides techniques{% endblock %}
+{% block content %}
+<div class="container">
+  <header class="page-head">
+    {% include "partials/breadcrumb.html" %}
+    <p class="kicker mt-5">Savoir-faire</p>
+    <h1>Guides techniques</h1>
+    <p class="lead muted mt-3">Choisir le bon poids de gant, la bonne taille de protège-tibias, entretenir son cuir : les conseils de la salle, sans jargon.</p>
+  </header>
+  <ul class="guide-list">
+    {% for g in guides %}
+      <li><a href="{{ g.get_absolute_url }}"><span class="kicker muted">{{ g.kicker }} · {{ g.reading_minutes }} min · {{ g.published_at|date:"d/m/Y" }}</span><span class="guide-list__title">{{ g.title }}</span><span class="muted">{{ g.excerpt }}</span></a></li>
+    {% empty %}
+      <li><p class="mt-4">Aucun guide publié pour le moment.</p></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

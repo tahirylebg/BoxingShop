@@ -1,0 +1,24 @@
+{% extends "core/legal/base_legal.html" %}
+{% block legal %}
+<h2>Votre choix actuel</h2>
+<p class="panel">{% if cookie_consent == "accepted" %}Vous avez <strong>accepté</strong> les cookies de mesure d'audience.{% elif cookie_consent == "refused" %}Vous avez <strong>refusé</strong> les cookies optionnels.{% else %}Vous n'avez pas encore fait de choix.{% endif %}</p>
+<form method="post" action="{% url 'core:cookie_consent' %}" class="cluster">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.path }}">
+  <button class="btn btn--ghost" type="submit" name="choice" value="refused">Tout refuser</button>
+  <button class="btn" type="submit" name="choice" value="accepted">Tout accepter</button>
+</form>
+<h2>Cookies strictement nécessaires (toujours actifs)</h2>
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th scope="col">Cookie</th><th scope="col">Rôle</th><th scope="col">Durée</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">sessionid</td><td>Panier et connexion</td><td>14 jours</td></tr>
+      <tr><td class="mono">csrftoken</td><td>Protection des formulaires contre la falsification de requêtes</td><td>1 an</td></tr>
+      <tr><td class="mono">bs_consent</td><td>Mémorise votre choix concernant les cookies</td><td>6 mois</td></tr>
+    </tbody>
+  </table>
+</div>
+<h2>Cookies optionnels</h2>
+<p>Mesure d'audience anonyme : <strong>aucun outil n'est activé à ce jour</strong>. Si un outil était ajouté, il ne serait déposé qu'avec votre accord et figurerait dans ce tableau. Votre choix est conservé 6 mois, puis vous sera redemandé.</p>
+{% endblock %}

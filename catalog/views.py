@@ -1,0 +1,173 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import Prefetch
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_GET, require_POST
+
+from core.ratelimit import ratelimit
+
+from content.models import Guide
+
+from .filters import CatalogFilter, listing_queryset
+from .forms import ReviewForm
+from .models import Category, Discipline, Product, ProductImage, Variant
+from .seo import breadcrumb_jsonld, product_jsonld
+
+PER_PAGE = 24
+
+
+def _listing(request, *, title, intro="", kicker="Catalogue", discipline=None, category=None, crumbs=(),
+             meta_obj=None):
+    flt = CatalogFilter(request.GET, discipline=discipline, category=category)
+    page = Paginator(flt.queryset(), PER_PAGE).get_page(request.GET.get("page"))
+    context = {
+        "title": title, "intro": intro, "kicker": kicker, "filter": flt, "page": page, "products": page.object_list,
+        "discipline": discipline, "category": category, "crumbs": crumbs, "meta_obj": meta_obj,
+        "breadcrumb_ld": breadcrumb_jsonld(request, crumbs),
+        # pages filtrées : on évite l'indexation de milliers de combinaisons
+        "noindex": flt.is_filtered,
+    }
+    # Requête fetch() du filtrage dynamique : on ne renvoie que la zone de résultats.
+    if request.headers.get("X-Requested-With") == "fetch":
+        return render(request, "catalog/_results.html", context)
+    return render(request, "catalog/listing.html", context)
+
+
+@require_GET
+def shop(request):
+    return _listing(request, title="Tout l'équipement", kicker="Boutique",
+                    intro="Gants, protections, tenues et matériel de club : filtrez par discipline, poids, taille, "
+                          "matière et niveau.",
+                    crumbs=[("Boutique", None)])
+
+
+@require_GET
+def discipline_view(request, discipline_slug):
+    discipline = get_object_or_404(Discipline, slug=discipline_slug)
+    return _listing(request, title=discipline.name, intro=discipline.description, kicker="Discipline",
+                    discipline=discipline, crumbs=[(discipline.name, None)], meta_obj=discipline)
+
+
+@require_GET
+def category_view(request, category_slug):
+    category = get_object_or_404(Category, slug=category_slug)
+    crumbs = [(category.parent.name, category.parent.get_absolute_url())] if category.parent_id else []
+    return _listing(request, title=category.name, intro=category.description, kicker="Équipement",
+                    category=category, crumbs=[*crumbs, (category.name, None)], meta_obj=category)
+
+
+@require_GET
+def discipline_category_view(request, discipline_slug, category_slug):
+    discipline = get_object_or_404(Discipline, slug=discipline_slug)
+    category = get_object_or_404(Category, slug=category_slug)
+    return _listing(request, title=f"{category.name} · {discipline.name}", kicker=discipline.name,
+                    discipline=discipline, category=category,
+                    crumbs=[(discipline.name, discipline.get_absolute_url()), (category.name, None)],
+                    meta_obj=category)
+
+
+def _axis_values(variants):
+    colors, seen = [], set()
+    for v in variants:
+        if v.color and v.color not in seen:
+            seen.add(v.color)
+            colors.append((v.color, v.color_hex))
+    weights = sorted({v.weight_oz for v in variants if v.weight_oz})
+    sizes = [s for s in Variant.SIZE_ORDER if any(v.size == s for v in variants)]
+    return colors, weights, sizes
+
+
+def _select_variant(variants, params):
+    sku = params.get("sku")
+    if sku:
+        for v in variants:
+            if v.sku == sku:
+                return v
+    color, weight, size = params.get("couleur"), params.get("poids"), params.get("taille")
+    if color or weight or size:
+        for v in variants:
+            if ((not color or v.color == color) and (not weight or str(v.weight_oz) == weight)
+                    and (not size or v.size == size)):
+                return v
+    return next((v for v in variants if v.in_stock), variants[0] if variants else None)
+
+
+@require_GET
+def product_view(request, discipline_slug, category_slug, product_slug):
+    product = get_object_or_404(
+        Product.objects.active().select_related("discipline", "category__parent", "size_chart").prefetch_related(
+            Prefetch("images", queryset=ProductImage.objects.order_by("position", "id")),
+            Prefetch("variants", queryset=Variant.objects.filter(is_active=True)),
+        ),
+        slug=product_slug,
+    )
+    canonical = product.get_absolute_url()
+    if request.path != canonical:  # URL non canonique (ancienne discipline/catégorie) → 301
+        query = request.GET.urlencode()
+        return redirect(f"{canonical}?{query}" if query else canonical, permanent=True)
+
+    variants = list(product.variants.all())
+    if not variants:
+        raise Http404("Produit sans déclinaison active")
+    images = list(product.images.all())
+    colors, weights, sizes = _axis_values(variants)
+    selected = _select_variant(variants, request.GET)
+    color_image = {img.color: i for i, img in reversed(list(enumerate(images))) if img.color}
+
+    variant_data = [
+        {"id": v.pk, "sku": v.sku, "color": v.color, "weight": v.weight_oz, "size": v.size,
+         "price": str(v.price), "compare": str(v.compare_at_price) if v.on_sale else None, "stock": v.stock,
+         "low": v.is_low_stock, "image": color_image.get(v.color)}
+        for v in variants
+    ]
+    chart = product.get_size_chart()
+    chart_rows = list(chart.rows.all()) if chart else []
+    guides = list(
+        (Guide.objects.filter(is_published=True, products=product)
+         | Guide.objects.filter(is_published=True, categories__in=[product.category_id, product.category.root.pk]))
+        .distinct()
+    )
+    reviews = list(product.reviews.filter(is_published=True)[:10])
+    rating = product.rating_summary()
+    related = list(
+        listing_queryset().filter(category=product.category).exclude(pk=product.pk).order_by("-sales_count")[:4]
+    )
+    crumbs = [
+        (product.discipline.name, product.discipline.get_absolute_url()),
+        (product.category.name, f"{product.discipline.get_absolute_url()}{product.category.slug}/"),
+        (product.name, None),
+    ]
+    return render(request, "catalog/product.html", {
+        "product": product, "images": images, "variants": variants, "selected": selected,
+        "colors": colors, "weights": weights, "sizes": sizes, "variant_data": variant_data,
+        "chart": chart, "chart_rows": chart_rows, "guides": guides,
+        "chart_cols": {
+            "weight": any(r.body_weight_min or r.body_weight_max for r in chart_rows),
+            "height": any(r.height_min or r.height_max for r in chart_rows),
+            "note": any(r.note for r in chart_rows),
+        },
+        "reviews": reviews, "rating": rating, "related": related, "crumbs": crumbs,
+        "review_form": ReviewForm() if request.user.is_authenticated else None,
+        "product_ld": product_jsonld(request, product, variants, images, rating, reviews),
+        "breadcrumb_ld": breadcrumb_jsonld(request, crumbs),
+    })
+
+
+@login_required
+@require_POST
+@ratelimit("review", "5/h")
+def review_create(request, product_id):
+    product = get_object_or_404(Product.objects.active(), pk=product_id)
+    form = ReviewForm(request.POST)
+    if form.is_valid():
+        review = form.save(commit=False)
+        review.product = product
+        review.customer = request.user
+        review.author_name = request.user.get_short_name() or request.user.first_name or "Client"
+        review.save()
+        messages.success(request, "Merci ! Votre avis sera publié après relecture par notre équipe.")
+    else:
+        messages.error(request, "Avis non enregistré : vérifiez la note et le texte.")
+    return redirect(f"{product.get_absolute_url()}#avis")

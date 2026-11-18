@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static shop %}
+{% block title %}{% if meta_obj.meta_title %}{{ meta_obj.meta_title }}{% elif page_meta.meta_title %}{{ page_meta.meta_title }}{% else %}{{ title }} — Boxing Shop{% endif %}{% endblock %}
+{% block meta_description %}{% if meta_obj.meta_description %}{{ meta_obj.meta_description }}{% elif page_meta.meta_description %}{{ page_meta.meta_description }}{% else %}{{ title }} : {{ intro|default:"équipement de sports de combat sélectionné par Boxing Shop."|truncatechars:140 }}{% endif %}{% endblock %}
+{% block robots %}{% if noindex %}<meta name="robots" content="noindex, follow">{% endif %}{% endblock %}
+{% block canonical %}{{ SITE_URL }}{{ request.path }}{% if page.number > 1 and not noindex %}?page={{ page.number }}{% endif %}{% endblock %}
+{% block og_title %}{{ title }}{% endblock %}
+{% block head_extra %}{% jsonld breadcrumb_ld %}{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'js/filters.js' %}"></script>{% endblock %}
+{% block content %}
+<div class="container">
+  <header class="catalog-head">
+    {% include "partials/breadcrumb.html" %}
+    <p class="kicker mt-5">{{ kicker }}</p>
+    <h1>{{ title }}</h1>
+    {% if intro %}<p class="lead muted">{{ intro }}</p>{% endif %}
+  </header>
+
+  <div class="catalog-layout">
+    <aside class="filters" aria-label="Filtres">
+      <form method="get" action="{{ request.path }}" data-filter-form>
+        <details open data-filter-details>
+          <summary class="btn btn--ghost filters__toggle">Filtrer les produits</summary>
+          {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
+          {% if request.GET.tri %}<input type="hidden" name="tri" value="{{ filter.sort }}" data-sort-mirror>{% endif %}
+          {% for key, legend, style, options in filter.groups %}
+            <fieldset>
+              <legend>{{ legend }}</legend>
+              {% if style == "chips" %}
+                <div class="chips">
+                  {% for value, label, n, checked in options %}
+                    <label class="chip"><input type="checkbox" name="{{ key }}" value="{{ value }}"{% if checked %} checked{% endif %}><span>{{ label }}</span></label>
+                  {% endfor %}
+                </div>
+              {% else %}
+                {% for value, label, n, checked in options %}
+                  <label class="check"><input type="checkbox" name="{{ key }}" value="{{ value }}"{% if checked %} checked{% endif %}><span>{{ label }}</span>{% if n %}<small>{{ n }}</small>{% endif %}</label>
+                {% endfor %}
+              {% endif %}
+            </fieldset>
+          {% endfor %}
+          <fieldset>
+            <legend>Disponibilité</legend>
+            <label class="check"><input type="checkbox" name="dispo" value="1"{% if filter.in_stock %} checked{% endif %}><span>En stock uniquement</span></label>
+          </fieldset>
+          <div class="filters__actions">
+            <button class="btn" type="submit" data-filter-submit>Appliquer les filtres</button>
+            <a class="btn btn--ghost" href="{{ request.path }}">Réinitialiser</a>
+          </div>
+        </details>
+      </form>
+    </aside>
+
+    <div class="results" id="resultats" data-results>
+      {% include "catalog/_results.html" %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | Boxing Shop{% endblock %}
+{% block meta_description %}{{ title }} du site Boxing Shop.{% endblock %}
+{% block content %}
+<div class="container">
+  <header class="page-head">
+    {% include "partials/breadcrumb.html" %}
+    <p class="kicker mt-5">Informations légales</p>
+    <h1>{{ title }}</h1>
+    <p class="muted mt-3">Dernière mise à jour : 18/11/2026</p>
+  </header>
+  <div class="legal">{% block legal %}{% endblock %}</div>
+</div>
+{% endblock %}

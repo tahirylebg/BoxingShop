@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load shop %}
+{% block og_title %}Boxing Shop — l'équipement du combattant{% endblock %}
+{% block head_extra %}{% jsonld org_ld %}{% endblock %}
+{% block content %}
+<section class="hero" aria-labelledby="hero-title">
+  <div class="container hero__grid">
+    <div>
+      <p class="kicker">Manifeste — Boxe · Muay Thaï · MMA · JJB</p>
+      <h1 class="hero__title mt-4" id="hero-title">Le matériel ne fait pas le combattant. <em>Il le protège.</em></h1>
+    </div>
+    <div class="hero__aside">
+      <p class="lead">Une sélection courte et exigeante d'équipements testés à la salle : chaque gant, protège-tibia ou kimono est décrit avec la précision qu'on attend avant de monter sur le ring.</p>
+      <ul class="hero__facts">
+        <li><span>Livraison offerte</span><span>dès {{ shipping_settings.free_shipping_threshold|floatformat:"0" }} €</span></li>
+        <li><span>Expédition</span><span>48 h</span></li>
+        <li><span>Retours</span><span>30 jours</span></li>
+      </ul>
+      <div class="cluster"><a class="btn btn--lg" href="{% url 'catalog:shop' %}">Voir l'équipement</a><a class="btn btn--ghost btn--lg" href="{% url 'content:guides' %}">Bien choisir</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="disciplines-title">
+  <div class="container">
+    <div class="section__head"><h2 id="disciplines-title">Choisissez votre discipline</h2><p class="kicker">05 disciplines</p></div>
+    <ol class="fight-card">
+      {% for d in nav_disciplines %}
+        <li><a href="{{ d.get_absolute_url }}"><span class="fight-card__num">{{ forloop.counter|stringformat:"02d" }}</span><span class="fight-card__name">{{ d.name }}</span><span class="fight-card__tag">{{ d.tagline }}</span></a></li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="best-title">
+  <div class="container">
+    <div class="section__head">
+      <div><p class="kicker">Meilleures ventes</p><h2 id="best-title" class="mt-3">Équipement du Combattant</h2></div>
+      <a class="btn btn--ghost" href="{% url 'catalog:shop' %}?tri=ventes">Tout voir <span class="arrow" aria-hidden="true"></span></a>
+    </div>
+    <ul class="product-grid">
+      {% for product in best_sellers %}<li>{% include "catalog/_card.html" %}</li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="types-title">
+  <div class="container">
+    <div class="section__head"><h2 id="types-title">Par type d'équipement</h2></div>
+    <ul class="type-strip">
+      {% for c in types %}<li><a href="{{ c.get_absolute_url }}"><span class="kicker">{{ forloop.counter|stringformat:"02d" }}</span><span class="display">{{ c.name }}</span></a></li>{% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="edito-title">
+  <div class="container editorial">
+    <div>
+      <p class="kicker">Le choix du matériel</p>
+      <h2 id="edito-title" class="editorial__quote mt-4">Un gant trop léger blesse <span>votre partenaire.</span> Trop lourd, il vous ralentit.</h2>
+    </div>
+    <div class="stack">
+      <p class="lead">Poids en onces, densité des mousses, cuir ou microfibre, fermeture à lacets ou à scratch : chaque détail compte. Nos guides techniques vous aident à choisir juste, du premier cours au combat officiel.</p>
+      <ul class="guide-list">
+        {% for g in guides %}
+          <li><a href="{{ g.get_absolute_url }}"><span class="kicker muted">{{ g.kicker }} · {{ g.reading_minutes }} min</span><span class="guide-list__title">{{ g.title }}</span><span class="muted">{{ g.excerpt }}</span></a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section section--tight" aria-label="Nos engagements">
+  <div class="container">
+    <ul class="reassurance">
+      <li><strong>Testé à la salle</strong>Chaque référence est éprouvée par des pratiquants avant d'entrer au catalogue.</li>
+      <li><strong>Conseil technique</strong>Tableaux de correspondance morphologique sur chaque fiche.</li>
+      <li><strong>Offre clubs</strong>Tarifs dégressifs pour les clubs et coachs validés.</li>
+      <li><strong>Paiement sécurisé</strong>Carte bancaire, Apple Pay et Google Pay via Stripe.</li>
+    </ul>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "core/legal/base_legal.html" %}
+{% block legal %}
+<h2>Responsable du traitement</h2>
+<p>{{ SHOP.legal_name }}, {{ SHOP.address }} — <a href="mailto:{{ SHOP.email }}">{{ SHOP.email }}</a>.</p>
+<h2>Données collectées et finalités</h2>
+<div class="table-wrap">
+  <table class="table">
+    <thead><tr><th scope="col">Données</th><th scope="col">Finalité</th><th scope="col">Base légale</th><th scope="col">Durée de conservation</th></tr></thead>
+    <tbody>
+      <tr><td>Identité, e-mail, téléphone, adresses</td><td>Gestion du compte client</td><td>Contrat</td><td>Jusqu'à suppression du compte, ou 3 ans après la dernière activité</td></tr>
+      <tr><td>Commandes, factures, adresse de livraison</td><td>Exécution des commandes, comptabilité</td><td>Obligation légale</td><td>10 ans (article L123-22 du Code de commerce)</td></tr>
+      <tr><td>Paniers non commandés</td><td>Conservation du panier</td><td>Intérêt légitime</td><td>30 jours</td></tr>
+      <tr><td>Avis produits</td><td>Publication d'avis</td><td>Consentement</td><td>Jusqu'à suppression du compte (avis anonymisés)</td></tr>
+      <tr><td>Informations Club / Coach (nom du club, SIRET)</td><td>Accès à la grille tarifaire clubs</td><td>Contrat</td><td>Durée du compte</td></tr>
+      <tr><td>Journaux techniques (adresse IP)</td><td>Sécurité, prévention de la fraude</td><td>Intérêt légitime</td><td>12 mois maximum</td></tr>
+    </tbody>
+  </table>
+</div>
+<h2>Destinataires</h2>
+<p>Vos données ne sont jamais vendues. Elles sont transmises uniquement aux prestataires nécessaires : Stripe (paiement), le transporteur (livraison), notre hébergeur et notre prestataire d'e-mail. La saisie d'adresse interroge le service public « API Adresse » (IGN / data.gouv.fr) avec le seul texte saisi.</p>
+<h2>Vos droits</h2>
+<p>Vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité. Depuis votre espace client, vous pouvez à tout moment <strong>télécharger vos données</strong> (format JSON) et <strong>supprimer votre compte</strong>. Les factures sont conservées pour respecter nos obligations comptables, détachées de votre compte.</p>
+<p>Pour toute demande : <a href="mailto:{{ SHOP.email }}">{{ SHOP.email }}</a>. Vous pouvez introduire une réclamation auprès de la CNIL (cnil.fr).</p>
+<h2>Cookies</h2>
+<p>Voir la page <a href="{% url 'core:cookies' %}">Gestion des cookies</a>.</p>
+{% endblock %}

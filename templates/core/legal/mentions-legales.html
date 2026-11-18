@@ -1,0 +1,16 @@
+{% extends "core/legal/base_legal.html" %}
+{% block legal %}
+<p class="panel">Modèle à compléter par l'éditeur du site avant la mise en ligne (informations exactes de la société, de l'hébergeur et du directeur de la publication).</p>
+<h2>Éditeur du site</h2>
+<p>{{ SHOP.legal_name }}, société au capital de [à compléter] €<br>
+Siège social : {{ SHOP.address }}<br>
+SIRET : {{ SHOP.siret }} — TVA intracommunautaire : {{ SHOP.vat_number }}<br>
+Contact : <a href="mailto:{{ SHOP.email }}">{{ SHOP.email }}</a><br>
+Directeur de la publication : [à compléter]</p>
+<h2>Hébergement</h2>
+<p>[Nom de l'hébergeur], [adresse], [téléphone].</p>
+<h2>Propriété intellectuelle</h2>
+<p>L'ensemble des contenus de ce site (textes, visuels, logo, mise en page) est la propriété de {{ SHOP.legal_name }}. Toute reproduction sans autorisation écrite est interdite.</p>
+<h2>Médiation de la consommation</h2>
+<p>Conformément à l'article L612-1 du Code de la consommation, le client peut recourir gratuitement au médiateur : [nom et coordonnées du médiateur à compléter].</p>
+{% endblock %}

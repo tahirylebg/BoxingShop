@@ -1,0 +1,37 @@
+{% load shop %}
+<h2 class="visually-hidden">Résultats</h2>
+<div class="results-bar">
+  <p class="mono" role="status" data-results-count><strong>{{ page.paginator.count }}</strong> produit{{ page.paginator.count|pluralize }}</p>
+  <form method="get" action="{{ request.path }}" class="cluster" data-sort-form>
+    {% for key, values in request.GET.lists %}{% if key != "tri" and key != "page" %}{% for v in values %}<input type="hidden" name="{{ key }}" value="{{ v }}">{% endfor %}{% endif %}{% endfor %}
+    <label class="label" for="tri">Trier</label>
+    <select id="tri" name="tri" data-sort-select>
+      {% for value, label in filter.sort_options %}<option value="{{ value }}"{% if value == filter.sort %} selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <button class="btn btn--ghost" type="submit" data-sort-submit>OK</button>
+  </form>
+</div>
+{% with chips=filter.active_chips %}{% if chips %}
+  <div class="active-filters" aria-label="Filtres actifs">
+    {% for label, url in chips %}<a href="{{ request.path }}{{ url }}" data-filter-link aria-label="Retirer le filtre {{ label }}">{{ label }}</a>{% endfor %}
+  </div>
+{% endif %}{% endwith %}
+{% if products %}
+  <ul class="product-grid">
+    {% for product in products %}<li>{% include "catalog/_card.html" %}</li>{% endfor %}
+  </ul>
+  {% if page.has_other_pages %}
+    <nav class="pagination" aria-label="Pagination">
+      {% if page.has_previous %}<a href="{% query_replace page=page.previous_page_number %}" data-filter-link aria-label="Page précédente">←</a>{% endif %}
+      {% for n in page.paginator.page_range %}
+        {% if n == page.number %}<span aria-current="page">{{ n }}</span>{% else %}<a href="{% query_replace page=n %}" data-filter-link>{{ n }}</a>{% endif %}
+      {% endfor %}
+      {% if page.has_next %}<a href="{% query_replace page=page.next_page_number %}" data-filter-link aria-label="Page suivante">→</a>{% endif %}
+    </nav>
+  {% endif %}
+{% else %}
+  <div class="empty-state">
+    <h2>Aucun produit</h2>
+    <p class="mt-3">Aucun équipement ne correspond à ces critères. Retirez un filtre ou <a href="{{ request.path }}">réinitialisez la recherche</a>.</p>
+  </div>
+{% endif %}
