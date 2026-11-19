@@ -19,7 +19,7 @@
     </ul>
     <p class="mt-4"><a class="btn btn--ghost" href="{% url 'accounts:orders' %}">Toutes mes commandes</a></p>
   {% else %}
-    <p class="mt-4">Aucune commande pour le moment. <a href="{% url 'catalog:shop' %}">Découvrir l'équipement</a>.</p>
+    {% url 'catalog:shop' as shop_url %}{% include "partials/empty_state.html" with icon="box" heading="h3" title="Aucune commande" text="Vos commandes et factures apparaîtront ici." cta_url=shop_url cta_label="Découvrir l'équipement" %}
   {% endif %}
 </section>
 <section class="panel mt-6" aria-labelledby="club-box">

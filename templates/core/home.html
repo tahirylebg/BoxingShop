@@ -1,71 +1,102 @@
 {% extends "base.html" %}
 {% load shop %}
 {% block og_title %}Boxing Shop — l'équipement du combattant{% endblock %}
+{% block og_image %}{% if home.hero_photo %}<meta property="og:image" content="{{ SITE_URL }}{% largest_rendition_url home.hero_photo %}">{% endif %}{% endblock %}
 {% block head_extra %}{% jsonld org_ld %}{% endblock %}
 {% block content %}
 <section class="hero" aria-labelledby="hero-title">
-  <div class="container hero__grid">
-    <div>
-      <p class="kicker">Manifeste — Boxe · Muay Thaï · MMA · JJB</p>
-      <h1 class="hero__title mt-4" id="hero-title">Le matériel ne fait pas le combattant. <em>Il le protège.</em></h1>
+  {% if home.hero_photo %}
+    <div class="hero__media grain">{% responsive_img home.hero_photo sizes="100vw" loading="eager" fetchpriority="high" alt="" %}</div>
+    {% if home.hero_photo.credit %}<p class="hero__credit photo-credit">Photo : {{ home.hero_photo.credit_line }}</p>{% endif %}
+  {% endif %}
+  <div class="container hero__content">
+    <div class="hero__head">
+      <p class="kicker hero__kicker"><span>Boxe</span><span>Muay Thaï</span><span>MMA</span><span>JJB</span></p>
+      <h1 class="hero__title mt-4" id="hero-title">{{ home.hero_title }} <em>Protège-toi.</em></h1>
     </div>
     <div class="hero__aside">
-      <p class="lead">Une sélection courte et exigeante d'équipements testés à la salle : chaque gant, protège-tibia ou kimono est décrit avec la précision qu'on attend avant de monter sur le ring.</p>
+      <p class="lead">{{ home.hero_text }}</p>
       <ul class="hero__facts">
-        <li><span>Livraison offerte</span><span>dès {{ shipping_settings.free_shipping_threshold|floatformat:"0" }} €</span></li>
-        <li><span>Expédition</span><span>48 h</span></li>
-        <li><span>Retours</span><span>30 jours</span></li>
+        <li><strong>{{ shipping_settings.free_shipping_threshold|floatformat:"0" }} €</strong>Livraison offerte dès</li>
+        <li><strong>48 h</strong>Expédition</li>
+        <li><strong>30 j</strong>Retours</li>
       </ul>
-      <div class="cluster"><a class="btn btn--lg" href="{% url 'catalog:shop' %}">Voir l'équipement</a><a class="btn btn--ghost btn--lg" href="{% url 'content:guides' %}">Bien choisir</a></div>
+      <div class="cluster">
+        <a class="btn btn--inverse btn--lg" href="{% url 'catalog:shop' %}">Voir l'équipement</a>
+        <a class="btn btn--outline-inverse btn--lg" href="{% url 'content:guides' %}">Bien choisir</a>
+      </div>
     </div>
   </div>
 </section>
 
 <section class="section" aria-labelledby="disciplines-title">
   <div class="container">
-    <div class="section__head"><h2 id="disciplines-title">Choisissez votre discipline</h2><p class="kicker">05 disciplines</p></div>
-    <ol class="fight-card">
-      {% for d in nav_disciplines %}
-        <li><a href="{{ d.get_absolute_url }}"><span class="fight-card__num">{{ forloop.counter|stringformat:"02d" }}</span><span class="fight-card__name">{{ d.name }}</span><span class="fight-card__tag">{{ d.tagline }}</span></a></li>
+    <div class="section__head">
+      <p class="section__index"><b>01</b> / Disciplines</p>
+      <h2 id="disciplines-title">Choisissez votre discipline</h2>
+      <a class="btn-link" href="{% url 'catalog:shop' %}">Tout le catalogue <span class="arrow" aria-hidden="true"></span></a>
+    </div>
+    <ul class="mosaic">
+      {% for d in disciplines %}
+        <li data-reveal>
+          <a class="tile grain" href="{{ d.get_absolute_url }}">
+            {% if d.photo %}<span class="tile__media">{% responsive_img d.photo sizes="(min-width: 64em) 58vw, (min-width: 48em) 50vw, 100vw" alt="" %}</span>{% endif %}
+            <span class="tile__index">{{ forloop.counter|stringformat:"02d" }} / {{ d.short_name|default:d.name }}</span>
+            <span class="tile__name">{{ d.name }}</span>
+            <span class="tile__tag">{{ d.tagline }}</span>
+            <span class="tile__go">Voir l'équipement <span class="arrow" aria-hidden="true"></span></span>
+          </a>
+        </li>
       {% endfor %}
-    </ol>
+    </ul>
   </div>
 </section>
 
 <section class="section" aria-labelledby="best-title">
   <div class="container">
     <div class="section__head">
-      <div><p class="kicker">Meilleures ventes</p><h2 id="best-title" class="mt-3">Équipement du Combattant</h2></div>
+      <p class="section__index"><b>02</b> / Meilleures ventes</p>
+      <h2 id="best-title">Équipement du Combattant</h2>
       <a class="btn btn--ghost" href="{% url 'catalog:shop' %}?tri=ventes">Tout voir <span class="arrow" aria-hidden="true"></span></a>
     </div>
     <ul class="product-grid">
-      {% for product in best_sellers %}<li>{% include "catalog/_card.html" %}</li>{% endfor %}
+      {% for product in best_sellers %}<li data-reveal>{% include "catalog/_card.html" %}</li>{% endfor %}
     </ul>
   </div>
 </section>
 
-<section class="section" aria-labelledby="types-title">
+<section class="section section--sunken" aria-labelledby="types-title">
   <div class="container">
-    <div class="section__head"><h2 id="types-title">Par type d'équipement</h2></div>
+    <div class="section__head">
+      <p class="section__index"><b>03</b> / Par type</p>
+      <h2 id="types-title">Le matériel, rayon par rayon</h2>
+    </div>
     <ul class="type-strip">
-      {% for c in types %}<li><a href="{{ c.get_absolute_url }}"><span class="kicker">{{ forloop.counter|stringformat:"02d" }}</span><span class="display">{{ c.name }}</span></a></li>{% endfor %}
+      {% for c in types %}<li data-reveal><a href="{{ c.get_absolute_url }}"><span class="kicker">{{ forloop.counter|stringformat:"02d" }} / {{ c.name }}</span><span class="display">{{ c.name }}</span><span class="arrow" aria-hidden="true"></span></a></li>{% endfor %}
     </ul>
   </div>
 </section>
 
 <section class="section" aria-labelledby="edito-title">
   <div class="container editorial">
-    <div>
-      <p class="kicker">Le choix du matériel</p>
-      <h2 id="edito-title" class="editorial__quote mt-4">Un gant trop léger blesse <span>votre partenaire.</span> Trop lourd, il vous ralentit.</h2>
+    <div class="editorial__lead stack">
+      <p class="section__index"><b>04</b> / Guides techniques</p>
+      <h2 id="edito-title" class="editorial__quote">Un gant trop léger blesse <span>votre partenaire.</span> Trop lourd, il vous ralentit.</h2>
+      {% with cover=guides.0.photo %}{% if cover %}
+        <figure class="editorial__figure grain" data-reveal>
+          {% responsive_img cover sizes="(min-width: 64em) 38vw, 100vw" alt="" %}
+          {% if cover.credit %}<figcaption class="photo-credit">Photo : {{ cover.credit_line }}</figcaption>{% endif %}
+        </figure>
+      {% endif %}{% endwith %}
     </div>
-    <div class="stack">
-      <p class="lead">Poids en onces, densité des mousses, cuir ou microfibre, fermeture à lacets ou à scratch : chaque détail compte. Nos guides techniques vous aident à choisir juste, du premier cours au combat officiel.</p>
+    <div class="editorial__body stack">
+      <p class="lead">Poids en onces, densité des mousses, cuir ou microfibre, lacets ou scratch : chaque détail compte. Nos guides vous aident à choisir juste, du premier cours au combat officiel.</p>
       <ul class="guide-list">
         {% for g in guides %}
-          <li><a href="{{ g.get_absolute_url }}"><span class="kicker muted">{{ g.kicker }} · {{ g.reading_minutes }} min</span><span class="guide-list__title">{{ g.title }}</span><span class="muted">{{ g.excerpt }}</span></a></li>
+          <li data-reveal><a href="{{ g.get_absolute_url }}"><span class="kicker muted">{{ g.kicker }} · {{ g.reading_minutes }} min</span><span class="guide-list__title">{{ g.title }}</span><span class="muted">{{ g.excerpt }}</span></a></li>
         {% endfor %}
       </ul>
+      <a class="btn btn--ghost" href="{% url 'content:guides' %}">Tous les guides <span class="arrow" aria-hidden="true"></span></a>
     </div>
   </div>
 </section>
@@ -74,7 +105,7 @@
   <div class="container">
     <ul class="reassurance">
       <li><strong>Testé à la salle</strong>Chaque référence est éprouvée par des pratiquants avant d'entrer au catalogue.</li>
-      <li><strong>Conseil technique</strong>Tableaux de correspondance morphologique sur chaque fiche.</li>
+      <li><strong>Conseil technique</strong>Fiche de pesée et correspondance morphologique sur chaque produit.</li>
       <li><strong>Offre clubs</strong>Tarifs dégressifs pour les clubs et coachs validés.</li>
       <li><strong>Paiement sécurisé</strong>Carte bancaire, Apple Pay et Google Pay via Stripe.</li>
     </ul>

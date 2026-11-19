@@ -13,6 +13,12 @@
     <h1>{{ guide.title }}</h1>
     <p class="lead mt-4">{{ guide.excerpt }}</p>
   </header>
+  {% if guide.photo %}
+    <figure class="guide-cover grain">
+      {% responsive_img guide.photo sizes="(min-width: 90rem) 86rem, 100vw" alt="" loading="eager" fetchpriority="high" %}
+      {% if guide.photo.credit %}<figcaption class="photo-credit">Photo : {{ guide.photo.credit_line }}</figcaption>{% endif %}
+    </figure>
+  {% endif %}
   <div class="two-col">
     <div class="prose">{{ guide.body|simple_markup }}</div>
     <aside class="stack" aria-labelledby="guide-products-title">

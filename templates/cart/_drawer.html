@@ -1,7 +1,6 @@
 <div class="drawer__body" data-cart-total-count="{{ quote.item_count }}">
   {% if quote.is_empty %}
-    <p class="mt-4">Votre panier est vide.</p>
-    <p class="mt-4"><a class="btn btn--ghost" href="{% url 'catalog:shop' %}">Voir l'équipement</a></p>
+    {% url 'catalog:shop' as shop_url %}{% include "partials/empty_state.html" with icon="bag" heading="h3" title="Votre panier est vide" text="Gants, protections, tenues : choisissez votre équipement." cta_url=shop_url cta_label="Voir l'équipement" %}
   {% else %}
     {% include "cart/_lines.html" with prefix="d" %}
   {% endif %}

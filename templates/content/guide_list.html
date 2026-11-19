@@ -14,7 +14,7 @@
     {% for g in guides %}
       <li><a href="{{ g.get_absolute_url }}"><span class="kicker muted">{{ g.kicker }} · {{ g.reading_minutes }} min · {{ g.published_at|date:"d/m/Y" }}</span><span class="guide-list__title">{{ g.title }}</span><span class="muted">{{ g.excerpt }}</span></a></li>
     {% empty %}
-      <li><p class="mt-4">Aucun guide publié pour le moment.</p></li>
+      <li>{% include "partials/empty_state.html" with icon="box" title="Aucun guide publié" text="Les guides techniques arrivent bientôt." %}</li>
     {% endfor %}
   </ul>
 </div>

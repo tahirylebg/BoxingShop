@@ -23,6 +23,6 @@
     </table>
   </div>
 {% else %}
-  <p>Aucune commande pour le moment.</p>
+  {% url 'catalog:shop' as shop_url %}{% include "partials/empty_state.html" with icon="box" title="Aucune commande" text="Vos commandes et factures apparaîtront ici." cta_url=shop_url cta_label="Découvrir l'équipement" %}
 {% endif %}
 {% endblock %}

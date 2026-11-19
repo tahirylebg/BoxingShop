@@ -1,7 +1,12 @@
-{% load shop %}{% with image=product.images.all.0 %}
+{% load shop %}{% with images=product.images.all %}{% with image=images.0 alt_image=images.1 %}
 <article class="card">
   <div class="card__media">
-    {% if priority %}{% responsive_img image sizes="(min-width: 88rem) 20rem, (min-width: 40rem) 33vw, 100vw" alt="" loading="eager" fetchpriority="high" %}{% elif eager and eager <= 4 %}{% responsive_img image sizes="(min-width: 88rem) 20rem, (min-width: 40rem) 33vw, 100vw" alt="" loading="eager" %}{% else %}{% responsive_img image sizes="(min-width: 88rem) 20rem, (min-width: 40rem) 33vw, 100vw" alt="" %}{% endif %}
+    {% if image %}
+      {% if priority %}{% responsive_img image sizes="(min-width: 90rem) 22rem, (min-width: 40rem) 33vw, 100vw" alt="" loading="eager" fetchpriority="high" %}{% elif eager and eager <= 4 %}{% responsive_img image sizes="(min-width: 90rem) 22rem, (min-width: 40rem) 33vw, 100vw" alt="" loading="eager" %}{% else %}{% responsive_img image sizes="(min-width: 90rem) 22rem, (min-width: 40rem) 33vw, 100vw" alt="" %}{% endif %}
+      {% if alt_image %}{% responsive_img alt_image sizes="(min-width: 90rem) 22rem, (min-width: 40rem) 33vw, 100vw" alt="" css_class="card__alt" %}{% endif %}
+    {% else %}
+      <span class="card__placeholder" aria-hidden="true"><svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="3"><path d="M30 64V36a24 24 0 0 1 24-24h12a24 24 0 0 1 24 24v30a26 26 0 0 1-26 26H52a22 22 0 0 1-22-22z"/><path d="M38 92v16h40V92"/></svg></span>
+    {% endif %}
     <div class="card__badges">
       {% if product.range_tier == "competition" %}<span class="badge badge--leather">Compétition</span>{% elif product.range_tier == "pro" %}<span class="badge badge--leather">Pro</span>{% endif %}
       {% if product.total_stock is not None and product.total_stock <= 0 %}<span class="badge badge--ink">Épuisé</span>{% endif %}
@@ -16,4 +21,4 @@
     </div>
   </div>
 </article>
-{% endwith %}
+{% endwith %}{% endwith %}

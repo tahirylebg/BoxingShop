@@ -6,7 +6,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_GET, require_POST
 
 from catalog.filters import listing_queryset
-from catalog.models import Category
+from catalog.models import Category, Discipline
 from content.models import Guide
 
 from .cache import cached
@@ -19,6 +19,8 @@ LEGAL_PAGES = {
 }
 CONSENT_MAX_AGE = 60 * 60 * 24 * 182  # 6 mois (recommandation CNIL : 13 mois max.)
 
+from .models import HomeSettings
+
 
 @require_GET
 def home(request):
@@ -26,7 +28,9 @@ def home(request):
         return {
             "best_sellers": list(listing_queryset().order_by("-sales_count")[:8]),
             "types": list(Category.objects.filter(parent__isnull=True)),
-            "guides": list(Guide.objects.filter(is_published=True)[:3]),
+            "guides": list(Guide.objects.filter(is_published=True).select_related("photo")[:3]),
+            "disciplines": list(Discipline.objects.select_related("photo")),
+            "home": HomeSettings.objects.select_related("hero_photo").first() or HomeSettings.load(),
         }
 
     data = cached("home", build)

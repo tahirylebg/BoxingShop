@@ -20,7 +20,7 @@ def guide_list(request):
 
 @require_GET
 def guide_detail(request, slug):
-    guide = get_object_or_404(Guide.objects.filter(is_published=True), slug=slug)
+    guide = get_object_or_404(Guide.objects.filter(is_published=True).select_related("photo"), slug=slug)
     products = listing_queryset().filter(guides=guide).order_by("-sales_count")[:8]
     crumbs = [("Guides techniques", "/guides/"), (guide.title, None)]
     article_ld = {

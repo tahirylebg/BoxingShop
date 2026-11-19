@@ -6,8 +6,14 @@ let opener = null;
 
 const setCount = (count) => {
   document.querySelectorAll("[data-cart-count]").forEach((el) => {
+    const changed = el.dataset.count !== String(count);
     el.textContent = count;
     el.dataset.count = count;
+    if (changed) {
+      el.classList.remove("is-bumped");
+      void el.offsetWidth; // relance l'animation
+      el.classList.add("is-bumped");
+    }
   });
 };
 
@@ -85,7 +91,12 @@ if (dialog && content) {
     if (!isAdd && !isLine) return;
     event.preventDefault();
     const wasDisabled = submitter?.disabled;
-    if (submitter) submitter.disabled = true;
+    if (submitter) {
+      submitter.disabled = true;
+      submitter.setAttribute("aria-busy", "true");
+    }
+    const body = dialog.querySelector(".drawer__body");
+    if (isLine) body?.setAttribute("aria-busy", "true");
     try {
       const result = await post(formEl, submitter);
       if (result.html) renderDrawer(result.html);
@@ -99,7 +110,11 @@ if (dialog && content) {
     } catch {
       formEl.submit(); // repli : soumission classique
     } finally {
-      if (submitter) submitter.disabled = wasDisabled;
+      if (submitter) {
+        submitter.disabled = wasDisabled;
+        submitter.removeAttribute("aria-busy");
+      }
+      dialog.querySelector(".drawer__body")?.removeAttribute("aria-busy");
     }
   });
 }

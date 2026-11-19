@@ -1,0 +1,24 @@
+{% with threshold=shipping_settings.free_shipping_threshold|floatformat:"0" %}
+<div class="marquee" role="region" aria-label="Informations livraison">
+  <div class="marquee__track">
+    <ul class="marquee__group">
+      <li><span>Livraison offerte dès <b>{{ threshold }} €</b></span></li>
+      <li>Expédition sous 48 h</li>
+      <li>Retours 30 jours</li>
+      <li>CB · Apple Pay · Google Pay</li>
+      <li>Tarifs dégressifs clubs &amp; coachs</li>
+      <li>Livraison offerte dès <b>{{ threshold }} €</b></li>
+      <li>Matériel éprouvé en salle</li>
+    </ul>
+    <ul class="marquee__group" aria-hidden="true">
+      <li><span>Livraison offerte dès <b>{{ threshold }} €</b></span></li>
+      <li>Expédition sous 48 h</li>
+      <li>Retours 30 jours</li>
+      <li>CB · Apple Pay · Google Pay</li>
+      <li>Tarifs dégressifs clubs &amp; coachs</li>
+      <li>Livraison offerte dès <b>{{ threshold }} €</b></li>
+      <li>Matériel éprouvé en salle</li>
+    </ul>
+  </div>
+</div>
+{% endwith %}
