@@ -1,8 +1,8 @@
-{% load shop %}{% with images=product.images.all %}{% with image=images.0 alt_image=images.1 %}
-<article class="card">
+{% load shop %}{% with image=product.card_image alt_image=product.card_alt %}
+<article class="card" data-card>
   <div class="card__media">
     {% if image %}
-      {% if priority %}{% responsive_img image sizes="(min-width: 64em) 24vw, 50vw" alt="" loading="eager" fetchpriority="high" %}{% elif eager and eager <= 4 %}{% responsive_img image sizes="(min-width: 64em) 24vw, 50vw" alt="" loading="eager" %}{% else %}{% responsive_img image sizes="(min-width: 64em) 24vw, 50vw" alt="" %}{% endif %}
+      {% if priority %}{% responsive_img image sizes="(min-width: 64em) 24vw, 50vw" loading="eager" fetchpriority="high" css_class="card__main" %}{% elif eager and eager <= 4 %}{% responsive_img image sizes="(min-width: 64em) 24vw, 50vw" loading="eager" css_class="card__main" %}{% else %}{% responsive_img image sizes="(min-width: 64em) 24vw, 50vw" css_class="card__main" %}{% endif %}
       {% if alt_image %}{% responsive_img alt_image sizes="(min-width: 64em) 24vw, 50vw" alt="" css_class="card__alt" %}{% endif %}
     {% else %}
       <span class="card__placeholder" aria-hidden="true"><svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="3"><path d="M30 64V36a24 24 0 0 1 24-24h12a24 24 0 0 1 24 24v30a26 26 0 0 1-26 26H52a22 22 0 0 1-22-22z"/><path d="M38 92v16h40V92"/></svg></span>
@@ -30,18 +30,19 @@
         {% if product.is_new %}<span class="flag">Nouveau</span>{% endif %}
       </p>
     {% endif %}
-    <h3 class="card__title"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3>
-    <p class="card__cat">{{ product.category.name }}</p>
+    <h3 class="card__title"><a href="{{ product.get_absolute_url }}{% if product.card_color_slug %}?couleur={{ product.card_color_slug }}{% endif %}">{{ product.name }}</a></h3>
+    <p class="card__cat">{{ product.category.name }}{% if product.card_color_slug %} · {{ product.card_color }}{% endif %}</p>
     <div class="card__foot">
       <p class="price">{% if product.min_price %}<span class="visually-hidden">À partir de </span>{{ product.min_price|money }}{% endif %}</p>
       {% if product.swatches|length > 1 %}
-        <p class="swatches">
-          <span class="visually-hidden">Coloris : {% for c in product.swatches %}{{ c.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if product.swatches_more %} et {{ product.swatches_more }} autre(s){% endif %}</span>
-          {% for c in product.swatches %}<svg class="swatch-dot" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6" fill="{{ c.hex }}"/></svg>{% endfor %}
-          {% if product.swatches_more %}<span class="swatches__more" aria-hidden="true">+{{ product.swatches_more }}</span>{% endif %}
-        </p>
+        <ul class="swatches" aria-label="Coloris">
+          {% for c in product.swatches %}
+            <li><a class="swatch-link{% if c.active %} is-active{% endif %}" href="{{ product.get_absolute_url }}?couleur={{ c.slug }}"{% if c.srcset %} data-swatch-src="{{ c.src }}" data-swatch-srcset="{{ c.srcset }}"{% endif %} aria-label="{{ product.name }} coloris {{ c.name|lower }}"><svg class="swatch-dot" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6" fill="{{ c.hex }}"/></svg></a></li>
+          {% endfor %}
+          {% if product.swatches_more %}<li class="swatches__more" aria-label="et {{ product.swatches_more }} autre(s) coloris">+{{ product.swatches_more }}</li>{% endif %}
+        </ul>
       {% endif %}
     </div>
   </div>
 </article>
-{% endwith %}{% endwith %}
+{% endwith %}

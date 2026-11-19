@@ -132,11 +132,14 @@ class Command(BaseCommand):
             return {}
         library = {}
         for i, c in enumerate(json.loads(credits_file.read_text("utf-8"))):
-            src = demo / ("categories" if c["key"].startswith("cat-") else "originals") / f"{c['key']}.jpg"
+            folder = "categories" if c["key"].startswith("cat-") else "products" if c["key"].startswith("prod-") else "originals"
+            src = demo / folder / f"{c['key']}.jpg"
             if not src.exists():
                 continue
             raw = src.read_bytes()
             self.photo_meta[c["key"]] = (c, raw)
+            if c["key"].startswith("prod-"):
+                continue  # photos produit : utilisées telles quelles par _images, pas dans la photothèque éditoriale
             photo = Photo(title=c["alt"][:120], alt=c["alt"], credit=c["author"], credit_source=c["source"],
                           credit_url=c["page"])
             if c["key"].startswith("cat-"):
@@ -242,25 +245,37 @@ class Command(BaseCommand):
                 )
 
     def _images(self, product, spec):
+        """Pour chaque couleur : photo(s) produit vérifiées (couleurs fidèles), puis visuel détouré exact.
+        Les photos d'ambiance (sans couleur) viennent en dernier : survol des cartes et galerie."""
         cat_label = product.category.name
         index = list(data.PRODUCTS).index(spec)
-        keys = demo_photos.pick(demo_photos.SHAPES.get(spec["shape"], []), self.photos, offset=index, count=2)
-        for pos, key in enumerate(keys):
+        pos = 0
+        for color, hex_ in spec["colors"]:
+            alt = f"{product.name} coloris {color.lower()}"
+            for n, key in enumerate(demo_photos.PRODUCT_COLOR_PHOTOS.get((spec["slug"], color), [])):
+                if key not in self.photo_meta:
+                    continue
+                c, raw = self.photo_meta[key]
+                img = ProductImage(product=product, alt=alt, color=color, position=pos,
+                                   credit=f"{c['author']} · {c['source']}")
+                img.image.save(f"{spec['slug']}-{color.lower()}-{n + 1}.jpg",
+                               ContentFile(treat_photo(raw, mode="product", max_width=1400, crop=0.8)), save=False)
+                img.save()
+                pos += 1
+            caption = f"{spec['code']} · {color} · {cat_label}"
+            img = ProductImage(product=product, alt=alt, color=color, position=pos, credit="Visuel Boxing Shop")
+            img.image.save(f"{spec['slug']}-{color.lower()}.png", ContentFile(render(spec["shape"], hex_, caption)),
+                           save=False)
+            img.save()
+            pos += 1
+        for key in demo_photos.pick(demo_photos.SHAPES.get(spec["shape"], []), self.photos, offset=index, count=2):
             c, raw = self.photo_meta[key]
-            img = ProductImage(product=product, alt=c["alt"], position=pos,
-                               credit=f"{c['author']} · {c['source']}")
-            img.image.save(f"{spec['slug']}-photo-{pos + 1}.jpg",
+            img = ProductImage(product=product, alt=c["alt"], position=pos, credit=f"{c['author']} · {c['source']}")
+            img.image.save(f"{spec['slug']}-ambiance-{pos}.jpg",
                            ContentFile(treat_photo(raw, mode="editorial", max_width=1400, crop=0.8, seed=index)),
                            save=False)
             img.save()
-        offset = len(keys)
-        for pos, (color, hex_) in enumerate(spec["colors"], start=offset):
-            caption = f"{spec['code']} · {color} · {cat_label}"
-            png = render(spec["shape"], hex_, caption)
-            img = ProductImage(product=product, alt=f"{product.name}, coloris {color.lower()}", color=color,
-                               position=pos, credit="Visuel Boxing Shop")
-            img.image.save(f"{spec['slug']}-{color.lower()}.png", ContentFile(png), save=False)
-            img.save()
+            pos += 1
 
     def _guides(self, products, categories):
         for i, g in enumerate(data.GUIDES):

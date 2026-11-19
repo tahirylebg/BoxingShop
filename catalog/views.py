@@ -9,6 +9,7 @@ from django.views.decorators.http import require_GET, require_POST
 from core.ratelimit import ratelimit
 
 from .cards import decorate
+from .colors import color_slug, from_slug
 
 from content.models import Guide
 
@@ -26,7 +27,7 @@ def _listing(request, *, title, intro="", kicker="Catalogue", discipline=None, c
     page = Paginator(flt.queryset(), PER_PAGE).get_page(request.GET.get("page"))
     context = {
         "title": title, "intro": intro, "kicker": kicker, "filter": flt, "page": page,
-        "products": decorate(page.object_list), "fill_guide": _fill_guide(category),
+        "products": decorate(page.object_list, colors=flt.colors), "fill_guide": _fill_guide(category),
         "discipline": discipline, "category": category, "crumbs": crumbs, "meta_obj": meta_obj,
         "breadcrumb_ld": breadcrumb_jsonld(request, crumbs),
         # pages filtrées : on évite l'indexation de milliers de combinaisons
@@ -144,6 +145,11 @@ def _select_variant(variants, params):
             if v.sku == sku:
                 return v
     color, weight, size = params.get("couleur"), params.get("poids"), params.get("taille")
+    color = from_slug(color) or color  # ?couleur=bleu -> « Bleu »
+    if color and not (weight or size):
+        in_color = [v for v in variants if v.color == color]
+        if in_color:
+            return next((v for v in in_color if v.in_stock), in_color[0])
     if color or weight or size:
         for v in variants:
             if ((not color or v.color == color) and (not weight or str(v.weight_oz) == weight)
@@ -177,7 +183,7 @@ def product_view(request, discipline_slug, category_slug, product_slug):
     variant_data = [
         {"id": v.pk, "sku": v.sku, "color": v.color, "weight": v.weight_oz, "size": v.size,
          "price": str(v.price), "compare": str(v.compare_at_price) if v.on_sale else None, "stock": v.stock,
-         "low": v.is_low_stock, "image": color_image.get(v.color)}
+         "low": v.is_low_stock, "image": color_image.get(v.color), "color_slug": color_slug(v.color)}
         for v in variants
     ]
     chart = product.get_size_chart()

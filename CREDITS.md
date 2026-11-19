@@ -37,3 +37,16 @@ Les photos illustrent l'univers de la boutique ; elles ne représentent pas néc
 | `cat-tenues` | Boxeur en short de boxe rouge et blanc | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/7005124/) |
 | `cat-bandages` | Main protégée par une bande de boxe blanche | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/9944002/) |
 | `cat-materiel` | Sac de frappe noir suspendu dans une salle | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/4162449/) |
+| `prod-gants-rouges-1` | Paire de gants de boxe rouges suspendus | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/10689269/) |
+| `prod-gants-rouges-2` | Gants de boxe rouges suspendus, gros plan | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/10689272/) |
+| `prod-gants-noirs` | Paire de gants de boxe noirs posée au sol | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/18322889/) |
+| `prod-gants-blancs` | Paire de gants de boxe blancs posée sur le ring | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/34621808/) |
+| `prod-gants-blancs-2` | Gants de boxe blancs en gros plan | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/6296062/) |
+| `prod-gants-fauves` | Paire de gants de boxe en cuir fauve | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/6739945/) |
+| `prod-mma-noirs` | Gants de MMA noirs portés en garde | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/17400108/) |
+| `prod-casque-noir` | Casque de boxe noir porté, gros plan | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/7289917/) |
+| `prod-casque-rouge` | Casque de protection rouge, gros plan | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/6203424/) |
+| `prod-bandes-blanches` | Main protégée par une bande de boxe blanche | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/9944002/) |
+| `prod-bandes-noires` | Pose d'une bande de boxe noire sur la main | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/4058317/) |
+| `prod-protege-dents-blanc` | Protège-dents blanc porté, gros plan | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/9945116/) |
+| `prod-sac-noir` | Sac de frappe noir suspendu | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/4162449/) |

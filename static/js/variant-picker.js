@@ -28,6 +28,27 @@ if (form && dataEl) {
     });
   };
 
+  // Galerie : photos de la couleur choisie + photos d'ambiance (sans couleur), fondu de 200 ms.
+  let shownColor = form.querySelector('[data-axis="color"]:checked')?.value;
+  const filterGallery = (color) => {
+    if (!track || color === shownColor) return;
+    shownColor = color;
+    const apply = () => {
+      document.querySelectorAll(".gallery__slide, .gallery__thumbs li").forEach((el) => {
+        el.hidden = Boolean(el.dataset.color) && el.dataset.color !== color;
+      });
+      track.scrollTo({ left: 0 });
+      const first = [...track.children].findIndex((s) => !s.hidden);
+      document.querySelectorAll("[data-gallery-thumb]").forEach((t) => {
+        t.setAttribute("aria-current", String(Number(t.dataset.galleryThumb) === first));
+      });
+      track.classList.remove("is-fading");
+    };
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { apply(); return; }
+    track.classList.add("is-fading");
+    setTimeout(apply, 200);
+  };
+
   const render = (v) => {
     const priceText = money.format(Number(v.price));
     $("[data-price]").textContent = priceText;
@@ -61,7 +82,8 @@ if (form && dataEl) {
 
     const url = new URL(window.location.href);
     url.searchParams.set("sku", v.sku);
-    ["couleur", "poids", "taille"].forEach((k) => url.searchParams.delete(k));
+    ["poids", "taille"].forEach((k) => url.searchParams.delete(k));
+    if (v.color_slug) url.searchParams.set("couleur", v.color_slug); else url.searchParams.delete("couleur");
     window.history.replaceState(null, "", url);
   };
 
@@ -89,7 +111,7 @@ if (form && dataEl) {
     });
     if (variant) {
       render(variant);
-      if (changedAxis === "color") showSlide(variant.image);
+      if (changedAxis === "color") filterGallery(variant.color);
     }
   };
 

@@ -70,6 +70,20 @@ PHOTOS = [
     ("cat-tenues", "pexels", "7005124", "Boxeur en short de boxe rouge et blanc", None),
     ("cat-bandages", "pexels", "9944002", "Main protégée par une bande de boxe blanche", None),
     ("cat-materiel", "pexels", "4162449", "Sac de frappe noir suspendu dans une salle", None),
+    # Photos produit par couleur (media/demo/products/) : objet visible, couleur vérifiée à l'œil
+    ("prod-gants-rouges-1", "pexels", "10689269", "Paire de gants de boxe rouges suspendus", None),
+    ("prod-gants-rouges-2", "pexels", "10689272", "Gants de boxe rouges suspendus, gros plan", None),
+    ("prod-gants-noirs", "pexels", "18322889", "Paire de gants de boxe noirs posée au sol", None),
+    ("prod-gants-blancs", "pexels", "34621808", "Paire de gants de boxe blancs posée sur le ring", None),
+    ("prod-gants-blancs-2", "pexels", "6296062", "Gants de boxe blancs en gros plan", None),
+    ("prod-gants-fauves", "pexels", "6739945", "Paire de gants de boxe en cuir fauve", None),
+    ("prod-mma-noirs", "pexels", "17400108", "Gants de MMA noirs portés en garde", None),
+    ("prod-casque-noir", "pexels", "7289917", "Casque de boxe noir porté, gros plan", None),
+    ("prod-casque-rouge", "pexels", "6203424", "Casque de protection rouge, gros plan", None),
+    ("prod-bandes-blanches", "pexels", "9944002", "Main protégée par une bande de boxe blanche", None),
+    ("prod-bandes-noires", "pexels", "4058317", "Pose d'une bande de boxe noire sur la main", None),
+    ("prod-protege-dents-blanc", "pexels", "9945116", "Protège-dents blanc porté, gros plan", None),
+    ("prod-sac-noir", "pexels", "4162449", "Sac de frappe noir suspendu", None),
     # Unsplash (API officielle requise)
     ("ring-noir-blanc", "unsplash", "4zaaZR_vjnc", "Boxeur seul dans un ring, photographie noir et blanc", None),
     ("sacs-alignes", "unsplash", "2Ig4WSod3GQ", "Rangée de sacs de frappe suspendus dans une salle", None),
@@ -87,7 +101,9 @@ PHOTOS = [
 
 def folder_for(key):
     """Photos de rayon dans media/demo/categories/, le reste dans media/demo/originals/."""
-    return "categories" if key.startswith("cat-") else "originals"
+    if key.startswith("cat-"):
+        return "categories"
+    return "products" if key.startswith("prod-") else "originals"
 
 
 class Skipped(Exception):

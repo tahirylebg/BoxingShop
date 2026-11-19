@@ -60,3 +60,28 @@ def pick(keys, available, offset=0, count=1):
     start = offset % len(present)
     rotated = present[start:] + present[:start]
     return rotated[:count]
+
+
+# Photo(s) produit par couleur, vérifiées une à une (docs/PHOTO_AUDIT.md). Une couleur absente ici
+# garde son visuel détouré exact (« Visuel Boxing Shop ») : jamais de photo d'une autre couleur.
+PRODUCT_COLOR_PHOTOS = {
+    ("gant-cuir-heritage-pro", "Noir"): ["prod-gants-noirs"],
+    ("gant-cuir-heritage-pro", "Rouge"): ["prod-gants-rouges-1", "prod-gants-rouges-2"],
+    ("gant-initiation-club", "Rouge"): ["prod-gants-rouges-2", "prod-gants-rouges-1"],
+    ("gant-kickboxing-microfibre", "Noir"): ["prod-gants-noirs"],
+    ("gant-nak-muay-cuir", "Fauve"): ["prod-gants-fauves"],
+    ("gant-nak-muay-cuir", "Noir"): ["prod-gants-noirs"],
+    ("gant-sparring-microfibre", "Blanc"): ["prod-gants-blancs-2", "prod-gants-blancs"],
+    ("gant-sparring-microfibre", "Noir"): ["prod-gants-noirs"],
+    ("gant-combat-lacets-championnat", "Noir"): ["prod-gants-noirs"],
+    ("gant-combat-lacets-championnat", "Rouge"): ["prod-gants-rouges-1"],
+    ("gants-mma-combat", "Noir"): ["prod-mma-noirs"],
+    ("gants-mma-sparring-7oz", "Noir"): ["prod-mma-noirs"],
+    ("casque-ouvert-cuir", "Noir"): ["prod-casque-noir"],
+    ("casque-ouvert-cuir", "Rouge"): ["prod-casque-rouge"],
+    ("bandes-de-boxe-450", "Blanc"): ["prod-bandes-blanches"],
+    ("bandes-de-boxe-450", "Noir"): ["prod-bandes-noires"],
+    ("protege-dents-pro-thermoformable", "Blanc"): ["prod-protege-dents-blanc"],
+    ("sac-de-frappe-cuir-120", "Noir"): ["prod-sac-noir"],
+    ("sac-thai-180-microfibre", "Noir"): ["prod-sac-noir"],
+}

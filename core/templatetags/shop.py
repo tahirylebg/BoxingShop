@@ -114,6 +114,20 @@ def simple_markup(text):
     return mark_safe("\n".join(out))
 
 
+def rendition_srcset(image):
+    """(src, srcset) d'une image à déclinaisons WebP."""
+    widths = sorted(int(w) for w in image.renditions)
+    srcset = ", ".join(f"{default_storage.url(image.renditions[str(w)])} {w}w" for w in widths)
+    return default_storage.url(image.renditions[str(widths[min(1, len(widths) - 1)])]), srcset
+
+
+@register.filter
+def color_hex(name):
+    from catalog.colors import color_hex as _hex
+
+    return _hex(name)
+
+
 @register.simple_tag
 def responsive_img(image, sizes="100vw", loading="lazy", css_class="", alt=None, fetchpriority=None):
     """<img> WebP avec srcset à partir des déclinaisons générées par catalog.images."""

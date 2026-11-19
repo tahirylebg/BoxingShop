@@ -10,6 +10,7 @@ from django.utils.functional import cached_property
 
 from core.cache import cached
 
+from .colors import COLORS, color_slug, from_slug, singular, split_query
 from .models import Category, Discipline, Product, ProductImage, Variant
 
 SORTS = {
@@ -31,7 +32,7 @@ def listing_queryset():
 
 
 class CatalogFilter:
-    MULTI = ("discipline", "type", "poids", "taille", "matiere", "niveau")
+    MULTI = ("discipline", "type", "couleur", "poids", "taille", "matiere", "niveau")
 
     def __init__(self, params: QueryDict, discipline=None, category=None):
         self.params = params
@@ -41,6 +42,10 @@ class CatalogFilter:
         self.values["poids"] = [v for v in self.values["poids"] if v.isdigit()]
         self.in_stock = params.get("dispo") == "1"
         self.q = (params.get("q") or "").strip()[:80]
+        # « gants bleus » : la couleur devient un critère, le reste reste une recherche texte
+        self.q_text, q_colors = split_query(self.q)
+        picked = [from_slug(v) for v in self.values["couleur"]]
+        self.colors = list(dict.fromkeys([c for c in picked if c] + q_colors))
         self.sort = params.get("tri") if params.get("tri") in SORTS else "pertinence"
 
     # --- Requêtes -----------------------------------------------------------------------------
@@ -63,21 +68,32 @@ class CatalogFilter:
             qs = qs.filter(material__in=v["matiere"])
         if v["niveau"]:
             qs = qs.filter(level__in=v["niveau"])
-        if self.q:
-            # sous-requête : une jointure sur les variantes fausserait les agrégats prix/stock
-            matches = Product.objects.filter(
-                Q(name__icontains=self.q) | Q(short_description__icontains=self.q)
-                | Q(category__name__icontains=self.q) | Q(variants__sku__iexact=self.q)
-            ).values("pk")
-            qs = qs.filter(pk__in=matches)
+        if self.q_text:
+            # sous-requête : une jointure sur les variantes fausserait les agrégats prix/stock.
+            # Chaque mot doit apparaître (singulier toléré : « gants » trouve « Gant »).
+            matches = Product.objects.all()
+            for word in self.q_text.split():
+                stem = singular(word)
+                if Category.objects.filter(name__icontains=stem).exists():
+                    # le mot désigne un type de produit (« gants ») : on filtre sur le type, pas sur le nom
+                    # (sinon « Spray assainissant Gants » sortirait pour « gants rouges »)
+                    matches = matches.filter(Q(category__name__icontains=stem) | Q(category__parent__name__icontains=stem))
+                    continue
+                matches = matches.filter(
+                    Q(name__icontains=stem) | Q(short_description__icontains=stem)
+                    | Q(variants__sku__iexact=word)
+                )
+            qs = qs.filter(pk__in=matches.values("pk"))
         variant_q = Q(product=OuterRef("pk"), is_active=True)
+        if self.colors:
+            variant_q &= Q(color__in=self.colors)
         if v["poids"]:
             variant_q &= Q(weight_oz__in=[int(x) for x in v["poids"]])
         if v["taille"]:
             variant_q &= Q(size__in=v["taille"])
         if self.in_stock:
             variant_q &= Q(stock__gt=0)
-        if v["poids"] or v["taille"] or self.in_stock:
+        if self.colors or v["poids"] or v["taille"] or self.in_stock:
             qs = qs.filter(Exists(Variant.objects.filter(variant_q)))
         return qs.order_by(*SORTS[self.sort][1])
 
@@ -95,6 +111,7 @@ class CatalogFilter:
         products = Product.objects.filter(pk__in=base_ids)
         materials = dict(products.values_list("material").annotate(n=Count("id")))
         levels = dict(products.values_list("level").annotate(n=Count("id")))
+        color_counts = dict(variants.exclude(color="").values_list("color").annotate(n=Count("product", distinct=True)))
         disciplines = [] if self.discipline else [
             (d.slug, d.name, d.n) for d in Discipline.objects.annotate(
                 n=Count("products", filter=Q(products__in=base_ids), distinct=True)).filter(n__gt=0)
@@ -109,6 +126,7 @@ class CatalogFilter:
         return {
             "discipline": disciplines,
             "type": categories,
+            "couleur": [(color_slug(c), c, color_counts[c]) for c in COLORS if c in color_counts],
             "poids": [(str(w), f"{w} oz", None) for w in weights if 8 <= w <= 18],
             "taille": [(s, s, None) for s in Variant.SIZE_ORDER if s in sizes],
             "matiere": [(c, label, materials[c]) for c, label in Product.Material.choices if c in materials],
@@ -117,15 +135,16 @@ class CatalogFilter:
 
     def groups(self):
         """Structure prête pour le template : [(clé, légende, style, [(valeur, libellé, n, coché)])]."""
-        labels = {"discipline": "Discipline", "type": "Type de produit", "poids": "Poids (oz)", "taille": "Taille",
+        labels = {"discipline": "Discipline", "type": "Type de produit", "couleur": "Couleur", "poids": "Poids (oz)", "taille": "Taille",
                   "matiere": "Matière", "niveau": "Niveau de pratique"}
-        styles = {"poids": "chips", "taille": "chips"}
+        styles = {"poids": "chips", "taille": "chips", "couleur": "swatches"}
         out = []
-        for key in ("discipline", "type", "poids", "taille", "matiere", "niveau"):
-            options = self.facets[key]
+        for key in ("discipline", "type", "couleur", "poids", "taille", "matiere", "niveau"):
+            options = self.facets.get(key, [])
             if options:
+                active = [color_slug(c) for c in self.colors] if key == "couleur" else self.values[key]
                 out.append((key, labels[key], styles.get(key, "list"),
-                            [(val, label, n, val in self.values[key]) for val, label, n in options]))
+                            [(val, label, n, val in active) for val, label, n in options]))
         return out
 
     def active_chips(self):

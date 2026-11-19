@@ -1017,3 +1017,22 @@ a:hover .arrow::after { transform: translateX(4px); }
 }
 .cart-layout > *, .line-item > div { min-width: 0; }
 .line-item__meta { overflow-wrap: anywhere; }
+
+/* Couleurs : filtre en pastilles, pastilles cliquables des cartes, fondu de galerie */
+.color-filter { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 12px; }
+.color-filter__opt { position: relative; display: flex; align-items: center; gap: 10px; min-height: 40px; cursor: pointer; }
+.color-filter__opt input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.color-filter__opt svg { flex: none; width: 24px; height: 24px; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--color-rule-control); transition: outline-offset var(--motion-fast); }
+.color-filter__opt svg circle { stroke: var(--color-rule-control); stroke-width: 1; }
+.color-filter__opt input:checked + svg { outline: 2px solid var(--color-text); outline-offset: 2px; }
+.color-filter__opt input:focus-visible + svg { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+.color-filter__opt input:checked ~ span { font-weight: 700; }
+.color-filter__opt .check__count { margin-left: auto; }
+.swatches { list-style: none; padding: 0; }
+.swatch-link { position: relative; z-index: 5; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; }
+.swatch-link .swatch-dot { width: 14px; height: 14px; }
+.swatch-link.is-active .swatch-dot, .swatch-link.is-preview .swatch-dot { outline: 1.5px solid var(--color-text); outline-offset: 2px; border-radius: 50%; }
+.swatch-link:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 1px; }
+.gallery__track { transition: opacity 200ms var(--ease-out); }
+.gallery__track.is-fading { opacity: 0; }
+.gallery__slide[hidden], .gallery__thumbs li[hidden] { display: none; }

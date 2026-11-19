@@ -57,3 +57,28 @@ function setupGalleryZoom() {
 
 setupReveal();
 setupGalleryZoom();
+
+// Cartes produit : survol (ou focus) d'une pastille -> photo de cette couleur ; on revient à la photo d'origine en sortant.
+document.addEventListener("pointerover", swapCardImage);
+document.addEventListener("focusin", swapCardImage);
+function swapCardImage(event) {
+  const link = event.target.closest?.("[data-swatch-srcset]");
+  if (!link) return;
+  const card = link.closest("[data-card]");
+  const img = card?.querySelector(".card__main");
+  if (!img) return;
+  if (!img.dataset.origSrcset) {
+    img.dataset.origSrc = img.getAttribute("src");
+    img.dataset.origSrcset = img.getAttribute("srcset");
+    const restore = () => {
+      img.setAttribute("srcset", img.dataset.origSrcset);
+      img.setAttribute("src", img.dataset.origSrc);
+      card.querySelectorAll(".swatch-link").forEach((l) => l.classList.toggle("is-preview", false));
+    };
+    card.querySelector(".swatches")?.addEventListener("pointerleave", restore);
+    card.querySelector(".swatches")?.addEventListener("focusout", (e) => { if (!card.querySelector(".swatches").contains(e.relatedTarget)) restore(); });
+  }
+  img.setAttribute("srcset", link.dataset.swatchSrcset);
+  img.setAttribute("src", link.dataset.swatchSrc);
+  card.querySelectorAll(".swatch-link").forEach((l) => l.classList.toggle("is-preview", l === link));
+}

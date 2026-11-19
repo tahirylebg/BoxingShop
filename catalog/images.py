@@ -69,7 +69,9 @@ def treat_photo(data, *, mode="editorial", max_width=2000, crop=None, seed=0):
         img = ImageOps.fit(img, _fit_size(img, crop), Image.Resampling.LANCZOS, centering=(0.5, 0.42))
     if img.width > max_width:
         img = img.resize((max_width, round(img.height * max_width / img.width)), Image.Resampling.LANCZOS)
-    if mode == "bw":
+    if mode == "product":
+        pass  # photo produit : couleurs fidèles, aucun traitement colorimétrique
+    elif mode == "bw":
         img = ImageOps.grayscale(img)
         img = ImageOps.autocontrast(img, cutoff=1)
         img = ImageEnhance.Contrast(img).enhance(1.25).convert("RGB")

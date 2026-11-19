@@ -54,7 +54,13 @@
               </summary>
               <fieldset>
                 <legend class="visually-hidden">{{ legend }}</legend>
-                {% if style == "chips" %}
+                {% if style == "swatches" %}
+                  <div class="color-filter">
+                    {% for value, label, n, checked in options %}
+                      <label class="color-filter__opt"><input type="checkbox" name="{{ key }}" value="{{ value }}"{% if checked %} checked{% endif %}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="{{ label|color_hex }}"/></svg><span>{{ label }}</span>{% if n %}<small class="check__count">{{ n }}</small>{% endif %}</label>
+                    {% endfor %}
+                  </div>
+                {% elif style == "chips" %}
                   <div class="pill-grid">
                     {% for value, label, n, checked in options %}
                       <label class="pill"><input type="checkbox" name="{{ key }}" value="{{ value }}"{% if checked %} checked{% endif %}><span>{{ label }}</span></label>
