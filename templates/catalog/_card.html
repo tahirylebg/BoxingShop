@@ -35,7 +35,7 @@
       {% if product.swatches|length > 1 %}
         <ul class="swatches" aria-label="Coloris">
           {% for c in product.swatches %}
-            <li><a class="swatch-link{% if c.active %} is-active{% endif %}" href="{{ product.get_absolute_url }}?couleur={{ c.slug }}"{% if c.srcset %} data-swatch-src="{{ c.src }}" data-swatch-srcset="{{ c.srcset }}"{% endif %} aria-label="{{ product.name }} coloris {{ c.name|lower }}"><svg class="swatch-dot" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6" fill="{{ c.hex }}"/></svg></a></li>
+            <li><a class="swatch-link{% if c.active %} is-active{% endif %}" href="{{ product.get_absolute_url }}?couleur={{ c.slug }}"{% if c.srcset %} data-swatch-src="{{ c.src }}" data-swatch-srcset="{{ c.srcset }}"{% endif %} aria-label="{{ product.name }} coloris {{ c.name|lower }}"><svg class="swatch-dot" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6" fill="{{ c.hex }}"/></svg></a></li>
           {% endfor %}
           {% if product.swatches_more %}<li class="swatches__more" aria-label="et {{ product.swatches_more }} autre(s) coloris">+{{ product.swatches_more }}</li>{% endif %}
         </ul>

@@ -21,25 +21,51 @@ function setupCounters() {
 }
 setupCounters();
 
+// Une seule classe utilitaire, .reveal ; l'état est porté par data-reveal (pending -> in).
+// Les éléments d'une même liste (cartes) apparaissent en cascade : 60 ms d'écart, 6 au plus.
 function setupReveal() {
-  const items = [...document.querySelectorAll("[data-reveal]")];
+  const items = [...document.querySelectorAll(".reveal")];
   if (reduced || !("IntersectionObserver" in window) || !items.length) return;
   const fold = window.innerHeight;
-  // Seuls les éléments sous la ligne de flottaison sont masqués : aucun clignotement au chargement.
   const pending = items.filter((el) => el.getBoundingClientRect().top > fold);
-  pending.forEach((el) => {
-    const siblings = [...el.parentElement.children].filter((c) => c.hasAttribute("data-reveal"));
-    el.style.setProperty("--reveal-index", String(Math.min(siblings.indexOf(el), 8)));
-    el.classList.add("reveal-pending");
-  });
+  pending.forEach((el) => { el.dataset.reveal = "pending"; });
+  // Un titre masqué par clip-path n'a plus de surface visible : on observe alors sa bande parente.
+  const watched = new Map(pending.map((el) => [el.matches(".campaign__title") ? el.closest(".campaign") : el, el]));
   const observer = new IntersectionObserver((entries) => {
+    let step = 0;
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
-      entry.target.classList.add("is-visible");
+      const el = watched.get(entry.target);
+      if (el.tagName === "LI") {
+        el.style.setProperty("--reveal-delay", `${Math.min(step, 5) * 60}ms`);
+        step += 1;
+      }
+      el.dataset.reveal = "in";
       observer.unobserve(entry.target);
     });
-  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
-  pending.forEach((el) => observer.observe(el));
+  }, { rootMargin: "0px 0px -8% 0px", threshold: 0 });
+  watched.forEach((_, target) => observer.observe(target));
+}
+
+// Bandes photo plein-largeur : léger parallax de l'image (±40 px), calculé au scroll (rAF).
+function setupParallax() {
+  const images = [...document.querySelectorAll(".campaign__media img")];
+  if (reduced || !images.length) return;
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    const vh = window.innerHeight;
+    images.forEach((img) => {
+      const rect = img.parentElement.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > vh) return;
+      const progress = (rect.top + rect.height / 2 - vh / 2) / (vh / 2 + rect.height / 2);
+      img.style.setProperty("--parallax", `${(-progress * 40).toFixed(1)}px`);
+    });
+  };
+  window.addEventListener("scroll", () => {
+    if (!ticking) { ticking = true; requestAnimationFrame(update); }
+  }, { passive: true });
+  update();
 }
 
 function setupGalleryZoom() {
@@ -56,6 +82,7 @@ function setupGalleryZoom() {
 }
 
 setupReveal();
+setupParallax();
 setupGalleryZoom();
 
 // Cartes produit : survol (ou focus) d'une pastille -> photo de cette couleur ; on revient à la photo d'origine en sortant.

@@ -237,7 +237,8 @@ a:hover .arrow::after { transform: translateX(4px); }
 .card__cat { font-size: 0.875rem; color: var(--color-text-muted); }
 .card__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; }
 .card .price { font-family: var(--font-data); font-weight: 600; }
-.swatches { display: flex; align-items: center; gap: 4px; }
+.swatches { display: flex; align-items: center; gap: 4px; list-style: none; margin: 0; padding: 0; }
+.swatches > li { display: flex; }
 .swatch-dot { width: 14px; height: 14px; }
 .swatch-dot circle { stroke: var(--color-rule-control); stroke-width: 1; }
 .swatches__more { font-family: var(--font-data); font-size: 11px; color: var(--color-text-muted); }
@@ -439,14 +440,17 @@ a:hover .arrow::after { transform: translateX(4px); }
 
 /* Bande campagne plein écran avant le pied de page */
 .campaign { position: relative; isolation: isolate; display: grid; align-items: end; min-height: min(100svh, 52rem); background: var(--color-surface-inverse); color: var(--color-text-inverse); overflow: hidden; }
-.campaign__media, .campaign__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.campaign__media { position: absolute; inset: 0; overflow: hidden; }
+.campaign__media img { position: absolute; inset: -40px 0; width: 100%; height: calc(100% + 80px); object-fit: cover; transform: translate3d(0, var(--parallax, 0px), 0); }
 .campaign__media { z-index: -1; }
 .campaign__media::before { content: ""; position: absolute; inset: 0; z-index: 1; background: var(--photo-fade); }
-.campaign__content { display: grid; gap: var(--space-lg); padding-block: var(--space-3xl) var(--space-xl); }
+.campaign__content { display: grid; gap: var(--space-lg); padding-block: var(--space-3xl) calc(var(--space-xl) + 1.5rem); }
 .campaign__title { font-size: max(var(--text-poster), 18vw); line-height: 1; max-width: 10ch; }
 .campaign__aside { display: grid; gap: var(--space-md); justify-items: start; align-content: end; }
 .campaign__aside .lead { color: var(--color-text-inverse); }
-.campaign__credit { position: absolute; right: var(--layout-gutter); top: var(--space-sm); color: var(--color-text-inverse-muted); }
+.campaign__credit { position: absolute; right: var(--layout-gutter); bottom: var(--space-sm); left: auto; max-width: calc(100% - 2 * var(--layout-gutter)); font-size: 0.625rem; line-height: 1.4; text-align: right; overflow-wrap: anywhere; color: var(--color-text-inverse-muted); }
+main + .campaign, .campaign--after-grid { margin-top: 72px; }
+@media (min-width: 48em) { main + .campaign, .campaign--after-grid { margin-top: 120px; } }
 @media (min-width: 40em) { .campaign__title { font-size: var(--text-poster); } }
 @media (min-width: 64em) { .campaign__content { grid-template-columns: 2fr 1fr; align-items: end; } }
 
@@ -695,7 +699,6 @@ a:hover .arrow::after { transform: translateX(4px); }
   .filters__scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 16px var(--layout-gutter) 0; }
   .filters__actions { position: sticky; bottom: 0; background: var(--color-bg); padding-block: 12px calc(12px + env(safe-area-inset-bottom)); }
   .has-filters-open { overflow: hidden; }
-  .results { padding-bottom: 5rem; }
 }
 
 /* 9. Fiche produit --------------------------------------------------------- */
@@ -861,9 +864,12 @@ a:hover .arrow::after { transform: translateX(4px); }
 .legal > * + * { margin-top: var(--space-xs); }
 
 /* 11. Mouvement ------------------------------------------------------------ */
-/* Révélation au défilement : seuls les éléments sous la ligne de flottaison sont masqués, par le JS */
-.reveal-pending { opacity: 0; transform: translateY(18px); transition: opacity var(--motion-reveal) var(--ease-out), transform var(--motion-reveal) var(--ease-out); transition-delay: calc(var(--reveal-index, 0) * 45ms); }
-.reveal-pending.is-visible { opacity: 1; transform: none; }
+/* Révélation au défilement (.reveal) : seul le JS masque, et seulement sous la ligne de flottaison.
+   Sans JS, ou avec prefers-reduced-motion, tout reste visible. */
+.reveal { transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out), clip-path 900ms var(--ease-out); transition-delay: var(--reveal-delay, 0ms); }
+.reveal[data-reveal="pending"] { opacity: 0; transform: translateY(24px); }
+.campaign__title.reveal { clip-path: inset(-0.15em -0.15em -0.15em -0.15em); }
+.campaign__title.reveal[data-reveal="pending"] { opacity: 1; transform: none; clip-path: inset(-0.15em 100% -0.15em -0.15em); }
 @keyframes marquee { to { transform: translateX(-50%); } }
 @keyframes pulse { from { opacity: 1; } to { opacity: 0.45; } }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -874,7 +880,8 @@ a:hover .arrow::after { transform: translateX(4px); }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; }
   .marquee__track { animation: none; flex-wrap: wrap; width: auto; }
   .marquee__group[aria-hidden="true"] { display: none; }
-  .reveal-pending { opacity: 1; transform: none; }
+  .reveal, .reveal[data-reveal="pending"] { opacity: 1; transform: none; clip-path: none; transition: none; }
+  .campaign__media img { transform: none; }
 }
 
 /* 12. Utilitaires ---------------------------------------------------------- */
@@ -1017,16 +1024,14 @@ a:hover .arrow::after { transform: translateX(4px); }
 .line-item__meta { overflow-wrap: anywhere; }
 
 /* Couleurs : filtre en pastilles, pastilles cliquables des cartes, fondu de galerie */
-.color-filter { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 12px; }
-.color-filter__opt { position: relative; display: flex; align-items: center; gap: 10px; min-height: 40px; cursor: pointer; }
-.color-filter__opt input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-.color-filter__opt svg { flex: none; width: 24px; height: 24px; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--color-rule-control); transition: outline-offset var(--motion-fast); }
-.color-filter__opt svg circle { stroke: var(--color-rule-control); stroke-width: 1; }
-.color-filter__opt input:checked + svg { outline: 2px solid var(--color-text); outline-offset: 2px; }
-.color-filter__opt input:focus-visible + svg { outline: 3px solid var(--color-focus); outline-offset: 2px; }
-.color-filter__opt input:checked ~ span { font-weight: 700; }
-.color-filter__opt .check__count { margin-left: auto; }
-.swatches { list-style: none; padding: 0; }
+.color-filter { display: grid; }
+.color-filter__opt { position: relative; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: var(--space-xs); min-height: var(--tap-min); padding-block: var(--space-2xs); cursor: pointer; }
+.color-filter__input { position: absolute; width: 1px; height: 1px; margin: 0; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; appearance: none; border: 0; }
+.color-filter__dot { display: block; width: 18px; height: 18px; border-radius: 50%; }
+.color-filter__dot circle { stroke: var(--color-rule-control); stroke-width: 1; }
+.color-filter__input:checked + .color-filter__dot { outline: 2px solid var(--color-text); outline-offset: 2px; }
+.color-filter__input:focus-visible + .color-filter__dot { outline: 3px solid var(--color-focus); outline-offset: 2px; }
+.color-filter__input:checked ~ .check__label { font-weight: 700; }
 .swatch-link { position: relative; z-index: 5; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; }
 .swatch-link .swatch-dot { width: 14px; height: 14px; }
 .swatch-link.is-active .swatch-dot, .swatch-link.is-preview .swatch-dot { outline: 1.5px solid var(--color-text); outline-offset: 2px; border-radius: 50%; }

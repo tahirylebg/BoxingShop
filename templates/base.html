@@ -9,8 +9,8 @@
   <link rel="canonical" href="{% block canonical %}{{ SITE_URL }}{{ request.path }}{% endblock %}">
   <link rel="preload" href="{% static 'fonts/anton-latin-400.woff2' %}" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="{% static 'fonts/inter-latin-wght.woff2' %}" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
-  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v={{ ASSET_V }}">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}?v={{ ASSET_V }}">
   <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
   <meta name="theme-color" content="#0D0D0D">
   <meta property="og:site_name" content="Boxing Shop">
@@ -20,9 +20,9 @@
   <meta property="og:title" content="{% block og_title %}Boxing Shop{% endblock %}">
   {% block og_image %}{% endblock %}
   {% block head_extra %}{% endblock %}
-  <script type="module" src="{% static 'js/cart-drawer.js' %}"></script>
-  <script type="module" src="{% static 'js/motion.js' %}"></script>
-  <script type="module" src="{% static 'js/nav.js' %}"></script>
+  <script type="module" src="{% static 'js/cart-drawer.js' %}?v={{ ASSET_V }}"></script>
+  <script type="module" src="{% static 'js/motion.js' %}?v={{ ASSET_V }}"></script>
+  <script type="module" src="{% static 'js/nav.js' %}?v={{ ASSET_V }}"></script>
   {% block scripts %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">

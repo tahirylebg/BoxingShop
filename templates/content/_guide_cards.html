@@ -17,7 +17,7 @@
 {% if guides %}
   <ul class="guide-grid">
     {% for g in guides %}
-      <li data-reveal>
+      <li class="reveal">
         <article class="guide-card">
           <div class="guide-card__media">
             {% if g.photo %}{% responsive_img g.photo sizes="(min-width: 64em) 30vw, (min-width: 40em) 50vw, 100vw" alt="" %}{% endif %}

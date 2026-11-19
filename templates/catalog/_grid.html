@@ -2,7 +2,7 @@
 {% load shop %}
 <ul class="product-grid{% if fill_guide %} product-grid--catalog{% endif %}">
   {% for product in products %}
-    <li{% if reveal %} data-reveal{% endif %}>{% if priority_first and forloop.first %}{% include "catalog/_card.html" with priority=True %}{% else %}{% include "catalog/_card.html" with eager=forloop.counter %}{% endif %}</li>
+    <li class="reveal">{% if priority_first and forloop.first %}{% include "catalog/_card.html" with priority=True %}{% else %}{% include "catalog/_card.html" with eager=forloop.counter %}{% endif %}</li>
   {% endfor %}
   {% if fill_guide %}
     <li class="grid-fill">

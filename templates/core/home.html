@@ -30,14 +30,14 @@
   </div>
 </section>
 
-<section class="section section--flush" aria-labelledby="disciplines-title">
+<section class="section section--flush reveal" aria-labelledby="disciplines-title">
   <div class="container section__head">
     <p class="section__index"><b>01</b> / Disciplines</p>
     <h2 id="disciplines-title">Choisissez votre combat</h2>
   </div>
   <ul class="mosaic">
     {% for d in disciplines %}
-      <li data-reveal>
+      <li class="reveal">
         <a class="tile" href="{{ d.get_absolute_url }}">
           {% if d.photo %}<span class="tile__media">{% responsive_img d.photo sizes="(min-width: 64em) 58vw, (min-width: 48em) 50vw, 100vw" alt="" %}</span>{% endif %}
           <span class="tile__index">{{ forloop.counter|stringformat:"02d" }}</span>
@@ -50,7 +50,7 @@
   </ul>
 </section>
 
-<section class="section" aria-labelledby="best-title">
+<section class="section reveal" aria-labelledby="best-title">
   <div class="container">
     <div class="section__head">
       <p class="section__index"><b>02</b> / Meilleures ventes</p>
@@ -61,7 +61,7 @@
   </div>
 </section>
 
-<section class="section" aria-labelledby="types-title">
+<section class="section reveal" aria-labelledby="types-title">
   <div class="container">
     <div class="section__head">
       <p class="section__index"><b>03</b> / Par type</p>
@@ -80,7 +80,7 @@
   </ul>
 </section>
 
-<section class="section" aria-labelledby="edito-title">
+<section class="section reveal" aria-labelledby="edito-title">
   <div class="container">
     <header class="guides-head">
       <h2 id="edito-title" class="guides-head__title sig">Un gant trop léger blesse <span>votre partenaire.</span></h2>
@@ -93,7 +93,7 @@
 
 {% include "partials/campaign.html" %}
 
-<section class="pledges" aria-label="Nos engagements">
+<section class="pledges reveal" aria-label="Nos engagements">
   <div class="container">
     <ul class="pledges__list">
       <li class="pledge" data-index="01">

@@ -6,7 +6,7 @@
 {% block og_title %}{{ product.name }}{% endblock %}
 {% block og_image %}{% if images %}<meta property="og:image" content="{{ SITE_URL }}{% largest_rendition_url images.0 %}">{% endif %}{% endblock %}
 {% block head_extra %}{% jsonld product_ld %}{% jsonld breadcrumb_ld %}{% endblock %}
-{% block scripts %}<script type="module" src="{% static 'js/variant-picker.js' %}"></script>{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'js/variant-picker.js' %}?v={{ ASSET_V }}"></script>{% endblock %}
 {% block body_class %}has-sticky-buy page--concrete{% endblock %}
 {% block content %}
 <div class="container">

@@ -37,9 +37,23 @@ def _nav():
     }
 
 
+def _asset_version():
+    """Plus grande date de modification des CSS/JS : change à chaque édition, casse le cache navigateur."""
+    root = settings.BASE_DIR / "static"
+    files = [*root.glob("css/*.css"), *root.glob("js/*.js")]
+    return str(int(max((f.stat().st_mtime for f in files), default=0)))
+
+
+_ASSET_VERSION = None
+
+
 def site(request):
+    global _ASSET_VERSION
+    if settings.DEBUG or _ASSET_VERSION is None:
+        _ASSET_VERSION = _asset_version()
     nav = cached("nav", _nav)
     return {
+        "ASSET_V": _ASSET_VERSION,
         "SHOP": settings.SHOP,
         "SITE_URL": settings.SITE_URL,
         "nav_disciplines": nav["disciplines"],

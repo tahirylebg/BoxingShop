@@ -6,7 +6,7 @@
 {% block canonical %}{{ SITE_URL }}{{ request.path }}{% if page.number > 1 and not noindex %}?page={{ page.number }}{% endif %}{% endblock %}
 {% block og_title %}{{ title }}{% endblock %}
 {% block head_extra %}{% jsonld breadcrumb_ld %}{% endblock %}
-{% block scripts %}<script type="module" src="{% static 'js/filters.js' %}"></script>{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'js/filters.js' %}?v={{ ASSET_V }}"></script>{% endblock %}
 {% block content %}
 {% with parts=title|title_split %}
 <header class="listing-hero">
@@ -57,7 +57,7 @@
                 {% if style == "swatches" %}
                   <div class="color-filter">
                     {% for value, label, n, checked in options %}
-                      <label class="color-filter__opt"><input type="checkbox" name="{{ key }}" value="{{ value }}"{% if checked %} checked{% endif %}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="{{ label|color_hex }}"/></svg><span>{{ label }}</span>{% if n %}<small class="check__count">{{ n }}</small>{% endif %}</label>
+                      <label class="color-filter__opt"><input class="color-filter__input" type="checkbox" name="{{ key }}" value="{{ value }}"{% if checked %} checked{% endif %}><svg class="color-filter__dot" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8.5" fill="{{ label|color_hex }}"/></svg><span class="check__label">{{ label }}</span>{% if n %}<small class="check__count">{{ n }}</small>{% endif %}</label>
                     {% endfor %}
                   </div>
                 {% elif style == "chips" %}
