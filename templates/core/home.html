@@ -3,6 +3,7 @@
 {% block og_title %}Boxing Shop — l'équipement du combattant{% endblock %}
 {% block og_image %}{% if home.hero_photo %}<meta property="og:image" content="{{ SITE_URL }}{% largest_rendition_url home.hero_photo %}">{% endif %}{% endblock %}
 {% block head_extra %}{% jsonld org_ld %}{% endblock %}
+{% block campaign %}{% endblock %}
 {% block content %}
 <section class="hero" aria-labelledby="hero-title">
   {% if home.hero_photo %}
@@ -23,65 +24,67 @@
       </ul>
       <div class="cluster">
         <a class="btn btn--inverse btn--lg" href="{% url 'catalog:shop' %}">Voir l'équipement</a>
-        <a class="btn btn--outline-inverse btn--lg" href="{% url 'content:guides' %}">Bien choisir</a>
+        <a class="btn btn--blood btn--lg" href="{% url 'content:guides' %}">Bien choisir</a>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section" aria-labelledby="disciplines-title">
-  <div class="container">
-    <div class="section__head">
-      <p class="section__index"><b>01</b> / Disciplines</p>
-      <h2 id="disciplines-title">Choisissez votre discipline</h2>
-      <a class="btn-link" href="{% url 'catalog:shop' %}">Tout le catalogue <span class="arrow" aria-hidden="true"></span></a>
-    </div>
-    <ul class="mosaic">
-      {% for d in disciplines %}
-        <li data-reveal>
-          <a class="tile grain" href="{{ d.get_absolute_url }}">
-            {% if d.photo %}<span class="tile__media">{% responsive_img d.photo sizes="(min-width: 64em) 58vw, (min-width: 48em) 50vw, 100vw" alt="" %}</span>{% endif %}
-            <span class="tile__index">{{ forloop.counter|stringformat:"02d" }} / {{ d.short_name|default:d.name }}</span>
-            <span class="tile__name">{{ d.name }}</span>
-            <span class="tile__tag">{{ d.tagline }}</span>
-            <span class="tile__go">Voir l'équipement <span class="arrow" aria-hidden="true"></span></span>
-          </a>
-        </li>
-      {% endfor %}
-    </ul>
+<section class="section section--flush" aria-labelledby="disciplines-title">
+  <div class="container section__head">
+    <p class="section__index"><b>01</b> / Disciplines</p>
+    <h2 id="disciplines-title">Choisissez votre combat</h2>
   </div>
+  <ul class="mosaic">
+    {% for d in disciplines %}
+      <li data-reveal>
+        <a class="tile" href="{{ d.get_absolute_url }}">
+          {% if d.photo %}<span class="tile__media">{% responsive_img d.photo sizes="(min-width: 64em) 58vw, (min-width: 48em) 50vw, 100vw" alt="" %}</span>{% endif %}
+          <span class="tile__index">{{ forloop.counter|stringformat:"02d" }}</span>
+          <span class="tile__name">{{ d.name }}</span>
+          <span class="tile__tag">{{ d.tagline }}</span>
+          <span class="tile__go">Voir l'équipement <span class="tile__arrow" aria-hidden="true">→</span></span>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
 </section>
 
 <section class="section" aria-labelledby="best-title">
   <div class="container">
     <div class="section__head">
       <p class="section__index"><b>02</b> / Meilleures ventes</p>
-      <h2 id="best-title">Équipement du Combattant</h2>
-      <a class="btn btn--ghost" href="{% url 'catalog:shop' %}?tri=ventes">Tout voir <span class="arrow" aria-hidden="true"></span></a>
+      <h2 id="best-title">Équipement du combattant</h2>
     </div>
-    <ul class="product-grid">
-      {% for product in best_sellers %}<li data-reveal>{% include "catalog/_card.html" %}</li>{% endfor %}
-    </ul>
+    {% url 'catalog:shop' as shop_url %}
+    {% include "catalog/_grid.html" with products=best_sellers reveal=True cta_url=shop_url cta_label="Tout voir" %}
   </div>
 </section>
 
-<section class="section section--sunken" aria-labelledby="types-title">
+<section class="section" aria-labelledby="types-title">
   <div class="container">
     <div class="section__head">
       <p class="section__index"><b>03</b> / Par type</p>
-      <h2 id="types-title">Le matériel, rayon par rayon</h2>
+      <h2 id="types-title">Rayon par rayon</h2>
     </div>
-    <ul class="type-strip">
-      {% for c in types %}<li data-reveal><a href="{{ c.get_absolute_url }}"><span class="kicker">{{ forloop.counter|stringformat:"02d" }} / {{ c.name }}</span><span class="display">{{ c.name }}</span><span class="arrow" aria-hidden="true"></span></a></li>{% endfor %}
-    </ul>
   </div>
+  <ul class="type-rail container" aria-label="Types de produit">
+    {% for t in types %}
+      <li>
+        <a class="type-tile" href="{{ t.category.get_absolute_url }}">
+          <span class="type-tile__media">{% if t.image %}{% responsive_img t.image sizes="(min-width: 64em) 20vw, 70vw" alt="" %}{% endif %}</span>
+          <span class="type-tile__name">{{ t.category.name }}</span>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
 </section>
 
 <section class="section" aria-labelledby="edito-title">
   <div class="container editorial">
     <div class="editorial__lead stack">
       <p class="section__index"><b>04</b> / Guides techniques</p>
-      <h2 id="edito-title" class="editorial__quote">Un gant trop léger blesse <span>votre partenaire.</span> Trop lourd, il vous ralentit.</h2>
+      <h2 id="edito-title" class="editorial__quote">Un gant trop léger blesse <span>votre partenaire.</span></h2>
       {% with cover=guides.0.photo %}{% if cover %}
         <figure class="editorial__figure grain" data-reveal>
           {% responsive_img cover sizes="(min-width: 64em) 38vw, 100vw" alt="" %}
@@ -93,13 +96,15 @@
       <p class="lead">Poids en onces, densité des mousses, cuir ou microfibre, lacets ou scratch : chaque détail compte. Nos guides vous aident à choisir juste, du premier cours au combat officiel.</p>
       <ul class="guide-list">
         {% for g in guides %}
-          <li data-reveal><a href="{{ g.get_absolute_url }}"><span class="kicker muted">{{ g.kicker }} · {{ g.reading_minutes }} min</span><span class="guide-list__title">{{ g.title }}</span><span class="muted">{{ g.excerpt }}</span></a></li>
+          <li data-reveal><a href="{{ g.get_absolute_url }}"><span class="kicker muted">{{ g.get_topic_display }} · {{ g.reading_minutes }} min</span><span class="guide-list__title">{{ g.title }}</span><span class="muted">{{ g.excerpt }}</span></a></li>
         {% endfor %}
       </ul>
-      <a class="btn btn--ghost" href="{% url 'content:guides' %}">Tous les guides <span class="arrow" aria-hidden="true"></span></a>
+      <a class="btn" href="{% url 'content:guides' %}">Tous les guides <span class="arrow" aria-hidden="true"></span></a>
     </div>
   </div>
 </section>
+
+{% include "partials/campaign.html" %}
 
 <section class="section section--tight" aria-label="Nos engagements">
   <div class="container">

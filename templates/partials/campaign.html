@@ -1,0 +1,15 @@
+{% load shop %}{% if campaign %}
+<section class="campaign" aria-labelledby="campaign-title">
+  {% if campaign.campaign_photo %}
+    <div class="campaign__media grain">{% responsive_img campaign.campaign_photo sizes="100vw" alt="" %}</div>
+  {% endif %}
+  <div class="container campaign__content">
+    <h2 class="campaign__title" id="campaign-title">{{ campaign.campaign_title }}</h2>
+    <div class="campaign__aside">
+      <p class="lead">{{ campaign.campaign_text }}</p>
+      <a class="btn btn--inverse btn--lg" href="{% url 'catalog:shop' %}">{{ campaign.campaign_cta }} <span class="arrow" aria-hidden="true"></span></a>
+    </div>
+  </div>
+  {% if campaign.campaign_photo.credit %}<p class="campaign__credit photo-credit">Photo : {{ campaign.campaign_photo.credit_line }}</p>{% endif %}
+</section>
+{% endif %}

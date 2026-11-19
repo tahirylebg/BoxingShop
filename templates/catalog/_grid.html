@@ -1,0 +1,9 @@
+{# Grille produit 2 / 4 colonnes. La carte CTA finale comble la dernière rangée (voir .grid-cta dans main.css). #}
+<ul class="product-grid">
+  {% for product in products %}
+    <li{% if reveal %} data-reveal{% endif %}>{% if priority_first and forloop.first %}{% include "catalog/_card.html" with priority=True %}{% else %}{% include "catalog/_card.html" with eager=forloop.counter %}{% endif %}</li>
+  {% endfor %}
+  {% if cta_url %}
+    <li class="grid-cta"><a href="{{ cta_url }}"><span class="grid-cta__kicker">{{ cta_kicker|default:"Catalogue complet" }}</span><span class="grid-cta__label">{{ cta_label|default:"Tout voir" }}</span><span class="grid-cta__arrow" aria-hidden="true">→</span></a></li>
+  {% endif %}
+</ul>

@@ -125,34 +125,7 @@
 
     {% if chart %}
       <section id="tailles" class="span-full" aria-labelledby="chart-title">
-        <div class="weigh-in">
-          <div class="weigh-in__head">
-            <div>
-              <p class="kicker muted">Fiche de pesée · {{ product.category.name }}</p>
-              <h2 class="weigh-in__title mt-3" id="chart-title">{{ chart.name }}</h2>
-            </div>
-            <p class="weigh-in__no">N° {{ selected.sku|default:product.slug }}<br>Boxing Shop</p>
-          </div>
-          <dl class="weigh-in__fields">
-            <div><dt>Discipline</dt><dd>{{ product.discipline.short_name|default:product.discipline.name }}</dd></div>
-            <div><dt>Mesure</dt><dd>{{ chart.measure_label }}</dd></div>
-            <div><dt>Niveau</dt><dd>{{ product.get_level_display }}</dd></div>
-          </dl>
-          {% if chart.intro %}<p>{{ chart.intro }}</p>{% endif %}
-          <div class="table-wrap mt-4">
-            <table>
-              <caption class="visually-hidden">Correspondance entre votre morphologie et la taille conseillée</caption>
-              <thead><tr>{% if chart_cols.weight %}<th scope="col">Votre poids</th>{% endif %}{% if chart_cols.height %}<th scope="col">Votre taille</th>{% endif %}<th scope="col">{{ chart.measure_label }} conseillé</th>{% if chart_cols.note %}<th scope="col">Usage</th>{% endif %}</tr></thead>
-              <tbody>
-                {% for row in chart_rows %}
-                  <tr>{% if chart_cols.weight %}<td>{{ row.weight_range }}</td>{% endif %}{% if chart_cols.height %}<td>{{ row.height_range }}</td>{% endif %}<td><strong>{{ row.recommended }}</strong></td>{% if chart_cols.note %}<td class="weigh-in__note">{{ row.note }}</td>{% endif %}</tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          <p class="weigh-in__foot"><span>Entre deux tailles : prenez la plus grande.</span><span>Mesures en kg et cm</span></p>
-          <p class="weigh-in__stamp" aria-hidden="true">Pesé</p>
-        </div>
+        {% include "catalog/_weigh_in.html" with kicker=product.category.name sheet_no=selected.sku|default:product.slug discipline=product.discipline.short_name|default:product.discipline.name level=product.get_level_display %}
       </section>
     {% endif %}
 
@@ -206,7 +179,7 @@
   {% if related %}
     <section class="section" aria-labelledby="related-title">
       <div class="section__head"><h2 id="related-title">Dans la même catégorie</h2></div>
-      <ul class="product-grid">{% for product in related %}<li>{% include "catalog/_card.html" %}</li>{% endfor %}</ul>
+      {% include "catalog/_grid.html" with products=related cta_url=product.category.get_absolute_url cta_kicker=product.category.name cta_label="Tout voir" %}
     </section>
   {% endif %}
 </div>

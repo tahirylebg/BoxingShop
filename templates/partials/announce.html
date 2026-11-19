@@ -1,0 +1,16 @@
+{% with threshold=shipping_settings.free_shipping_threshold|floatformat:"0" %}
+<div class="announce" data-announce>
+  <div class="container announce__inner">
+    <ul class="announce__list" aria-live="off">
+      <li class="is-active">Livraison offerte dès {{ threshold }} €</li>
+      <li>Expédition sous 48 h · Retours 30 jours</li>
+      <li>Tarifs dégressifs pour les clubs et les coachs</li>
+      <li>Paiement CB, Apple Pay et Google Pay</li>
+    </ul>
+    <button class="announce__pause" type="button" data-announce-toggle aria-pressed="false" hidden>
+      <span class="visually-hidden">Mettre en pause les annonces</span>
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3h2v10H5zM9 3h2v10H9z" fill="currentColor"/></svg>
+    </button>
+  </div>
+</div>
+{% endwith %}

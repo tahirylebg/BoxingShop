@@ -354,7 +354,7 @@ GUIDES = [
                 "rentable.",
     },
     {
-        "slug": "entretien-du-cuir", "title": "Entretien du cuir : faire durer ses gants et protections",
+        "slug": "entretien-du-cuir", "topic": "entretien", "title": "Entretien du cuir : faire durer ses gants et protections",
         "kicker": "Savoir-faire", "minutes": 4,
         "excerpt": "Un gant en cuir bien entretenu dure trois fois plus longtemps. Séchage, nettoyage, nutrition : "
                    "la routine qui préserve votre matériel.",
@@ -376,6 +376,96 @@ GUIDES = [
                 "## À éviter\n"
                 "- Le sac de sport fermé avec les gants humides à l'intérieur.\n"
                 "- Les produits ménagers et l'alcool, qui dessèchent le cuir.",
+    },
+    {
+        "slug": "choisir-protege-tibias", "title": "Protège-tibias : trouver la bonne taille et le bon modèle",
+        "kicker": "Guide technique", "minutes": 5, "topic": "protections",
+        "excerpt": "Mousse, cuir ou chaussette : chaque modèle répond à un usage. La taille se choisit à la "
+                   "longueur du tibia, pas à la pointure.",
+        "categories": ["protege-tibias"],
+        "products": ["protege-tibias-cuir-pro", "protege-tibias-mousse-sparring", "protege-tibias-mma-socks",
+                     "paos-thai-paire"],
+        "body": "Un protège-tibias doit couvrir l'os du genou jusqu'au cou-de-pied, sans gêner la flexion de la "
+                "cheville. Trop court, il laisse le tibia exposé ; trop long, il bascule à chaque check.\n\n"
+                "## Mesurer avant d'acheter\n"
+                "Mesurez du bas de la rotule jusqu'au pli de la cheville, jambe tendue. Reportez la mesure et votre "
+                "poids sur le tableau ci-dessous : en cas d'hésitation, prenez la taille au-dessus.\n\n"
+                "## Trois familles de protège-tibias\n"
+                "- **Mousse moulée avec pied** : le standard du sparring en muay thaï, il protège aussi le dessus "
+                "du pied.\n"
+                "- **Cuir pro** : plus dense, il encaisse les entraînements intensifs et garde sa forme des années.\n"
+                "- **Chaussette (sock)** : léger et maintenu sans scratch, il convient au MMA et aux enchaînements "
+                "avec lutte.\n\n"
+                "## Le bon maintien\n"
+                "Deux scratchs larges valent mieux que trois fins. Après dix minutes de shadow, la protection ne "
+                "doit ni tourner ni glisser.",
+    },
+    {
+        "slug": "poser-ses-bandes-de-boxe", "title": "Poser ses bandes de boxe en 8 étapes",
+        "kicker": "Débuter", "minutes": 4, "topic": "debutant",
+        "excerpt": "Les bandes maintiennent le poignet et protègent les métacarpes. Une pose correcte prend une "
+                   "minute ; voici la méthode enseignée en club.",
+        "categories": ["bandages-soins"],
+        "products": ["bandes-de-boxe-450", "sous-gants-gel-rapides", "gant-initiation-club",
+                     "spray-assainissant-gants"],
+        "body": "Une bande de 4,5 m suffit pour la plupart des mains. En dessous, le poignet est mal tenu ; "
+                "au-delà, le gant devient difficile à enfiler.\n\n"
+                "## La méthode en 8 étapes\n"
+                "- Passez la boucle autour du pouce, bande vers le dos de la main.\n"
+                "- Faites trois tours autour du poignet, sans serrer au point de bloquer la circulation.\n"
+                "- Remontez en diagonale sur le dos de la main.\n"
+                "- Faites trois tours autour des articulations, doigts écartés.\n"
+                "- Passez entre chaque doigt en revenant par le poignet.\n"
+                "- Faites un tour autour du pouce pour le verrouiller.\n"
+                "- Repassez sur les articulations pour les rembourrer.\n"
+                "- Terminez au poignet et fermez le scratch.\n\n"
+                "## Le test\n"
+                "Fermez le poing : il doit se fermer complètement, sans fourmillement. Si les doigts bleuissent, "
+                "recommencez en serrant moins.",
+    },
+    {
+        "slug": "choisir-kimono-jjb", "title": "Kimono de JJB : taille, grammage et rétrécissement",
+        "kicker": "Débuter", "minutes": 5, "topic": "debutant",
+        "excerpt": "A1, A2, 350 ou 450 g/m² : comment lire l'étiquette d'un kimono et éviter la mauvaise "
+                   "surprise du premier lavage.",
+        "categories": ["kimonos"],
+        "products": ["kimono-jjb-heritage-450", "kimono-jjb-leger-350", "rashguard-jjb-ranked", "short-grappling"],
+        "body": "Les kimonos de jiu-jitsu brésilien se taillent par la lettre A (adulte) suivie d'un chiffre de "
+                "0 à 5. Le chiffre dépend d'abord de votre taille, ensuite de votre poids.\n\n"
+                "## Le grammage\n"
+                "- **350 g/m²** : léger, il sèche vite et convient aux climats chauds et aux entraînements "
+                "quotidiens.\n"
+                "- **450 g/m²** : plus épais, il résiste mieux aux saisies et dure plus longtemps en "
+                "compétition.\n\n"
+                "## Le rétrécissement\n"
+                "Un kimono en coton peut perdre 3 à 5 % au premier lavage. Lavez à 30 °C, séchez à l'air libre "
+                "et évitez le sèche-linge.\n\n"
+                "## Les règles de compétition\n"
+                "La manche doit arriver à 5 cm du poignet bras tendu, et le pantalon à 5 cm de la malléole. "
+                "Vérifiez-le avant de vous inscrire.",
+    },
+    {
+        "slug": "choisir-sac-de-frappe", "title": "Choisir son sac de frappe : poids, hauteur et remplissage",
+        "kicker": "Guide technique", "minutes": 6, "topic": "debutant",
+        "excerpt": "Un sac trop léger se balance, un sac trop lourd abîme les poignets. La règle simple : la moitié "
+                   "de votre poids de corps.",
+        "categories": ["materiel-de-club"],
+        "products": ["sac-de-frappe-cuir-120", "sac-thai-180-microfibre", "pattes-d-ours-cuir",
+                     "gant-sparring-microfibre", "bandes-de-boxe-450"],
+        "body": "Le sac de frappe est l'investissement central d'une salle à domicile. Trois critères comptent : "
+                "son poids, sa hauteur et la manière dont il est rempli.\n\n"
+                "## Le poids\n"
+                "Visez environ la moitié de votre poids de corps : un sac de 35 à 40 kg convient à un pratiquant "
+                "de 75 kg. Plus léger, il bouge trop ; plus lourd, il devient dur comme un mur.\n\n"
+                "## La hauteur\n"
+                "- **120 cm** : boxe anglaise, travail des poings et des crochets au corps.\n"
+                "- **180 cm** : muay thaï et kickboxing, pour frapper aussi en low-kick.\n\n"
+                "## Le remplissage\n"
+                "Un mélange de chutes textiles et de sable ensaché répartit le poids sans créer de zone dure. "
+                "Faites-le tourner d'un quart de tour chaque mois pour éviter qu'il ne se tasse.\n\n"
+                "## L'installation\n"
+                "Fixez-le à une poutre ou à une potence capable de supporter trois fois son poids, et laissez "
+                "un mètre libre tout autour.",
     },
 ]
 

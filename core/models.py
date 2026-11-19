@@ -120,6 +120,16 @@ class HomeSettings(SingletonModel):
         default="Du matériel de combat choisi par des pratiquants, éprouvé au sac, au sparring et sur le ring.",
     )
 
+    guides_photo = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL, related_name="+",
+                                     verbose_name="photo de la page Guides")
+    campaign_photo = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL, related_name="+",
+                                       verbose_name="photo de la bande campagne",
+                                       help_text="Bande plein écran affichée avant le pied de page.")
+    campaign_title = models.CharField("slogan de campagne", max_length=60, default="Rien n'est donné.")
+    campaign_text = models.CharField("texte de campagne", max_length=200,
+                                     default="Chaque round se gagne à l'entraînement. Équipez-vous pour durer.")
+    campaign_cta = models.CharField("bouton de campagne", max_length=40, default="S'équiper")
+
     class Meta:
         verbose_name = "page d'accueil"
         verbose_name_plural = "page d'accueil"

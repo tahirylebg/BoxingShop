@@ -1,45 +1,95 @@
-<header class="site-header">
+{% load shop %}
+<header class="site-header" data-site-header>
   <div class="container site-header__inner">
-    <details class="menu-mobile">
-      <summary class="icon-btn" aria-label="Menu">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    {# Menu mobile plein écran (sans JS : <details>) #}
+    <details class="menu-mobile" data-menu-mobile>
+      <summary class="icon-btn" aria-label="Ouvrir le menu">
+        <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 7h18M3 17h18"/></svg>
+        <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
       </summary>
-      <nav class="menu-mobile__panel" aria-label="Menu principal (mobile)">
-        <form action="{% url 'catalog:shop' %}" method="get" role="search" class="field">
-          <label for="q-mobile">Rechercher</label>
-          <input id="q-mobile" type="search" name="q" placeholder="Gant cuir, protège-tibias…">
-        </form>
-        <p class="kicker">Disciplines</p>
-        <ul>
-          {% for d in nav_disciplines %}<li><a href="{{ d.get_absolute_url }}">{{ d.name }}<span class="mono" aria-hidden="true">→</span></a></li>{% endfor %}
+      <nav class="menu-mobile__panel" aria-label="Menu principal">
+        <ul class="menu-mobile__list">
+          {% for entry in nav_mega %}
+            <li>
+              <details class="menu-mobile__group">
+                <summary>{{ entry.discipline.short_name|default:entry.discipline.name }}<span class="menu-mobile__plus" aria-hidden="true"></span></summary>
+                <ul class="menu-mobile__sub">
+                  <li><a href="{{ entry.discipline.get_absolute_url }}">Tout {{ entry.discipline.name }}</a></li>
+                  {% for col in entry.columns %}<li><a href="{{ entry.discipline.get_absolute_url }}{{ col.category.slug }}/">{{ col.category.name }}</a></li>{% endfor %}
+                </ul>
+              </details>
+            </li>
+          {% endfor %}
+          <li><a class="menu-mobile__link" href="{% url 'content:guides' %}">Guides</a></li>
+          <li><a class="menu-mobile__link" href="{% url 'catalog:shop' %}">Tout le catalogue</a></li>
         </ul>
-        <p class="kicker">Équipement</p>
-        <ul>
-          {% for c in nav_categories %}<li><a href="{{ c.get_absolute_url }}">{{ c.name }}<span class="mono" aria-hidden="true">→</span></a></li>{% endfor %}
-          <li><a href="{% url 'content:guides' %}">Guides techniques<span class="mono" aria-hidden="true">→</span></a></li>
+        <ul class="menu-mobile__meta">
+          <li><a href="{% if user.is_authenticated %}{% url 'accounts:dashboard' %}{% else %}{% url 'accounts:login' %}{% endif %}">{% if user.is_authenticated %}Mon compte{% else %}Se connecter{% endif %}</a></li>
+          <li><a href="{% url 'orders:track' %}">Suivre une commande</a></li>
+          <li><a href="{% url 'accounts:club_request' %}">Offre clubs &amp; coachs</a></li>
         </ul>
       </nav>
     </details>
 
     <a class="logo" href="{% url 'core:home' %}">
-      <span class="logo__word">Boxing Shop<span class="visually-hidden"> — accueil</span></span><span class="logo__est" aria-hidden="true">EST. 2026</span>
+      <span class="logo__word">Boxing Shop<span class="visually-hidden"> — accueil</span></span><span class="logo__est" aria-hidden="true">Est. 2026</span>
     </a>
 
     <nav class="nav-main" aria-label="Disciplines">
-      <ul>
-        {% for d in nav_disciplines %}
-          <li><a href="{{ d.get_absolute_url }}"{% if request.path == d.get_absolute_url %} aria-current="page"{% endif %}>{{ d.short_name|default:d.name }}</a></li>
-        {% endfor %}
-        <li><a href="{% url 'content:guides' %}"{% if request.resolver_match.app_name == 'content' %} aria-current="page"{% endif %}>Guides</a></li>
+      <ul class="nav-main__list">
+        {% for entry in nav_mega %}{% with d=entry.discipline %}
+          <li class="nav-main__item" data-mega-item>
+            <a class="nav-main__link" href="{{ d.get_absolute_url }}"{% if request.path == d.get_absolute_url %} aria-current="page"{% endif %}>{{ d.short_name|default:d.name }}</a>
+            {% if entry.columns %}
+              <div class="mega" data-mega>
+                <div class="container mega__inner">
+                  <div class="mega__cols">
+                    {% for col in entry.columns %}
+                      <div class="mega__col">
+                        <a class="mega__head" href="{{ d.get_absolute_url }}{{ col.category.slug }}/">{{ col.category.name }}</a>
+                        {% if col.children %}<ul>{% for c in col.children %}<li><a href="{{ d.get_absolute_url }}{{ c.slug }}/">{{ c.name }}</a></li>{% endfor %}</ul>{% endif %}
+                      </div>
+                    {% endfor %}
+                    <div class="mega__col"><a class="mega__head mega__all" href="{{ d.get_absolute_url }}">Tout voir <span aria-hidden="true">→</span></a></div>
+                  </div>
+                  {% if d.photo %}
+                    <a class="mega__feature" href="{{ d.get_absolute_url }}" tabindex="-1" aria-hidden="true">
+                      {% responsive_img d.photo sizes="26rem" alt="" %}
+                      <span class="mega__feature-label">{{ d.name }}</span>
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+          </li>
+        {% endwith %}{% endfor %}
+        <li class="nav-main__item"><a class="nav-main__link" href="{% url 'content:guides' %}"{% if request.resolver_match.app_name == 'content' %} aria-current="page"{% endif %}>Guides</a></li>
       </ul>
     </nav>
 
-    <form class="search-form" action="{% url 'catalog:shop' %}" method="get" role="search">
-      <label class="visually-hidden" for="q">Rechercher un produit</label>
-      <input id="q" type="search" name="q" placeholder="Rechercher…" value="{{ request.GET.q|default:'' }}">
-    </form>
-
     <div class="header-actions">
+      <details class="search-panel" data-search>
+        <summary class="icon-btn" aria-label="Rechercher">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        </summary>
+        <div class="search-panel__sheet">
+          <div class="container">
+            <form class="search-panel__form" action="{% url 'catalog:shop' %}" method="get" role="search" data-suggest-url="{% url 'catalog:search_suggest' %}">
+              <label class="visually-hidden" for="q">Rechercher un produit</label>
+              <input id="q" type="search" name="q" placeholder="Gant cuir, protège-tibias, kimono…" autocomplete="off" value="{{ request.GET.q|default:'' }}" aria-controls="search-suggestions" aria-describedby="search-status">
+              <button class="btn" type="submit">Rechercher</button>
+            </form>
+            <p class="visually-hidden" id="search-status" role="status" aria-live="polite" data-search-status></p>
+            <ul class="search-panel__results" id="search-suggestions" data-search-results></ul>
+            <div class="search-panel__popular">
+              <p class="kicker muted">Recherches fréquentes</p>
+              <ul class="cluster">
+                {% for c in nav_categories %}<li><a class="tag" href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>{% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </details>
       <a class="icon-btn" href="{% if user.is_authenticated %}{% url 'accounts:dashboard' %}{% else %}{% url 'accounts:login' %}{% endif %}" aria-label="{% if user.is_authenticated %}Mon compte{% else %}Se connecter{% endif %}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
       </a>

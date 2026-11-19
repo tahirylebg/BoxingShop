@@ -35,6 +35,21 @@ def jsonld(data):
     return mark_safe(f'<script type="application/ld+json">{payload}</script>')  # contenu échappé ci-dessus
 
 
+def _anchor(title):
+    from django.utils.text import slugify
+
+    import html
+
+    return "s-" + slugify(html.unescape(str(title)).replace("**", ""))[:60]
+
+
+@register.filter
+def markup_toc(text):
+    """Intertitres « ## » d'un contenu simple_markup : [(ancre, titre)] pour le sommaire."""
+    return [(_anchor(line.strip()[3:]), line.strip()[3:].replace("**", ""))
+            for line in str(text or "").splitlines() if line.strip().startswith("## ")]
+
+
 def _inline(text):
     """Texte déjà échappé → applique uniquement **gras**."""
     return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)
@@ -53,7 +68,7 @@ def simple_markup(text):
         if not lines:
             continue
         if lines[0].startswith("## "):
-            out.append(f"<h2>{_inline(lines[0][3:])}</h2>")
+            out.append(f'<h2 id="{_anchor(lines[0][3:])}">{_inline(lines[0][3:])}</h2>')
             lines = lines[1:]
             if not lines:
                 continue

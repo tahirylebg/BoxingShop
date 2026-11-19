@@ -3,19 +3,54 @@
 {% block head_extra %}{% jsonld breadcrumb_ld %}{% endblock %}
 {% block og_title %}Guides techniques{% endblock %}
 {% block content %}
-<div class="container">
-  <header class="page-head">
+<section class="page-hero" aria-labelledby="guides-title">
+  {% if home.guides_photo %}
+    <div class="page-hero__media grain">{% responsive_img home.guides_photo sizes="100vw" alt="" loading="eager" fetchpriority="high" %}</div>
+  {% endif %}
+  <div class="container page-hero__content">
     {% include "partials/breadcrumb.html" %}
-    <p class="kicker mt-5">Savoir-faire</p>
-    <h1>Guides techniques</h1>
-    <p class="lead muted mt-3">Choisir le bon poids de gant, la bonne taille de protège-tibias, entretenir son cuir : les conseils de la salle, sans jargon.</p>
-  </header>
-  <ul class="guide-list">
-    {% for g in guides %}
-      <li><a href="{{ g.get_absolute_url }}"><span class="kicker muted">{{ g.kicker }} · {{ g.reading_minutes }} min · {{ g.published_at|date:"d/m/Y" }}</span><span class="guide-list__title">{{ g.title }}</span><span class="muted">{{ g.excerpt }}</span></a></li>
-    {% empty %}
-      <li>{% include "partials/empty_state.html" with icon="box" title="Aucun guide publié" text="Les guides techniques arrivent bientôt." %}</li>
+    <h1 class="page-hero__title" id="guides-title">Guides techniques</h1>
+    <p class="lead">Poids des gants, taille des protections, entretien du cuir : les conseils de la salle, sans jargon.</p>
+  </div>
+  {% if home.guides_photo.credit %}<p class="page-hero__credit photo-credit">Photo : {{ home.guides_photo.credit_line }}</p>{% endif %}
+</section>
+
+<div class="container">
+  <nav class="chip-bar" aria-label="Filtrer les guides par thème">
+    <a class="chip-link" href="{% url 'content:guides' %}"{% if not topic %} aria-current="page"{% endif %}>Tous</a>
+    {% for value, label in topics %}
+      <a class="chip-link" href="?sujet={{ value }}"{% if topic == value %} aria-current="page"{% endif %}>{{ label }}</a>
     {% endfor %}
-  </ul>
+  </nav>
+
+  {% if featured %}
+    <article class="guide-feature">
+      <a class="guide-feature__media" href="{{ featured.get_absolute_url }}" tabindex="-1" aria-hidden="true">
+        {% if featured.photo %}{% responsive_img featured.photo sizes="(min-width: 64em) 60vw, 100vw" alt="" loading="eager" %}{% endif %}
+      </a>
+      <div class="guide-feature__body">
+        <p class="guide-meta"><span>{{ featured.get_topic_display }}</span><span>{{ featured.reading_minutes }} min de lecture</span></p>
+        <h2 class="guide-feature__title"><a href="{{ featured.get_absolute_url }}">{{ featured.title }}</a></h2>
+        <p>{{ featured.excerpt }}</p>
+        <a class="btn" href="{{ featured.get_absolute_url }}">Lire le guide <span class="arrow" aria-hidden="true"></span></a>
+      </div>
+    </article>
+    {% if guides %}
+      <ul class="guide-grid">
+        {% for g in guides %}
+          <li data-reveal>
+            <article class="guide-card">
+              <div class="guide-card__media">{% if g.photo %}{% responsive_img g.photo sizes="(min-width: 64em) 30vw, (min-width: 40em) 50vw, 100vw" alt="" %}{% endif %}</div>
+              <p class="guide-meta"><span>{{ g.get_topic_display }}</span><span>{{ g.reading_minutes }} min</span></p>
+              <h3 class="guide-card__title"><a href="{{ g.get_absolute_url }}">{{ g.title }}</a></h3>
+              <p class="guide-card__excerpt">{{ g.excerpt }}</p>
+            </article>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% else %}
+    {% url 'content:guides' as guides_url %}{% include "partials/empty_state.html" with icon="box" title="Aucun guide sur ce thème" text="Affichez tous les guides pour voir les autres sujets." cta_url=guides_url cta_label="Tous les guides" %}
+  {% endif %}
 </div>
 {% endblock %}

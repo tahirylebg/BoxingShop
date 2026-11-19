@@ -1,0 +1,31 @@
+{# Fiche de pesée. Paramètres : chart, chart_rows, chart_cols, title_id, kicker, sheet_no, discipline, level #}
+<div class="weigh-in">
+  <div class="weigh-in__head">
+    <div>
+      <p class="kicker muted">Fiche de pesée{% if kicker %} · {{ kicker }}{% endif %}</p>
+      <h2 class="weigh-in__title mt-3" id="{{ title_id|default:'chart-title' }}">{{ chart.name }}</h2>
+    </div>
+    <p class="weigh-in__no">N° {{ sheet_no }}<br>Boxing Shop</p>
+  </div>
+  {% if discipline or level %}
+    <dl class="weigh-in__fields">
+      {% if discipline %}<div><dt>Discipline</dt><dd>{{ discipline }}</dd></div>{% endif %}
+      <div><dt>Mesure</dt><dd>{{ chart.measure_label }}</dd></div>
+      {% if level %}<div><dt>Niveau</dt><dd>{{ level }}</dd></div>{% endif %}
+    </dl>
+  {% endif %}
+  {% if chart.intro %}<p class="mt-4">{{ chart.intro }}</p>{% endif %}
+  <div class="table-wrap mt-4">
+    <table>
+      <caption class="visually-hidden">Correspondance entre votre morphologie et la taille conseillée</caption>
+      <thead><tr>{% if chart_cols.weight %}<th scope="col">Votre poids</th>{% endif %}{% if chart_cols.height %}<th scope="col">Votre taille</th>{% endif %}<th scope="col">{{ chart.measure_label }} conseillé</th>{% if chart_cols.note %}<th scope="col">Usage</th>{% endif %}</tr></thead>
+      <tbody>
+        {% for row in chart_rows %}
+          <tr>{% if chart_cols.weight %}<td>{{ row.weight_range }}</td>{% endif %}{% if chart_cols.height %}<td>{{ row.height_range }}</td>{% endif %}<td><strong>{{ row.recommended }}</strong></td>{% if chart_cols.note %}<td class="weigh-in__note">{{ row.note }}</td>{% endif %}</tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="weigh-in__foot"><span>Entre deux tailles : prenez la plus grande.</span><span>Mesures en kg et cm</span></p>
+  <p class="weigh-in__stamp" aria-hidden="true">Pesé</p>
+</div>

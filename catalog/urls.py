@@ -7,6 +7,7 @@ app_name = "catalog"
 # Les routes « /<discipline>/… » sont incluses en DERNIER dans boxingshop/urls.py (attrape-tout).
 urlpatterns = [
     path("boutique/", views.shop, name="shop"),
+    path("recherche/suggestions/", views.search_suggest, name="search_suggest"),
     path("equipement/<slug:category_slug>/", views.category_view, name="category"),
     path("avis/<int:product_id>/", views.review_create, name="review_create"),
     path("<slug:discipline_slug>/", views.discipline_view, name="discipline"),

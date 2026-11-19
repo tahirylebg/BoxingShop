@@ -75,7 +75,7 @@ class Command(BaseCommand):
         for model in (StripeEvent, Invoice, OrderItem, Order, Cart, Review, Guide, ProductImage, Variant, Product,
                       SizeChartRow, SizeChart, PromoCode, ClubPriceTier, PageMeta):
             model.objects.all().delete()
-        HomeSettings.objects.update(hero_photo=None)
+        HomeSettings.objects.update(hero_photo=None, campaign_photo=None, guides_photo=None)
         Photo.objects.all().delete()
         Category.objects.filter(parent__isnull=False).delete()
         Category.objects.all().delete()
@@ -126,15 +126,21 @@ class Command(BaseCommand):
 
     def _home(self):
         home = HomeSettings.load()
-        key = next(iter(demo_photos.pick(demo_photos.HERO, self.photos)), None)
-        if key:
+        used = set()
+        for field, prefs, label, seed in (("hero_photo", demo_photos.HERO, "Hero", 7),
+                                          ("campaign_photo", demo_photos.CAMPAIGN, "Campagne", 11),
+                                          ("guides_photo", demo_photos.GUIDES_HERO, "Guides", 13)):
+            key = next((k for k in demo_photos.pick(prefs, self.photos, count=len(prefs)) if k not in used), None)
+            if not key:
+                continue
+            used.add(key)
             c, raw = self.photo_meta[key]
-            hero = Photo(title=f"Hero — {c['alt']}"[:120], alt="", credit=c["author"], credit_source=c["source"],
-                         credit_url=c["page"])
-            hero.image.save(f"hero-{key}.jpg", ContentFile(treat_photo(raw, mode="bw", max_width=2400, seed=7)),
-                            save=False)
-            hero.save()
-            home.hero_photo = hero
+            photo = Photo(title=f"{label} — {c['alt']}"[:120], alt="", credit=c["author"],
+                          credit_source=c["source"], credit_url=c["page"])
+            photo.image.save(f"{label.lower()}-{key}.jpg",
+                             ContentFile(treat_photo(raw, mode="bw", max_width=2400, seed=seed)), save=False)
+            photo.save()
+            setattr(home, field, photo)
         home.save()
 
     def _disciplines(self):
@@ -226,7 +232,7 @@ class Command(BaseCommand):
         for i, g in enumerate(data.GUIDES):
             guide = Guide.objects.create(
                 slug=g["slug"], title=g["title"], kicker=g["kicker"], excerpt=g["excerpt"], body=g["body"],
-                reading_minutes=g["minutes"], published_at=date.today() - timedelta(days=20 * (i + 1)),
+                reading_minutes=g["minutes"], topic=g.get("topic", "gants"), published_at=date.today() - timedelta(days=20 * (i + 1)),
                 meta_description=g["excerpt"][:160],
             )
             guide.photo = self._first_photo(demo_photos.GUIDES.get(g["slug"], []))

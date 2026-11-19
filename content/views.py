@@ -4,6 +4,8 @@ from django.utils import timezone
 from django.views.decorators.http import require_GET
 
 from catalog.filters import listing_queryset
+from catalog.models import SizeChart
+from catalog.views import chart_columns
 from catalog.seo import breadcrumb_jsonld
 
 from .models import Guide
@@ -11,9 +13,20 @@ from .models import Guide
 
 @require_GET
 def guide_list(request):
-    guides = Guide.objects.filter(is_published=True)
+    from core.models import HomeSettings
+
+    topics = dict(Guide.TOPICS)
+    topic = request.GET.get("sujet", "")
+    guides = Guide.objects.filter(is_published=True).select_related("photo")
+    if topic in topics:
+        guides = guides.filter(topic=topic)
+    else:
+        topic = ""
+    guides = list(guides)
     return render(request, "content/guide_list.html", {
-        "guides": guides, "crumbs": [("Guides techniques", None)],
+        "featured": guides[0] if guides else None, "guides": guides[1:], "topics": Guide.TOPICS,
+        "topic": topic, "home": HomeSettings.objects.select_related("guides_photo").first(),
+        "crumbs": [("Guides techniques", None)],
         "breadcrumb_ld": breadcrumb_jsonld(request, [("Guides techniques", None)]),
     })
 
@@ -21,7 +34,10 @@ def guide_list(request):
 @require_GET
 def guide_detail(request, slug):
     guide = get_object_or_404(Guide.objects.filter(is_published=True).select_related("photo"), slug=slug)
-    products = listing_queryset().filter(guides=guide).order_by("-sales_count")[:8]
+    products = listing_queryset().filter(guides=guide).order_by("-sales_count")[:4]
+    chart = SizeChart.objects.filter(category__in=guide.categories.all()).prefetch_related("rows").first()
+    chart_rows = list(chart.rows.all()) if chart else []
+    published = Guide.objects.filter(is_published=True).select_related("photo")
     crumbs = [("Guides techniques", "/guides/"), (guide.title, None)]
     article_ld = {
         "@context": "https://schema.org", "@type": "Article", "headline": guide.title,
@@ -33,5 +49,7 @@ def guide_detail(request, slug):
     return render(request, "content/guide_detail.html", {
         "guide": guide, "products": products, "article_ld": article_ld,
         "breadcrumb_ld": breadcrumb_jsonld(request, crumbs), "crumbs": crumbs,
-        "others": Guide.objects.filter(is_published=True).exclude(pk=guide.pk)[:3],
+        "chart": chart, "chart_rows": chart_rows, "chart_cols": chart_columns(chart_rows),
+        "previous": published.filter(published_at__gt=guide.published_at).order_by("published_at").first(),
+        "next": published.filter(published_at__lt=guide.published_at).order_by("-published_at").first(),
     })

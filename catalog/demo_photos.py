@@ -15,9 +15,17 @@ DISCIPLINES = {
     "entrainement-sacs-de-frappe": ["sacs-alignes", "silhouette-salle", "px-sac-homme", "px-sac-repos"],
 }
 
+# Bandes plein écran (traitées en noir et blanc) : page Guides et bande campagne.
+GUIDES_HERO = ["px-garde-nb", "px-sparring", "px-boxe-salle"]
+CAMPAIGN = ["px-sparring", "px-boxe-salle", "px-garde-nb"]
+
 GUIDES = {
     "choisir-poids-gants-oz": ["px-gants-gros-plan", "gants-noirs", "px-gants-salle"],
     "entretien-du-cuir": ["px-gants-cuir", "px-gants-detail", "px-gants-blancs"],
+    "choisir-protege-tibias": ["kick-sac", "px-shadow"],
+    "poser-ses-bandes-de-boxe": ["px-bandages-pose", "px-garde-bandes", "px-bandages-frappe"],
+    "choisir-kimono-jjb": ["px-kimono", "px-jjb"],
+    "choisir-sac-de-frappe": ["px-sac-entrainement", "px-sac-homme", "px-sac-repos"],
 }
 
 # Photos par forme de produit : la 1re sert de visuel principal, la suivante de 2ᵉ photo (survol des cartes).

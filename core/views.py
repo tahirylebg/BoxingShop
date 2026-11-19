@@ -22,12 +22,24 @@ CONSENT_MAX_AGE = 60 * 60 * 24 * 182  # 6 mois (recommandation CNIL : 13 mois ma
 from .models import HomeSettings
 
 
+def _type_tiles():
+    """Pour chaque type racine : le premier visuel produit détouré (packshot), sinon la première photo."""
+    from catalog.models import ProductImage
+
+    tiles = []
+    for c in Category.objects.filter(parent__isnull=True):
+        images = ProductImage.objects.filter(product__category_id__in=c.descendant_ids(), product__is_active=True)
+        image = images.filter(credit="Visuel Boxing Shop").order_by("position", "id").first() or images.first()
+        tiles.append({"category": c, "image": image})
+    return tiles
+
+
 @require_GET
 def home(request):
     def build():
         return {
-            "best_sellers": list(listing_queryset().order_by("-sales_count")[:8]),
-            "types": list(Category.objects.filter(parent__isnull=True)),
+            "best_sellers": list(listing_queryset().order_by("-sales_count")[:7]),  # + carte « Tout voir » = 2 rangées pleines
+            "types": _type_tiles(),
             "guides": list(Guide.objects.filter(is_published=True).select_related("photo")[:3]),
             "disciplines": list(Discipline.objects.select_related("photo")),
             "home": HomeSettings.objects.select_related("hero_photo").first() or HomeSettings.load(),

@@ -2,8 +2,8 @@
 <article class="card">
   <div class="card__media">
     {% if image %}
-      {% if priority %}{% responsive_img image sizes="(min-width: 90rem) 22rem, (min-width: 40rem) 33vw, 100vw" alt="" loading="eager" fetchpriority="high" %}{% elif eager and eager <= 4 %}{% responsive_img image sizes="(min-width: 90rem) 22rem, (min-width: 40rem) 33vw, 100vw" alt="" loading="eager" %}{% else %}{% responsive_img image sizes="(min-width: 90rem) 22rem, (min-width: 40rem) 33vw, 100vw" alt="" %}{% endif %}
-      {% if alt_image %}{% responsive_img alt_image sizes="(min-width: 90rem) 22rem, (min-width: 40rem) 33vw, 100vw" alt="" css_class="card__alt" %}{% endif %}
+      {% if priority %}{% responsive_img image sizes="(min-width: 64em) 24vw, 50vw" alt="" loading="eager" fetchpriority="high" %}{% elif eager and eager <= 4 %}{% responsive_img image sizes="(min-width: 64em) 24vw, 50vw" alt="" loading="eager" %}{% else %}{% responsive_img image sizes="(min-width: 64em) 24vw, 50vw" alt="" %}{% endif %}
+      {% if alt_image %}{% responsive_img alt_image sizes="(min-width: 64em) 24vw, 50vw" alt="" css_class="card__alt" %}{% endif %}
     {% else %}
       <span class="card__placeholder" aria-hidden="true"><svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="3"><path d="M30 64V36a24 24 0 0 1 24-24h12a24 24 0 0 1 24 24v30a26 26 0 0 1-26 26H52a22 22 0 0 1-22-22z"/><path d="M38 92v16h40V92"/></svg></span>
     {% endif %}
@@ -13,12 +13,9 @@
     </div>
   </div>
   <div class="card__body">
-    <p class="kicker muted">{{ product.discipline.short_name|default:product.discipline.name }} · {{ product.category.name }}</p>
     <h3 class="card__title"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3>
-    <div class="card__meta">
-      <span class="price">{% if product.min_price %}<span class="visually-hidden">À partir de </span>{{ product.min_price|money }}{% endif %}</span>
-      <span class="stock-note">{{ product.get_level_display }}</span>
-    </div>
+    <p class="card__cat">{{ product.category.name }} · {{ product.discipline.short_name|default:product.discipline.name }}</p>
+    <p class="price">{% if product.min_price %}<span class="visually-hidden">À partir de </span>{{ product.min_price|money }}{% endif %}</p>
   </div>
 </article>
 {% endwith %}{% endwith %}

@@ -115,6 +115,8 @@
   --text-poster: var(--p-size-5xl);
   --leading-tight: 0.95;
   --leading-heading: 0.95;
+  --leading-display: 0.9;
+  --text-headline: clamp(3rem, 1.8rem + 3.6vw, 6rem);
   --leading-body: 1.55;
   --tracking-label: 0.08em;
 
@@ -138,6 +140,9 @@
   --layout-col-gap: clamp(0.75rem, 0.5rem + 1vw, 1.5rem);
   --tap-min: 44px;
   --header-height: 4rem;
+  --announce-height: 2rem;
+  --grid-gap: var(--p-space-1);
+  --grid-gap-lg: var(--p-space-2);
 
   /* Filets et formes : coins droits, aucune ombre */
   --rule-hair: var(--p-line-1) solid var(--color-rule);
@@ -170,13 +175,13 @@
   /* Bouton */
   --btn-height: var(--tap-min);
   --btn-height-lg: 3.5rem;
-  --btn-pad-x: 1.4rem;
-  --btn-font: var(--font-data);
+  --btn-pad-x: 2rem;
+  --btn-font: var(--font-body);
   --btn-bg: var(--color-surface-inverse);
   --btn-fg: var(--color-text-inverse);
-  --btn-border: var(--rule-strong);
-  --btn-hover-bg: var(--color-accent);
-  --btn-hover-fg: var(--color-text-on-accent);
+  --btn-border: 2px solid var(--btn-bg);
+  --btn-hover-bg: var(--color-surface);
+  --btn-hover-fg: var(--color-text);
   --btn-cta-bg: var(--color-accent);
   --btn-cta-hover-bg: var(--color-surface-inverse);
   --btn-ghost-hover-bg: var(--color-surface-inverse);
@@ -205,13 +210,15 @@
   --marquee-speed: 38s;
 
   /* Hero */
-  --hero-min-height: min(56rem, calc(100svh - var(--header-height) - 2.25rem));
+  --hero-min-height: min(58rem, calc(100svh - var(--header-height) - var(--announce-height)));
   --hero-veil: var(--color-scrim);
   --hero-fg: var(--color-text-inverse);
 
   /* Mosaïque des disciplines */
-  --tile-min-height: clamp(15rem, 28vw, 26rem);
+  --tile-min-height: clamp(20rem, 30vw, 30rem);
   --tile-veil: var(--color-veil);
+  /* Seule exception au « sans dégradé » : voile bas des photos pour la lisibilité des titres. */
+  --photo-fade: linear-gradient(to top, rgb(13 13 13 / 0.9) 0%, rgb(13 13 13 / 0.6) 40%, rgb(13 13 13 / 0) 78%);
 
   /* Tiroir panier */
   --drawer-width: min(100%, 30rem);

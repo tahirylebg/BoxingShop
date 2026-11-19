@@ -143,11 +143,7 @@ def product_view(request, discipline_slug, category_slug, product_slug):
         "product": product, "images": images, "variants": variants, "selected": selected,
         "colors": colors, "weights": weights, "sizes": sizes, "variant_data": variant_data,
         "chart": chart, "chart_rows": chart_rows, "guides": guides,
-        "chart_cols": {
-            "weight": any(r.body_weight_min or r.body_weight_max for r in chart_rows),
-            "height": any(r.height_min or r.height_max for r in chart_rows),
-            "note": any(r.note for r in chart_rows),
-        },
+        "chart_cols": chart_columns(chart_rows),
         "reviews": reviews, "rating": rating, "related": related, "crumbs": crumbs,
         "review_form": ReviewForm() if request.user.is_authenticated else None,
         "product_ld": product_jsonld(request, product, variants, images, rating, reviews),
@@ -171,3 +167,40 @@ def review_create(request, product_id):
     else:
         messages.error(request, "Avis non enregistré : vérifiez la note et le texte.")
     return redirect(f"{product.get_absolute_url()}#avis")
+
+
+@require_GET
+def search_suggest(request):
+    """Suggestions en direct pour le panneau de recherche : 6 produits au plus, données texte uniquement."""
+    from django.db.models import Q
+    from django.http import JsonResponse
+
+    q = request.GET.get("q", "").strip()[:60]
+    if len(q) < 2:
+        return JsonResponse({"results": []})
+    qs = (listing_queryset()
+          .filter(Q(name__icontains=q) | Q(category__name__icontains=q) | Q(discipline__name__icontains=q))
+          .order_by("-sales_count")[:6])
+    results = []
+    for p in qs:
+        img = next(iter(p.images.all()), None)
+        thumb = None
+        if img and img.renditions:
+            from django.core.files.storage import default_storage
+
+            thumb = default_storage.url(img.renditions[str(min(int(w) for w in img.renditions))])
+        results.append({
+            "name": p.name, "url": p.get_absolute_url(), "category": p.category.name,
+            "price": f"{p.min_price:.2f}".replace(".", ",") + " €" if p.min_price else "", "image": thumb,
+        })
+    response = JsonResponse({"results": results})
+    response["Cache-Control"] = "public, max-age=60"
+    return response
+
+
+def chart_columns(rows):
+    return {
+        "weight": any(r.body_weight_min or r.body_weight_max for r in rows),
+        "height": any(r.height_min or r.height_max for r in rows),
+        "note": any(r.note for r in rows),
+    }

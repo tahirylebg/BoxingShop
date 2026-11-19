@@ -21,6 +21,9 @@ class Guide(SEOFields):
     )
     photo = models.ForeignKey("core.Photo", null=True, blank=True, on_delete=models.SET_NULL, related_name="+",
                               verbose_name="photo de couverture")
+    TOPICS = [("gants", "Gants"), ("protections", "Protections"), ("entretien", "Entretien"), ("debutant", "Débutant")]
+    topic = models.CharField("thème", max_length=20, choices=TOPICS, default="gants",
+                             help_text="Sert aux filtres de la page Guides.")
     reading_minutes = models.PositiveSmallIntegerField("temps de lecture (min)", default=5)
     is_published = models.BooleanField("publié", default=True)
     published_at = models.DateField("date de publication")

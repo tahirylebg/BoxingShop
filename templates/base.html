@@ -22,12 +22,13 @@
   {% block head_extra %}{% endblock %}
   <script type="module" src="{% static 'js/cart-drawer.js' %}"></script>
   <script type="module" src="{% static 'js/motion.js' %}"></script>
+  <script type="module" src="{% static 'js/nav.js' %}"></script>
   {% block scripts %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
   <a class="skip-link" href="#contenu">Aller au contenu</a>
 
-  {% include "partials/marquee.html" %}
+  {% include "partials/announce.html" %}
 
   {% include "partials/header.html" %}
 
@@ -42,6 +43,7 @@
     {% block content %}{% endblock %}
   </main>
 
+  {% block campaign %}{% include "partials/campaign.html" %}{% endblock %}
   {% include "partials/footer.html" %}
   {% include "partials/cart_drawer_shell.html" %}
   {% if not cookie_consent %}{% include "partials/cookie_banner.html" %}{% endif %}
