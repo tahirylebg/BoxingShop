@@ -10,10 +10,10 @@
         {% if fill_guide.photo %}<span class="fill-card__media">{% responsive_img fill_guide.photo sizes="(min-width: 64em) 50vw, 100vw" alt="" %}</span>{% endif %}
         <span class="fill-card__kicker">Guide · {{ fill_guide.reading_minutes }} min</span>
         <span class="fill-card__title">{{ fill_guide.title }}</span>
-        <span class="fill-card__go">Lire le guide <span class="tile__arrow" aria-hidden="true">→</span></span>
+        <span class="fill-card__go">Lire le guide <span class="tile__arrow" aria-hidden="true"><svg class="ico-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.75"/></svg></span></span>
       </a>
     </li>
   {% elif cta_url %}
-    <li class="grid-cta"><a href="{{ cta_url }}"><span class="grid-cta__kicker">{{ cta_kicker|default:"Catalogue complet" }}</span><span class="grid-cta__label">{{ cta_label|default:"Tout voir" }}</span><span class="grid-cta__arrow" aria-hidden="true">→</span></a></li>
+    <li class="grid-cta"><a href="{{ cta_url }}"><span class="grid-cta__kicker">{{ cta_kicker|default:"Catalogue complet" }}</span><span class="grid-cta__label">{{ cta_label|default:"Tout voir" }}</span><span class="grid-cta__arrow" aria-hidden="true"><svg class="ico-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.75"/></svg></span></a></li>
   {% endif %}
 </ul>

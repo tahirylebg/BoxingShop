@@ -41,7 +41,7 @@ def home(request):
         return {
             "best_sellers": decorate(listing_queryset().order_by("-sales_count")[:7]),  # + carte « Tout voir » = 2 rangées pleines
             "types": _type_tiles(),
-            "guides": list(Guide.objects.filter(is_published=True).select_related("photo")[:3]),
+            "guides": list(Guide.objects.filter(is_published=True).select_related("photo")[:4]),
             "disciplines": list(Discipline.objects.select_related("photo")),
             "home": HomeSettings.objects.select_related("hero_photo").first() or HomeSettings.load(),
         }

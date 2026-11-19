@@ -65,7 +65,7 @@
       {% else %}<span></span>{% endif %}
       {% if next %}
         <a class="guide-pager__link guide-pager__link--next" href="{{ next.get_absolute_url }}" rel="next">
-          <span class="guide-pager__dir">Guide suivant →</span><span class="guide-pager__title">{{ next.title }}</span>
+          <span class="guide-pager__dir">Guide suivant <svg class="ico-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.75"/></svg></span><span class="guide-pager__title">{{ next.title }}</span>
         </a>
       {% endif %}
     </nav>

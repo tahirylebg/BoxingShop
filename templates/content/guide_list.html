@@ -24,31 +24,8 @@
   </nav>
 
   {% if featured %}
-    <article class="guide-feature">
-      <a class="guide-feature__media" href="{{ featured.get_absolute_url }}" tabindex="-1" aria-hidden="true">
-        {% if featured.photo %}{% responsive_img featured.photo sizes="(min-width: 64em) 60vw, 100vw" alt="" loading="eager" %}{% endif %}
-      </a>
-      <div class="guide-feature__body">
-        <p class="guide-meta"><span>{{ featured.get_topic_display }}</span><span>{{ featured.reading_minutes }} min de lecture</span></p>
-        <h2 class="guide-feature__title"><a href="{{ featured.get_absolute_url }}">{{ featured.title }}</a></h2>
-        <p>{{ featured.excerpt }}</p>
-        <a class="btn" href="{{ featured.get_absolute_url }}">Lire le guide <span class="arrow" aria-hidden="true"></span></a>
-      </div>
-    </article>
-    {% if guides %}
-      <ul class="guide-grid">
-        {% for g in guides %}
-          <li data-reveal>
-            <article class="guide-card">
-              <div class="guide-card__media">{% if g.photo %}{% responsive_img g.photo sizes="(min-width: 64em) 30vw, (min-width: 40em) 50vw, 100vw" alt="" %}{% endif %}</div>
-              <p class="guide-meta"><span>{{ g.get_topic_display }}</span><span>{{ g.reading_minutes }} min</span></p>
-              <h3 class="guide-card__title"><a href="{{ g.get_absolute_url }}">{{ g.title }}</a></h3>
-              <p class="guide-card__excerpt">{{ g.excerpt }}</p>
-            </article>
-          </li>
-        {% endfor %}
-      </ul>
-    {% endif %}
+    <p class="chapo sig guides-intro">Choisir son poids de gants, mesurer sa main, entretenir le cuir : des réponses précises, testées à la salle, pour équiper chaque pratique.</p>
+    {% include "content/_guide_cards.html" %}
   {% else %}
     {% url 'content:guides' as guides_url %}{% include "partials/empty_state.html" with icon="box" title="Aucun guide sur ce thème" text="Affichez tous les guides pour voir les autres sujets." cta_url=guides_url cta_label="Tous les guides" %}
   {% endif %}

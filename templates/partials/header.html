@@ -50,7 +50,7 @@
                         {% if col.children %}<ul>{% for c in col.children %}<li><a href="{{ d.get_absolute_url }}{{ c.slug }}/">{{ c.name }}</a></li>{% endfor %}</ul>{% endif %}
                       </div>
                     {% endfor %}
-                    <div class="mega__col"><a class="mega__head mega__all" href="{{ d.get_absolute_url }}">Tout voir <span aria-hidden="true">→</span></a></div>
+                    <div class="mega__col"><a class="mega__head mega__all" href="{{ d.get_absolute_url }}">Tout voir <span aria-hidden="true"><svg class="ico-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.75"/></svg></span></a></div>
                   </div>
                   {% if d.photo %}
                     <a class="mega__feature" href="{{ d.get_absolute_url }}" tabindex="-1" aria-hidden="true">

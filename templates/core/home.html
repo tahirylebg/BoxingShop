@@ -16,11 +16,11 @@
       <h1 class="hero__title mt-4" id="hero-title">{{ home.hero_title }} <em>Protège-toi.</em></h1>
     </div>
     <div class="hero__aside">
-      <p class="lead">{{ home.hero_text }}</p>
+      <p class="hero__pitch">{{ home.hero_text|emphasize:"sac,sparring,ring" }}</p>
       <ul class="hero__facts">
-        <li><strong>{{ shipping_settings.free_shipping_threshold|floatformat:"0" }} €</strong>Livraison offerte dès</li>
-        <li><strong>48 h</strong>Expédition</li>
-        <li><strong>30 j</strong>Retours</li>
+        <li><strong><span data-count="{{ shipping_settings.free_shipping_threshold|floatformat:'0' }}">{{ shipping_settings.free_shipping_threshold|floatformat:"0" }}</span>&nbsp;<em>€</em></strong><span class="hero__fact-label">Livraison offerte</span></li>
+        <li><strong><span data-count="48">48</span>&nbsp;<em>H</em></strong><span class="hero__fact-label">Expédition</span></li>
+        <li><strong><span data-count="30">30</span>&nbsp;<em>J</em></strong><span class="hero__fact-label">Retours</span></li>
       </ul>
       <div class="cluster">
         <a class="btn btn--inverse btn--lg" href="{% url 'catalog:shop' %}">Voir l'équipement</a>
@@ -43,7 +43,7 @@
           <span class="tile__index">{{ forloop.counter|stringformat:"02d" }}</span>
           <span class="tile__name">{{ d.name }}</span>
           <span class="tile__tag">{{ d.tagline }}</span>
-          <span class="tile__go">Voir l'équipement <span class="tile__arrow" aria-hidden="true">→</span></span>
+          <span class="tile__go">Voir l'équipement <span class="tile__arrow" aria-hidden="true"><svg class="ico-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.75"/></svg></span></span>
         </a>
       </li>
     {% endfor %}
@@ -81,38 +81,41 @@
 </section>
 
 <section class="section" aria-labelledby="edito-title">
-  <div class="container editorial">
-    <div class="editorial__lead stack">
-      <p class="section__index"><b>04</b> / Guides techniques</p>
-      <h2 id="edito-title" class="editorial__quote">Un gant trop léger blesse <span>votre partenaire.</span></h2>
-      {% with cover=guides.0.photo %}{% if cover %}
-        <figure class="editorial__figure grain" data-reveal>
-          {% responsive_img cover sizes="(min-width: 64em) 38vw, 100vw" alt="" %}
-          {% if cover.credit %}<figcaption class="photo-credit">Photo : {{ cover.credit_line }}</figcaption>{% endif %}
-        </figure>
-      {% endif %}{% endwith %}
-    </div>
-    <div class="editorial__body stack">
-      <p class="lead">Poids en onces, densité des mousses, cuir ou microfibre, lacets ou scratch : chaque détail compte. Nos guides vous aident à choisir juste, du premier cours au combat officiel.</p>
-      <ul class="guide-list">
-        {% for g in guides %}
-          <li data-reveal><a href="{{ g.get_absolute_url }}"><span class="kicker muted">{{ g.get_topic_display }} · {{ g.reading_minutes }} min</span><span class="guide-list__title">{{ g.title }}</span><span class="muted">{{ g.excerpt }}</span></a></li>
-        {% endfor %}
-      </ul>
-      <a class="btn" href="{% url 'content:guides' %}">Tous les guides <span class="arrow" aria-hidden="true"></span></a>
-    </div>
+  <div class="container">
+    <header class="guides-head">
+      <h2 id="edito-title" class="guides-head__title sig">Un gant trop léger blesse <span>votre partenaire.</span></h2>
+      <p class="chapo">Poids en onces, densité des mousses, cuir ou microfibre, lacets ou scratch : chaque détail compte. Nos guides vous aident à choisir juste, du premier cours au combat officiel.</p>
+    </header>
+    {% include "content/_guide_cards.html" with featured=guides.0 guides=guides|slice:"1:" %}
+    <p class="guides-more"><a class="btn" href="{% url 'content:guides' %}">Tous les guides <span class="arrow" aria-hidden="true"></span></a></p>
   </div>
 </section>
 
 {% include "partials/campaign.html" %}
 
-<section class="section section--tight" aria-label="Nos engagements">
+<section class="pledges" aria-label="Nos engagements">
   <div class="container">
-    <ul class="reassurance">
-      <li><strong>Testé à la salle</strong>Chaque référence est éprouvée par des pratiquants avant d'entrer au catalogue.</li>
-      <li><strong>Conseil technique</strong>Fiche de pesée et correspondance morphologique sur chaque produit.</li>
-      <li><strong>Offre clubs</strong>Tarifs dégressifs pour les clubs et coachs validés.</li>
-      <li><strong>Paiement sécurisé</strong>Carte bancaire, Apple Pay et Google Pay via Stripe.</li>
+    <ul class="pledges__list">
+      <li class="pledge" data-index="01">
+        <svg class="pledge__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21v-3.5a6 6 0 0 1-3-5.2V8a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v5a5 5 0 0 1-5 5H9"/><path d="M6 11h4a2 2 0 0 0 0-4H8M9 21h7v-3"/></svg>
+        <h3 class="pledge__title">Testé à la salle</h3>
+        <p>Chaque référence est éprouvée par des pratiquants avant d'entrer au catalogue.</p>
+      </li>
+      <li class="pledge" data-index="02">
+        <svg class="pledge__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M7 21h10M5 7h14"/><path d="M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/></svg>
+        <h3 class="pledge__title">Conseil technique</h3>
+        <p>Fiche de pesée et correspondance morphologique sur chaque produit.</p>
+      </li>
+      <li class="pledge" data-index="03">
+        <svg class="pledge__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20a6 6 0 0 1 12 0M15 14.5a4.5 4.5 0 0 1 6.5 4"/></svg>
+        <h3 class="pledge__title">Offre clubs</h3>
+        <p>Tarifs dégressifs pour les clubs et coachs validés.</p>
+      </li>
+      <li class="pledge" data-index="04">
+        <svg class="pledge__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10.5" rx="1.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5M12 14.5v3"/></svg>
+        <h3 class="pledge__title">Paiement sécurisé</h3>
+        <p>Carte bancaire, Apple Pay et Google Pay via Stripe.</p>
+      </li>
     </ul>
   </div>
 </section>

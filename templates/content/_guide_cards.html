@@ -1,0 +1,34 @@
+{# Cartes éditoriales : 1er guide en grand format, les suivants en grille de 3. Attend `featured` et `guides`. #}
+{% load shop %}
+{% if featured %}
+  <article class="guide-feature">
+    <div class="guide-feature__media">
+      {% if featured.photo %}{% responsive_img featured.photo sizes="(min-width: 64em) 60vw, 100vw" alt="" %}{% endif %}
+      <span class="guide-chip">{{ featured.get_topic_display }}</span>
+    </div>
+    <div class="guide-feature__body">
+      <p class="guide-time">{{ featured.reading_minutes }} min de lecture</p>
+      <h3 class="guide-feature__title"><a href="{{ featured.get_absolute_url }}">{{ featured.title }}</a></h3>
+      <p class="guide-feature__excerpt">{{ featured.excerpt }}</p>
+      <span class="guide-go" aria-hidden="true">Lire le guide <span class="guide-go__arrow"><svg class="ico-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.75"/></svg></span></span>
+    </div>
+  </article>
+{% endif %}
+{% if guides %}
+  <ul class="guide-grid">
+    {% for g in guides %}
+      <li data-reveal>
+        <article class="guide-card">
+          <div class="guide-card__media">
+            {% if g.photo %}{% responsive_img g.photo sizes="(min-width: 64em) 30vw, (min-width: 40em) 50vw, 100vw" alt="" %}{% endif %}
+            <span class="guide-chip">{{ g.get_topic_display }}</span>
+          </div>
+          <p class="guide-time">{{ g.reading_minutes }} min</p>
+          <h3 class="guide-card__title"><a href="{{ g.get_absolute_url }}">{{ g.title }}</a></h3>
+          <p class="guide-card__excerpt">{{ g.excerpt }}</p>
+          <span class="guide-go" aria-hidden="true">Lire le guide <span class="guide-go__arrow"><svg class="ico-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 8h13M9 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.75"/></svg></span></span>
+        </article>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}

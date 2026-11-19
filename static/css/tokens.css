@@ -79,6 +79,11 @@
   --color-surface-inverse: var(--p-ink-900);
   --color-scrim: var(--p-scrim);
   --color-rule-faint: rgb(13 13 13 / 0.12);
+  --color-glass: rgb(13 13 13 / 0.55);
+  --color-text-inverse-soft: rgb(244 243 239 / 0.7);
+  --color-outline-inverse: rgb(244 243 239 / 0.15);
+  --sig-width: 32px;
+  --sig-height: 4px;
   --color-rule-control: rgb(13 13 13 / 0.25);
   --color-veil: var(--p-veil);
 

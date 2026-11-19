@@ -51,6 +51,15 @@ def markup_toc(text):
 
 
 @register.filter
+def emphasize(text, words):
+    """Met en valeur des mots-clés d'un texte saisi en back-office : échappé d'abord, puis balisé."""
+    out = str(conditional_escape(text or ""))
+    for w in [w.strip() for w in str(words).split(",") if w.strip()]:
+        out = re.sub(rf"\b({re.escape(w)})\b", r"<em>\1</em>", out, count=1)
+    return mark_safe(out)
+
+
+@register.filter
 def checked_count(options):
     """Nombre d'options cochées dans un groupe de filtres [(valeur, libellé, n, coché)]."""
     return sum(1 for o in options if o[3])

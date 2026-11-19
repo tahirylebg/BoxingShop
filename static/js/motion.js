@@ -2,6 +2,25 @@
 // Amélioration progressive : sans JS, tout le contenu est visible et la galerie zoome au centre.
 const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+// Compteurs du hero : 0 -> valeur au chargement. La valeur finale est déjà dans le HTML (sans JS ni mouvement).
+function setupCounters() {
+  if (reduced) return;
+  document.querySelectorAll("[data-count]").forEach((el) => {
+    const target = Number(el.dataset.count);
+    if (!target) return;
+    const start = performance.now();
+    const duration = 1100;
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      el.textContent = String(Math.round(target * (1 - (1 - t) ** 3)));
+      if (t < 1) requestAnimationFrame(tick);
+    };
+    el.textContent = "0";
+    requestAnimationFrame(tick);
+  });
+}
+setupCounters();
+
 function setupReveal() {
   const items = [...document.querySelectorAll("[data-reveal]")];
   if (reduced || !("IntersectionObserver" in window) || !items.length) return;
