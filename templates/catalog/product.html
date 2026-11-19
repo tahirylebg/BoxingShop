@@ -33,18 +33,19 @@
     </section>
 
     <section class="product__buy" aria-labelledby="product-title">
-      <div class="cluster">
+      <div class="cluster sig product__eyebrow">
         <span class="kicker">{{ product.discipline.name }} · {{ product.category.name }}</span>
         {% if product.is_premium %}<span class="badge badge--leather">Gamme {{ product.get_range_tier_display }}</span>{% endif %}
       </div>
       <h1 class="product__title" id="product-title">{{ product.name }}</h1>
+      <p class="product__sku">SKU <span data-sku>{{ selected.sku }}</span></p>
+      {% if rating.count %}<p class="product__rating"><a href="#avis"><span class="stars" aria-hidden="true">{{ rating.avg|stars }}</span> <strong>{{ rating.avg|floatformat:1 }}</strong><span class="visually-hidden"> sur 5</span> · {{ rating.count }} avis</a></p>{% endif %}
       <p class="lead">{{ product.short_description }}</p>
-      {% if rating.count %}<p class="rating mt-3"><a href="#avis"><span aria-hidden="true">{{ rating.avg|stars }}</span> {{ rating.avg|floatformat:1 }}/5 · {{ rating.count }} avis</a></p>{% endif %}
 
       <div class="product__price">
         <span class="price{% if selected.on_sale %} price--sale{% endif %}" data-price>{{ selected.price|money }}</span>
-        <del class="price muted" data-compare{% if not selected.on_sale %} hidden{% endif %}>{% if selected.on_sale %}{{ selected.compare_at_price|money }}{% endif %}</del>
-        <span class="sku">SKU <span data-sku>{{ selected.sku }}</span></span>
+        <del class="price-was" data-compare{% if not selected.on_sale %} hidden{% endif %}>{% if selected.on_sale %}{{ selected.compare_at_price|money }}{% endif %}</del>
+        <span class="price-off" data-discount{% if not selected.on_sale %} hidden{% endif %}>{% if selected.on_sale %}-{{ selected.price|discount_pct:selected.compare_at_price }} %{% endif %}</span>
       </div>
 
       <form method="post" action="{% url 'cart:add' %}" id="buy-form" data-variant-form data-add-to-cart>
@@ -55,9 +56,9 @@
         {% if colors|length > 0 and colors.0.0 %}
           <fieldset class="option-group">
             <legend>Couleur <output data-option-label="color">{{ selected.color }}</output></legend>
-            <div class="chips">
+            <div class="swatch-row">
               {% for name, hex in colors %}
-                <label class="chip swatch"><input type="radio" name="couleur" value="{{ name }}" data-axis="color"{% if selected.color == name %} checked{% endif %}><span>{% swatch hex %}<span class="visually-hidden">{{ name }}</span></span></label>
+                <label class="color-dot"><input type="radio" name="couleur" value="{{ name }}" data-axis="color"{% if selected.color == name %} checked{% endif %}><span>{% swatch hex %}<span class="visually-hidden">{{ name }}</span></span></label>
               {% endfor %}
             </div>
           </fieldset>
@@ -65,9 +66,9 @@
         {% if weights %}
           <fieldset class="option-group">
             <legend>Poids <output data-option-label="weight">{{ selected.weight_oz }} oz</output></legend>
-            <div class="chips">
+            <div class="size-row">
               {% for w in weights %}
-                <label class="chip"><input type="radio" name="poids" value="{{ w }}" data-axis="weight"{% if selected.weight_oz == w %} checked{% endif %}><span>{{ w }} oz</span></label>
+                <label class="chip size-chip"><input type="radio" name="poids" value="{{ w }}" data-axis="weight"{% if selected.weight_oz == w %} checked{% endif %}><span>{{ w }} oz</span></label>
               {% endfor %}
             </div>
           </fieldset>
@@ -75,35 +76,58 @@
         {% if sizes %}
           <fieldset class="option-group">
             <legend>Taille <output data-option-label="size">{{ selected.size }}</output></legend>
-            <div class="chips">
+            <div class="size-row">
               {% for s in sizes %}
-                <label class="chip"><input type="radio" name="taille" value="{{ s }}" data-axis="size"{% if selected.size == s %} checked{% endif %}><span>{{ s }}</span></label>
+                <label class="chip size-chip"><input type="radio" name="taille" value="{{ s }}" data-axis="size"{% if selected.size == s %} checked{% endif %}><span>{{ s }}</span></label>
               {% endfor %}
             </div>
           </fieldset>
         {% endif %}
-        {% if chart %}<p><a class="btn-link" href="#tailles">Quelle taille choisir ? Voir le tableau de correspondance</a></p>{% endif %}
+        {% if chart %}
+          <p><a class="size-guide-link" href="#tailles" data-size-guide-open>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2.5" y="8" width="19" height="8" rx="1"/><path d="M6.5 8v3M10 8v4.5M13.5 8v3M17 8v4.5"/></svg>
+            Guide des tailles
+          </a></p>
+        {% endif %}
 
         <button class="btn btn--ghost btn--block mt-3" type="submit" name="action" value="preview" data-nojs-only>Afficher le prix et la disponibilité</button>
 
-        <div class="buy-row mt-4">
-          <div class="field">
-            <label for="qty">Quantité</label>
+        <div class="buy-row">
+          <div class="stepper" data-stepper>
+            <button class="stepper__btn" type="button" data-step="-1" aria-label="Retirer un article" hidden>−</button>
+            <label class="visually-hidden" for="qty">Quantité</label>
             <input id="qty" type="number" name="quantity" value="1" min="1" max="99" inputmode="numeric">
+            <button class="stepper__btn" type="button" data-step="1" aria-label="Ajouter un article" hidden>+</button>
           </div>
-          <button class="btn btn--blood btn--lg" type="submit" name="action" value="add" data-add-button{% if not selected.in_stock %} disabled{% endif %}>Ajouter au panier</button>
+          <button class="btn btn--blood buy-btn" type="submit" name="action" value="add" data-add-button data-add-main{% if not selected.in_stock %} disabled{% endif %}>
+            <svg class="buy-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
+            <span data-add-label>Ajouter au panier</span>
+          </button>
+          <button class="fav-btn" type="button" aria-pressed="false" data-fav="{{ product.pk }}" aria-label="Ajouter {{ product.name }} aux favoris" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.2 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/></svg>
+          </button>
         </div>
-        <p class="stock-line{% if not selected.in_stock %} stock-line--out{% elif selected.is_low_stock %} stock-line--low{% endif %}" data-stock role="status">
+        <p class="stock-line{% if not selected.in_stock %} stock-line--out{% elif selected.stock < 5 %} stock-line--low{% endif %}" data-stock role="status">
           <span class="stock-dot" aria-hidden="true"></span>
-          <span data-stock-text>{% if not selected.in_stock %}Épuisé dans cette déclinaison{% elif selected.is_low_stock %}Stock faible : plus que {{ selected.stock }} en stock{% else %}En stock — expédié sous 48 h{% endif %}</span>
+          <span data-stock-text>{% if not selected.in_stock %}Épuisé dans cette déclinaison{% elif selected.stock < 5 %}Plus que {{ selected.stock }} en stock{% else %}En stock · expédié sous 48 h{% endif %}</span>
         </p>
       </form>
       {{ variant_data|json_script:"variant-data" }}
 
-      <dl class="data-list mt-5 rule-top">
-        <dt>Livraison</dt><dd>{{ shipping_settings.carrier_label }} — offerte dès {{ shipping_settings.free_shipping_threshold|money }}</dd>
-        <dt>Retours</dt><dd>30 jours, produit non utilisé</dd>
-      </dl>
+      <ul class="perks">
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2.5 6.5h11v9h-11zM13.5 9.5h4l3 3v3h-7"/><circle cx="6.5" cy="17" r="1.8"/><circle cx="17" cy="17" r="1.8"/></svg>
+          <span><strong>Livraison {{ shipping_settings.carrier_label }}</strong>Offerte dès {{ shipping_settings.free_shipping_threshold|money }}</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 9h11a5 5 0 0 1 0 10H9"/><path d="M8 5L4 9l4 4"/></svg>
+          <span><strong>Retours 30 jours</strong>Produit non utilisé</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="1.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+          <span><strong>Paiement sécurisé</strong>Carte, Apple Pay, Google Pay</span>
+        </li>
+      </ul>
     </section>
   </div>
 
@@ -184,8 +208,19 @@
   {% endif %}
 </div>
 
-<div class="sticky-buy" aria-label="Achat rapide">
+<div class="sticky-buy" aria-label="Achat rapide" data-sticky-buy>
   <span class="price" data-price-sticky>{{ selected.price|money }}</span>
-  <button class="btn btn--blood" type="submit" form="buy-form" name="action" value="add" data-add-button{% if not selected.in_stock %} disabled{% endif %}>Ajouter au panier</button>
+  <button class="btn btn--blood buy-btn" type="submit" form="buy-form" name="action" value="add" data-add-button{% if not selected.in_stock %} disabled{% endif %}><span data-add-label>Ajouter au panier</span></button>
 </div>
+{% if chart %}
+<dialog class="cart-drawer size-drawer" id="size-guide" aria-labelledby="size-guide-title" data-size-guide>
+  <div class="drawer__head">
+    <h2 id="size-guide-title">Guide des tailles</h2>
+    <button class="icon-btn" type="button" data-size-guide-close aria-label="Fermer le guide des tailles">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+    </button>
+  </div>
+  <div class="drawer__body" data-size-guide-body></div>
+</dialog>
+{% endif %}
 {% endblock %}

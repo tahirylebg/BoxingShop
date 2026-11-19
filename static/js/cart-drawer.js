@@ -50,6 +50,21 @@ const post = async (formEl, submitter) => {
   return response.json();
 };
 
+// Bouton d'ajout : « ✓ Ajouté » pendant 2 s après un ajout réussi.
+const confirmAdded = () => {
+  document.querySelectorAll("[data-add-label]").forEach((label) => {
+    const button = label.closest("button");
+    if (!label.dataset.idle) label.dataset.idle = label.textContent;
+    label.textContent = "✓ Ajouté";
+    button?.classList.add("is-added");
+    clearTimeout(Number(label.dataset.timer));
+    label.dataset.timer = String(setTimeout(() => {
+      label.textContent = label.dataset.idle;
+      button?.classList.remove("is-added");
+    }, 2000));
+  });
+};
+
 const announce = (formEl, message) => {
   let region = formEl.querySelector("[data-form-message]");
   if (!region) {
@@ -106,7 +121,10 @@ if (dialog && content) {
         return;
       }
       formEl.querySelector("[data-form-message]")?.remove();
-      if (isAdd) open();
+      if (isAdd) {
+        confirmAdded();
+        open();
+      }
     } catch {
       formEl.submit(); // repli : soumission classique
     } finally {
@@ -117,4 +135,19 @@ if (dialog && content) {
       dialog.querySelector(".drawer__body")?.removeAttribute("aria-busy");
     }
   });
+}
+
+// Panier (mobile) : total + bouton collants tant que le bouton du récapitulatif n'est pas visible.
+const cartBar = document.querySelector("[data-cart-bar]");
+const checkoutMain = document.querySelector("[data-checkout-main]");
+if (cartBar && checkoutMain) {
+  let ticking = false;
+  const sync = () => {
+    ticking = false;
+    const r = checkoutMain.getBoundingClientRect();
+    cartBar.classList.toggle("is-visible", r.top > window.innerHeight || r.bottom < 0);
+  };
+  window.addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(sync); } }, { passive: true });
+  window.addEventListener("resize", sync);
+  sync();
 }

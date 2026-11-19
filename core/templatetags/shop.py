@@ -51,6 +51,18 @@ def markup_toc(text):
 
 
 @register.filter
+def discount_pct(price, compare):
+    """Pourcentage de remise arrondi : discount_pct(80, 100) -> 20."""
+    try:
+        price, compare = Decimal(str(price)), Decimal(str(compare))
+    except Exception:
+        return ""
+    if not compare or compare <= price:
+        return ""
+    return int(((compare - price) / compare * 100).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+
+
+@register.filter
 def emphasize(text, words):
     """Met en valeur des mots-clés d'un texte saisi en back-office : échappé d'abord, puis balisé."""
     out = str(conditional_escape(text or ""))

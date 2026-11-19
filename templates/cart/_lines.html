@@ -3,7 +3,7 @@
   {% for line in quote.lines %}
     {% with v=line.variant p=line.variant.product %}
     <li class="line-item">
-      {% responsive_img p.images.all.0 sizes="80px" alt="" %}
+      <span class="line-item__media">{% if p.images.all.0 %}{% responsive_img p.images.all.0 sizes="80px" alt="" %}{% endif %}</span>
       <div>
         <p class="line-item__title"><a href="{{ p.get_absolute_url }}?sku={{ v.sku }}">{{ p.name }}</a></p>
         <p class="line-item__meta">{{ v.label }} · {{ v.sku }}</p>

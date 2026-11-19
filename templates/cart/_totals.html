@@ -5,12 +5,15 @@
     <progress max="100" value="{{ quote.free_shipping_progress }}" aria-label="Progression vers la livraison offerte">{{ quote.free_shipping_progress }} %</progress>
   </div>
 {% else %}
-  <p class="free-shipping-meter"><strong>Livraison offerte</strong> ✓</p>
+  <div class="free-shipping-meter free-shipping-meter--done">
+    <p><svg class="free-shipping-meter__check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 5" fill="none" stroke="currentColor" stroke-width="2"/></svg> Livraison offerte</p>
+    <progress max="100" value="100" aria-label="Livraison offerte atteinte">100 %</progress>
+  </div>
 {% endif %}
 <dl class="totals">
   <div><dt>Sous-total ({{ quote.item_count }} article{{ quote.item_count|pluralize }})</dt><dd>{{ quote.subtotal|money }}</dd></div>
   {% if quote.club_discount %}<div class="totals__discount"><dt>Remise club (−{{ quote.club_percent|floatformat:"-2" }} %)</dt><dd>−{{ quote.club_discount|money }}</dd></div>{% endif %}
   {% if quote.promo_discount %}<div class="totals__discount"><dt>Code {{ quote.promo_code }}</dt><dd>−{{ quote.promo_discount|money }}</dd></div>{% endif %}
   <div><dt>Livraison</dt><dd>{% if quote.shipping %}{{ quote.shipping|money }}{% else %}Offerte{% endif %}</dd></div>
-  <div class="totals__grand"><dt>Total TTC</dt><dd>{{ quote.total|money }}</dd></div>
+  <div class="totals__grand"><dt>Total <small>TVA incluse</small></dt><dd>{{ quote.total|money }}</dd></div>
 </dl>
