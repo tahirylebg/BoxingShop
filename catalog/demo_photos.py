@@ -2,7 +2,7 @@
 
 Chaque liste est un ordre de préférence : la première photo disponible est retenue, ce qui permet au seed de
 fonctionner avec ou sans les photos Unsplash (clé API facultative). Sans aucune photo, le visuel de secours
-illustré (catalog/demo_art.py) est utilisé.
+réel est utilisé (aucune illustration).
 """
 
 HERO = ["px-ring-nb", "ring-noir-blanc", "px-garde-nb", "px-combat-nb", "silhouette-salle"]
@@ -62,8 +62,9 @@ def pick(keys, available, offset=0, count=1):
     return rotated[:count]
 
 
-# Photo(s) produit par couleur, vérifiées une à une (docs/PHOTO_AUDIT.md). Une couleur absente ici
-# garde son visuel détouré exact (« Visuel Boxing Shop ») : jamais de photo d'une autre couleur.
+# Photos produit réelles par couleur, vérifiées une à une (docs/PHOTO_AUDIT.md).
+# Règle : une couleur n'est mise en vente que si elle a sa propre photo ; un produit sans aucune photo
+# n'est pas créé. Jamais d'illustration ni de visuel dessiné.
 PRODUCT_COLOR_PHOTOS = {
     ("gant-cuir-heritage-pro", "Noir"): ["prod-gants-noirs"],
     ("gant-cuir-heritage-pro", "Rouge"): ["prod-gants-rouges-1", "prod-gants-rouges-2"],
@@ -84,4 +85,16 @@ PRODUCT_COLOR_PHOTOS = {
     ("protege-dents-pro-thermoformable", "Blanc"): ["prod-protege-dents-blanc"],
     ("sac-de-frappe-cuir-120", "Noir"): ["prod-sac-noir"],
     ("sac-thai-180-microfibre", "Noir"): ["prod-sac-noir"],
+    ("corde-a-sauter-acier", "Noir"): ["prod-corde-noire"],
+    ("kimono-jjb-heritage-450", "Blanc"): ["prod-kimono-blanc", "prod-kimono-blanc-2"],
+    ("kimono-jjb-heritage-450", "Bleu"): ["prod-kimono-bleu"],
+    ("kimono-jjb-leger-350", "Blanc"): ["prod-kimono-blanc-2", "prod-kimono-blanc"],
+    ("kimono-jjb-leger-350", "Bleu"): ["prod-kimono-bleu"],
+    ("short-gala-satin", "Noir"): ["prod-short-noir"],
+    ("short-gala-satin", "Rouge"): ["prod-short-rouge"],
 }
+
+
+def sellable_colors(spec):
+    """Couleurs du produit qui ont leur propre photo réelle (les autres ne sont pas créées)."""
+    return [(c, h) for c, h in spec["colors"] if (spec["slug"], c) in PRODUCT_COLOR_PHOTOS]

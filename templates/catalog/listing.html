@@ -18,7 +18,7 @@
     {% if intro %}<p class="listing-hero__intro">{{ intro }}</p>{% endif %}
     <p class="listing-hero__figures">{% for f in hero.figures %}<span>{{ f }}</span>{% endfor %}</p>
   </div>
-  {% if hero.photo.credit and hero.photo.credit != "Visuel Boxing Shop" %}<p class="listing-hero__credit photo-credit">Photo : {% firstof hero.photo.credit_line hero.photo.credit %}</p>{% endif %}
+  {% if hero.photo.credit %}<p class="listing-hero__credit photo-credit">Photo : {% firstof hero.photo.credit_line hero.photo.credit %}</p>{% endif %}
 </header>
 {% endwith %}
 

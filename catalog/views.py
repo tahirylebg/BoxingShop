@@ -68,7 +68,7 @@ def _hero(flt, discipline, category):
     if discipline:
         photo = discipline.photo
     if photo is None:
-        images = ProductImage.objects.filter(product__in=base).exclude(credit="Visuel Boxing Shop")
+        images = ProductImage.objects.filter(product__in=base)
         photo = images.order_by("position", "id").first()
     if photo is None:
         home = HomeSettings.objects.select_related("hero_photo").first()

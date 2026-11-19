@@ -50,3 +50,9 @@ Les photos illustrent l'univers de la boutique ; elles ne représentent pas néc
 | `prod-bandes-noires` | Pose d'une bande de boxe noire sur la main | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/4058317/) |
 | `prod-protege-dents-blanc` | Protège-dents blanc porté, gros plan | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/9945116/) |
 | `prod-sac-noir` | Sac de frappe noir suspendu | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/4162449/) |
+| `prod-corde-noire` | Corde à sauter noire, poignées en mousse | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/45056/) |
+| `prod-short-rouge` | Short de boxe rouge porté dans la salle | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/4398908/) |
+| `prod-short-noir` | Short de boxe noir porté dans le coin du ring | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/8611369/) |
+| `prod-kimono-bleu` | Kimono bleu porté, ceinture nouée | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/6765099/) |
+| `prod-kimono-blanc` | Kimono blanc porté, ceinture bleue | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/8611964/) |
+| `prod-kimono-blanc-2` | Kimono blanc, ceinture tenue en main | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/8612073/) |

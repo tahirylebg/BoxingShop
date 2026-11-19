@@ -84,6 +84,12 @@ PHOTOS = [
     ("prod-bandes-noires", "pexels", "4058317", "Pose d'une bande de boxe noire sur la main", None),
     ("prod-protege-dents-blanc", "pexels", "9945116", "Protège-dents blanc porté, gros plan", None),
     ("prod-sac-noir", "pexels", "4162449", "Sac de frappe noir suspendu", None),
+    ("prod-corde-noire", "pexels", "45056", "Corde à sauter noire, poignées en mousse", None),
+    ("prod-short-rouge", "pexels", "4398908", "Short de boxe rouge porté dans la salle", None),
+    ("prod-short-noir", "pexels", "8611369", "Short de boxe noir porté dans le coin du ring", None),
+    ("prod-kimono-bleu", "pexels", "6765099", "Kimono bleu porté, ceinture nouée", None),
+    ("prod-kimono-blanc", "pexels", "8611964", "Kimono blanc porté, ceinture bleue", None),
+    ("prod-kimono-blanc-2", "pexels", "8612073", "Kimono blanc, ceinture tenue en main", None),
     # Unsplash (API officielle requise)
     ("ring-noir-blanc", "unsplash", "4zaaZR_vjnc", "Boxeur seul dans un ring, photographie noir et blanc", None),
     ("sacs-alignes", "unsplash", "2Ig4WSod3GQ", "Rangée de sacs de frappe suspendus dans une salle", None),

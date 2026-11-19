@@ -25,7 +25,6 @@ from catalog import demo_data as data
 from catalog import demo_photos
 from catalog.images import treat_photo
 from core.models import HomeSettings, Photo
-from catalog.demo_art import render
 from catalog.models import (Category, Discipline, Product, ProductImage, Review, SizeChart, SizeChartRow,
                             Variant)
 from content.models import Guide
@@ -208,6 +207,10 @@ class Command(BaseCommand):
     def _products(self, disciplines, categories, charts):
         products = {}
         for spec in data.PRODUCTS:
+            colors = demo_photos.sellable_colors(spec)
+            if not colors:
+                continue  # aucune photo réelle crédible : produit retiré (docs/PHOTO_AUDIT.md)
+            spec = {**spec, "colors": colors}
             product = Product.objects.create(
                 name=spec["name"], slug=spec["slug"], discipline=disciplines[spec["disc"]],
                 category=categories[spec["cat"]], short_description=spec["short"], description=spec["desc"],
@@ -245,10 +248,9 @@ class Command(BaseCommand):
                 )
 
     def _images(self, product, spec):
-        """Pour chaque couleur : photo(s) produit vérifiées (couleurs fidèles), puis visuel détouré exact.
+        """Pour chaque couleur : photo(s) produit réelles vérifiées, couleurs fidèles (pas de désaturation).
         Les photos d'ambiance (sans couleur) viennent en dernier : survol des cartes et galerie."""
-        cat_label = product.category.name
-        index = list(data.PRODUCTS).index(spec)
+        index = next(i for i, p in enumerate(data.PRODUCTS) if p["slug"] == spec["slug"])
         pos = 0
         for color, hex_ in spec["colors"]:
             alt = f"{product.name} coloris {color.lower()}"
@@ -262,12 +264,6 @@ class Command(BaseCommand):
                                ContentFile(treat_photo(raw, mode="product", max_width=1400, crop=0.8)), save=False)
                 img.save()
                 pos += 1
-            caption = f"{spec['code']} · {color} · {cat_label}"
-            img = ProductImage(product=product, alt=alt, color=color, position=pos, credit="Visuel Boxing Shop")
-            img.image.save(f"{spec['slug']}-{color.lower()}.png", ContentFile(render(spec["shape"], hex_, caption)),
-                           save=False)
-            img.save()
-            pos += 1
         for key in demo_photos.pick(demo_photos.SHAPES.get(spec["shape"], []), self.photos, offset=index, count=2):
             c, raw = self.photo_meta[key]
             img = ProductImage(product=product, alt=c["alt"], position=pos, credit=f"{c['author']} · {c['source']}")
@@ -286,7 +282,7 @@ class Command(BaseCommand):
             )
             guide.photo = self._first_photo(demo_photos.GUIDES.get(g["slug"], []))
             guide.save(update_fields=["photo"])
-            guide.products.set([products[s] for s in g["products"]])
+            guide.products.set([products[s] for s in g["products"] if s in products])
             guide.categories.set([categories[s] for s in g["categories"]])
 
     def _age_catalog(self):
@@ -301,6 +297,8 @@ class Command(BaseCommand):
 
     def _reviews(self, products):
         for slug, author, rating, title, body in data.REVIEWS:
+            if slug not in products:
+                continue  # produit retiré faute de photo réelle
             Review.objects.create(product=products[slug], author_name=author, rating=rating, title=title, body=body,
                                   is_published=True)
 
@@ -318,13 +316,14 @@ class Command(BaseCommand):
         address = client.addresses.first()
         history = [
             (Order.Status.DELIVERED, 40, [("gant-cuir-heritage-pro", 0, 1), ("bandes-de-boxe-450", 0, 2)]),
-            (Order.Status.SHIPPED, 3, [("protege-tibias-cuir-pro", 1, 1), ("short-muay-thai-traditionnel", 2, 1)]),
+            (Order.Status.SHIPPED, 3, [("kimono-jjb-heritage-450", 1, 1), ("short-gala-satin", 1, 1)]),
         ]
         for status, days_ago, lines in history:
             when = timezone.now() - timedelta(days=days_ago)
             items = []
             for slug, idx, qty in lines:
-                variant = list(products[slug].variants.all())[idx]
+                variants = list(products[slug].variants.all())
+                variant = variants[min(idx, len(variants) - 1)]
                 items.append((variant, qty))
             subtotal = sum(v.price * q for v, q in items)
             shipping = Decimal("0") if subtotal >= 90 else Decimal("6.90")

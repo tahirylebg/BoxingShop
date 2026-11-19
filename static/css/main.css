@@ -209,8 +209,6 @@ a:hover .arrow::after { transform: translateX(4px); }
 .card__media { position: relative; aspect-ratio: var(--card-media-ratio); background: var(--color-surface-sunken); border-radius: 2px; overflow: hidden; }
 .card__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity var(--card-swap-duration) var(--ease-out), transform 400ms var(--ease-out); }
 .card__media .card__alt { opacity: 0; }
-.card__placeholder { position: absolute; inset: 0; display: grid; place-items: center; color: var(--color-text-subtle); }
-.card__placeholder svg { width: 38%; }
 /* Étiquette de gamme en angle */
 .card__tier { position: absolute; z-index: 3; top: 0; left: 0; padding: 4px 8px; background: var(--color-pro); color: var(--color-text-inverse); font-family: var(--font-data); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.2; border-bottom-right-radius: 2px; }
 /* Ajout rapide : glisse depuis le bas de l'image au survol (et au focus clavier) */

@@ -19,7 +19,7 @@
           <figure class="gallery__slide" id="vue-{{ forloop.counter }}" data-color="{{ img.color }}"{% if img.color and img.color != selected.color %} hidden{% endif %}>
             {% if forloop.first %}{% responsive_img img sizes="(min-width: 64em) 55vw, 100vw" loading="eager" fetchpriority="high" %}{% else %}{% responsive_img img sizes="(min-width: 64em) 55vw, 100vw" %}{% endif %}
             <a class="gallery__zoom" href="{% largest_rendition_url img %}" target="_blank" rel="noopener">Zoom HD<span class="visually-hidden"> : {{ img.alt }} (nouvel onglet)</span></a>
-            {% if img.credit and img.credit != "Visuel Boxing Shop" %}<figcaption class="photo-credit">Photo : {{ img.credit }}</figcaption>{% endif %}
+            {% if img.credit %}<figcaption class="photo-credit">Photo : {{ img.credit }}</figcaption>{% endif %}
           </figure>
         {% endfor %}
       </div>
