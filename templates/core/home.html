@@ -72,7 +72,7 @@
     {% for t in types %}
       <li>
         <a class="type-tile" href="{{ t.category.get_absolute_url }}">
-          <span class="type-tile__media">{% if t.image %}{% responsive_img t.image sizes="(min-width: 64em) 20vw, 70vw" alt="" %}{% endif %}</span>
+          <span class="type-tile__media">{% if t.image %}{% responsive_img t.image sizes="(min-width: 64em) 20vw, 70vw" alt="" %}{% endif %}{% if t.legend %}<span class="type-tile__legend">{{ t.legend }}</span>{% endif %}</span>
           <span class="type-tile__name">{{ t.category.name }}</span>
         </a>
       </li>

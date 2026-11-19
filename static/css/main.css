@@ -514,7 +514,7 @@ a:hover .arrow::after { transform: translateX(4px); }
 .hero__aside .lead { color: var(--color-text-inverse); }
 .hero__pitch { max-width: 34ch; font-size: clamp(1.25rem, 1rem + 0.9vw, 1.625rem); font-weight: 500; line-height: 1.35; color: var(--color-text-inverse); }
 .hero__pitch em { font-style: italic; text-decoration: underline; text-decoration-color: var(--color-accent); text-decoration-thickness: 3px; text-underline-offset: 0.18em; }
-.hero__facts { list-style: none; display: grid; grid-template-columns: repeat(3, auto); justify-content: space-between; gap: 12px; padding: 14px 16px; background: var(--color-glass); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border-radius: 2px; }
+.hero__facts { list-style: none; display: grid; grid-template-columns: repeat(3, auto); justify-content: space-between; gap: 12px; }
 .hero__facts li { display: grid; gap: 6px; }
 .hero__facts strong { font-family: var(--font-display); font-size: clamp(3rem, 6vw, 5rem); font-weight: 400; line-height: 0.9; color: var(--color-text-inverse); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .hero__facts em { font-style: normal; color: var(--color-accent); }
@@ -566,9 +566,10 @@ a:hover .arrow::after { transform: translateX(4px); }
 .type-rail > li { flex: 0 0 min(72vw, 18rem); scroll-snap-align: start; }
 @media (min-width: 64em) { .type-rail { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); overflow: visible; } }
 .type-tile { display: grid; gap: var(--space-xs); text-decoration: none; }
-.type-tile__media { display: block; aspect-ratio: 1; background: var(--color-surface-sunken-strong); overflow: hidden; }
-.type-tile__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 400ms var(--ease-out); }
-.type-tile:hover .type-tile__media img { transform: scale(1.04); }
+.type-tile__media { position: relative; display: block; aspect-ratio: 1; background: var(--color-surface-sunken); border-radius: 2px; overflow: hidden; }
+.type-tile__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 500ms var(--ease-out); }
+.type-tile:hover .type-tile__media img { transform: scale(1.05); }
+.type-tile__legend { position: absolute; left: 0; right: 0; bottom: 0; padding: 2.5rem 12px 10px; background: linear-gradient(to top, rgb(13 13 13 / 0.6), transparent); color: var(--color-text-inverse); font-family: var(--font-data); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .type-tile__name { font-family: var(--font-display); font-size: var(--text-title-sm); line-height: var(--leading-display); text-transform: uppercase; }
 .type-tile:hover .type-tile__name { color: var(--color-accent); }
 

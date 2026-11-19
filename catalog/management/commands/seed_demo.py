@@ -33,6 +33,29 @@ from core.models import PageMeta, ShippingSettings
 from orders.models import Invoice, Order, OrderItem, StripeEvent
 
 
+
+# Photos de rayon : traitement Pillow commun, renditions WebP 400/800/1200, cadrage carré
+CATEGORY_WIDTHS = (400, 800, 1200)
+CATEGORY_PHOTOS = {"gants": "cat-gants", "protections": "cat-protections", "tenues": "cat-tenues",
+                   "bandages-soins": "cat-bandages", "materiel-de-club": "cat-materiel"}
+CATEGORY_FOCUS = {"cat-tenues": 0.82, "cat-protections": 0.3, "cat-materiel": 0.45}  # hauteur du centre d'intérêt
+
+
+def square_crop(raw, focus_y=0.5):
+    """Recadre en carré autour d'un centre d'intérêt vertical (0 = haut, 1 = bas)."""
+    from io import BytesIO
+
+    from PIL import Image
+
+    with Image.open(BytesIO(raw)) as img:
+        img = img.convert("RGB")
+        side = min(img.size)
+        left = (img.width - side) // 2
+        top = int(max(0, min(img.height - side, focus_y * img.height - side / 2)))
+        out = BytesIO()
+        img.crop((left, top, left + side, top + side)).save(out, "JPEG", quality=92)
+        return out.getvalue()
+
 class Command(BaseCommand):
     help = "Crée ~30 produits de démonstration, 2 guides, 1 code promo, 1 admin et 1 client de test."
 
@@ -55,6 +78,7 @@ class Command(BaseCommand):
             self._settings()
             self.photos = self._photo_library()
             self._home()
+            self._category_photos()
             disciplines = self._disciplines()
             categories = self._categories()
             charts = self._size_charts(categories)
@@ -108,18 +132,27 @@ class Command(BaseCommand):
             return {}
         library = {}
         for i, c in enumerate(json.loads(credits_file.read_text("utf-8"))):
-            src = demo / "originals" / f"{c['key']}.jpg"
+            src = demo / ("categories" if c["key"].startswith("cat-") else "originals") / f"{c['key']}.jpg"
             if not src.exists():
                 continue
             raw = src.read_bytes()
             self.photo_meta[c["key"]] = (c, raw)
             photo = Photo(title=c["alt"][:120], alt=c["alt"], credit=c["author"], credit_source=c["source"],
                           credit_url=c["page"])
+            if c["key"].startswith("cat-"):
+                photo.RENDITION_WIDTHS = CATEGORY_WIDTHS
+                raw = square_crop(raw, CATEGORY_FOCUS.get(c["key"], 0.5))
             photo.image.save(f"{c['key']}.jpg", ContentFile(treat_photo(raw, mode="editorial", seed=i)), save=False)
             photo.save()
             library[c["key"]] = photo
         self.stdout.write(f"Photothèque : {len(library)} photos.")
         return library
+
+    def _category_photos(self):
+        """Une photo d'objet par rayon racine (tuiles « Rayon par rayon »)."""
+        for slug, key in CATEGORY_PHOTOS.items():
+            if key in self.photos:
+                Category.objects.filter(slug=slug, parent__isnull=True).update(photo=self.photos[key])
 
     def _first_photo(self, keys):
         found = demo_photos.pick(keys, self.photos)

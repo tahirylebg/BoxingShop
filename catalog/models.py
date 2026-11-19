@@ -37,6 +37,8 @@ class Category(SEOFields):
         "self", null=True, blank=True, on_delete=models.PROTECT, related_name="children", verbose_name="type parent"
     )
     description = models.TextField(blank=True)
+    photo = models.ForeignKey("core.Photo", null=True, blank=True, on_delete=models.SET_NULL, related_name="+",
+                              verbose_name="photo du rayon", help_text="Photo carrée centrée sur l'objet (accueil).")
     position = models.PositiveSmallIntegerField(default=0)
 
     class Meta:

@@ -64,6 +64,12 @@ PHOTOS = [
     # Grappling
     ("px-jjb", "pexels", "8611251", "Deux pratiquants de jiu-jitsu brésilien en kimono", None),
     ("px-kimono", "pexels", "7988389", "Jeune pratiquant en kimono de jiu-jitsu", None),
+    # Rayons (accueil « Rayon par rayon ») : une photo centrée sur l'objet, rangée dans media/demo/categories/
+    ("cat-gants", "pexels", "6739945", "Paire de gants de boxe en cuir posée sur une étagère", None),
+    ("cat-protections", "pexels", "7289917", "Boxeur portant un casque de protection, gants levés", None),
+    ("cat-tenues", "pexels", "7005124", "Boxeur en short de boxe rouge et blanc", None),
+    ("cat-bandages", "pexels", "9944002", "Main protégée par une bande de boxe blanche", None),
+    ("cat-materiel", "pexels", "4162449", "Sac de frappe noir suspendu dans une salle", None),
     # Unsplash (API officielle requise)
     ("ring-noir-blanc", "unsplash", "4zaaZR_vjnc", "Boxeur seul dans un ring, photographie noir et blanc", None),
     ("sacs-alignes", "unsplash", "2Ig4WSod3GQ", "Rangée de sacs de frappe suspendus dans une salle", None),
@@ -77,6 +83,11 @@ PHOTOS = [
     ("jjb-kimono", "unsplash", "GeRXOhXA548", "Pratiquant en kimono de jiu-jitsu brésilien", None),
     ("corde-salle", "unsplash", "d5Q4aBfZclM", "Sportive sautant à la corde dans une salle", None),
 ]
+
+
+def folder_for(key):
+    """Photos de rayon dans media/demo/categories/, le reste dans media/demo/originals/."""
+    return "categories" if key.startswith("cat-") else "originals"
 
 
 class Skipped(Exception):
@@ -126,8 +137,10 @@ def fetch(entry):
         if img.width < MIN_WIDTH:
             raise ValueError(f"largeur insuffisante ({img.width}px)")
         size = img.size
-    (OUT / f"{key}.jpg").write_bytes(data)
-    return {"key": key, "file": f"demo/originals/{key}.jpg", "source": source.capitalize(), "id": pid,
+    folder = folder_for(key)
+    (OUT.parent / folder).mkdir(parents=True, exist_ok=True)
+    (OUT.parent / folder / f"{key}.jpg").write_bytes(data)
+    return {"key": key, "file": f"demo/{folder}/{key}.jpg", "source": source.capitalize(), "id": pid,
             "author": author, "page": page, "license": f"Licence {source.capitalize()}", "alt": alt,
             "size": list(size)}
 
@@ -138,7 +151,7 @@ def main(force=False):
     credits, failures, skipped = [], [], []
     for entry in PHOTOS:
         key = entry[0]
-        if not force and key in previous and (OUT / f"{key}.jpg").exists():
+        if not force and key in previous and (OUT.parent / folder_for(key) / f"{key}.jpg").exists():
             credits.append(previous[key])
             continue
         try:

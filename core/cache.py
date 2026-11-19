@@ -4,7 +4,7 @@ from django.core.cache import cache
 
 VERSION_KEY = "catalog:version"
 # À incrémenter quand la forme des données mises en cache change (déploiement de code).
-SCHEMA = 4
+SCHEMA = 6
 
 
 def catalog_version():

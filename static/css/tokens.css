@@ -218,7 +218,7 @@
 
   /* Hero */
   --hero-min-height: min(58rem, calc(100svh - var(--header-height) - var(--announce-height)));
-  --hero-veil: var(--color-scrim);
+  --hero-veil: linear-gradient(to top, rgb(13 13 13 / 0.92) 0%, rgb(13 13 13 / 0.75) 30%, rgb(13 13 13 / 0.5) 60%, rgb(13 13 13 / 0.45) 100%);
   --hero-fg: var(--color-text-inverse);
 
   /* Mosaïque des disciplines */
