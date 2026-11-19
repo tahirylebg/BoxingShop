@@ -7,11 +7,13 @@ Les identifiants des comptes de démonstration sont lus dans l'environnement
 (DEMO_ADMIN_EMAIL, DEMO_ADMIN_PASSWORD, DEMO_CUSTOMER_EMAIL, DEMO_CUSTOMER_PASSWORD) : aucun mot de passe
 n'est écrit dans le code.
 """
+import json
 import os
 import random
 from datetime import date, timedelta
 from decimal import Decimal
 
+from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
@@ -20,6 +22,9 @@ from django.utils import timezone
 from accounts.models import Address, ClubPriceTier, Customer
 from cart.models import Cart, PromoCode
 from catalog import demo_data as data
+from catalog import demo_photos
+from catalog.images import treat_photo
+from core.models import HomeSettings, Photo
 from catalog.demo_art import render
 from catalog.models import (Category, Discipline, Product, ProductImage, Review, SizeChart, SizeChartRow,
                             Variant)
@@ -48,6 +53,8 @@ class Command(BaseCommand):
                 self._reset()
             self.rng = random.Random(42)
             self._settings()
+            self.photos = self._photo_library()
+            self._home()
             disciplines = self._disciplines()
             categories = self._categories()
             charts = self._size_charts(categories)
@@ -68,6 +75,8 @@ class Command(BaseCommand):
         for model in (StripeEvent, Invoice, OrderItem, Order, Cart, Review, Guide, ProductImage, Variant, Product,
                       SizeChartRow, SizeChart, PromoCode, ClubPriceTier, PageMeta):
             model.objects.all().delete()
+        HomeSettings.objects.update(hero_photo=None)
+        Photo.objects.all().delete()
         Category.objects.filter(parent__isnull=False).delete()
         Category.objects.all().delete()
         Discipline.objects.all().delete()
@@ -86,11 +95,54 @@ class Command(BaseCommand):
         for path, label, title, desc in data.PAGE_META:
             PageMeta.objects.create(path=path, label=label, meta_title=title, meta_description=desc)
 
+    # --- Photos ---------------------------------------------------------------------------------
+    def _photo_library(self):
+        """Crée la photothèque à partir de media/demo (scripts/fetch_photos.py), traitement éditorial appliqué."""
+        demo = settings.MEDIA_ROOT / "demo"
+        credits_file = demo / "credits.json"
+        self.photo_meta = {}
+        if not credits_file.exists():
+            self.stdout.write(self.style.WARNING(
+                "Aucune photo : lancez `python scripts/fetch_photos.py` (visuels de secours utilisés)."))
+            return {}
+        library = {}
+        for i, c in enumerate(json.loads(credits_file.read_text("utf-8"))):
+            src = demo / "originals" / f"{c['key']}.jpg"
+            if not src.exists():
+                continue
+            raw = src.read_bytes()
+            self.photo_meta[c["key"]] = (c, raw)
+            photo = Photo(title=c["alt"][:120], alt=c["alt"], credit=c["author"], credit_source=c["source"],
+                          credit_url=c["page"])
+            photo.image.save(f"{c['key']}.jpg", ContentFile(treat_photo(raw, mode="editorial", seed=i)), save=False)
+            photo.save()
+            library[c["key"]] = photo
+        self.stdout.write(f"Photothèque : {len(library)} photos.")
+        return library
+
+    def _first_photo(self, keys):
+        found = demo_photos.pick(keys, self.photos)
+        return self.photos[found[0]] if found else None
+
+    def _home(self):
+        home = HomeSettings.load()
+        key = next(iter(demo_photos.pick(demo_photos.HERO, self.photos)), None)
+        if key:
+            c, raw = self.photo_meta[key]
+            hero = Photo(title=f"Hero — {c['alt']}"[:120], alt="", credit=c["author"], credit_source=c["source"],
+                         credit_url=c["page"])
+            hero.image.save(f"hero-{key}.jpg", ContentFile(treat_photo(raw, mode="bw", max_width=2400, seed=7)),
+                            save=False)
+            hero.save()
+            home.hero_photo = hero
+        home.save()
+
     def _disciplines(self):
         out = {}
         for i, (slug, name, short, tagline, desc) in enumerate(data.DISCIPLINES):
             out[slug] = Discipline.objects.create(slug=slug, name=name, short_name=short, tagline=tagline,
-                                                  description=desc, position=i)
+                                                  description=desc, position=i,
+                                                  photo=self._first_photo(demo_photos.DISCIPLINES.get(slug, [])))
         return out
 
     def _categories(self):
@@ -151,11 +203,22 @@ class Command(BaseCommand):
 
     def _images(self, product, spec):
         cat_label = product.category.name
-        for pos, (color, hex_) in enumerate(spec["colors"]):
+        index = list(data.PRODUCTS).index(spec)
+        keys = demo_photos.pick(demo_photos.SHAPES.get(spec["shape"], []), self.photos, offset=index, count=2)
+        for pos, key in enumerate(keys):
+            c, raw = self.photo_meta[key]
+            img = ProductImage(product=product, alt=c["alt"], position=pos,
+                               credit=f"{c['author']} · {c['source']}")
+            img.image.save(f"{spec['slug']}-photo-{pos + 1}.jpg",
+                           ContentFile(treat_photo(raw, mode="editorial", max_width=1400, crop=0.8, seed=index)),
+                           save=False)
+            img.save()
+        offset = len(keys)
+        for pos, (color, hex_) in enumerate(spec["colors"], start=offset):
             caption = f"{spec['code']} · {color} · {cat_label}"
             png = render(spec["shape"], hex_, caption)
             img = ProductImage(product=product, alt=f"{product.name}, coloris {color.lower()}", color=color,
-                               position=pos)
+                               position=pos, credit="Visuel Boxing Shop")
             img.image.save(f"{spec['slug']}-{color.lower()}.png", ContentFile(png), save=False)
             img.save()
 
@@ -166,6 +229,8 @@ class Command(BaseCommand):
                 reading_minutes=g["minutes"], published_at=date.today() - timedelta(days=20 * (i + 1)),
                 meta_description=g["excerpt"][:160],
             )
+            guide.photo = self._first_photo(demo_photos.GUIDES.get(g["slug"], []))
+            guide.save(update_fields=["photo"])
             guide.products.set([products[s] for s in g["products"]])
             guide.categories.set([categories[s] for s in g["categories"]])
 

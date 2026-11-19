@@ -68,3 +68,61 @@ class PageMeta(SEOFields):
 
     def __str__(self):
         return f"{self.label} ({self.path})"
+
+
+class Photo(models.Model):
+    """Photothèque éditoriale (accueil, disciplines, guides) avec crédit et déclinaisons WebP."""
+
+    RENDITION_WIDTHS = (640, 1024, 1600)
+
+    title = models.CharField("titre interne", max_length=120)
+    image = models.ImageField("image source", upload_to="photos/originals/")
+    alt = models.CharField("texte alternatif", max_length=200, blank=True,
+                           help_text="Vide si la photo est purement décorative.")
+    credit = models.CharField("auteur", max_length=120, blank=True)
+    credit_source = models.CharField("source", max_length=60, blank=True, help_text="Ex. Pexels, Unsplash")
+    credit_url = models.URLField("lien vers la photo", blank=True)
+    width = models.PositiveIntegerField(default=0, editable=False)
+    height = models.PositiveIntegerField(default=0, editable=False)
+    renditions = models.JSONField(default=dict, editable=False)
+
+    class Meta:
+        verbose_name = "photo"
+        verbose_name_plural = "photothèque"
+        ordering = ["title"]
+
+    def __str__(self):
+        return self.title
+
+    def rendition_folder(self):
+        return "photos/webp"
+
+    @property
+    def credit_line(self):
+        return " · ".join(filter(None, [self.credit, self.credit_source]))
+
+    def save(self, *args, **kwargs):
+        from catalog.images import build_renditions
+
+        changed = not self.pk or Photo.objects.filter(pk=self.pk).values_list("image", flat=True).first() != self.image.name
+        super().save(*args, **kwargs)
+        if changed or not self.renditions:
+            build_renditions(self)
+            super().save(update_fields=["renditions", "width", "height"])
+
+
+class HomeSettings(SingletonModel):
+    hero_photo = models.ForeignKey(Photo, null=True, blank=True, on_delete=models.SET_NULL, related_name="+",
+                                   verbose_name="photo du hero", help_text="Affichée en noir et blanc, plein écran.")
+    hero_title = models.CharField("titre du hero", max_length=80, default="Frappe juste.")
+    hero_text = models.TextField(
+        "manifeste", max_length=400,
+        default="Du matériel de combat choisi par des pratiquants, éprouvé au sac, au sparring et sur le ring.",
+    )
+
+    class Meta:
+        verbose_name = "page d'accueil"
+        verbose_name_plural = "page d'accueil"
+
+    def __str__(self):
+        return "Page d'accueil"

@@ -84,13 +84,23 @@ Toutes sont lues par `django-environ` depuis `.env` (voir `.env.example`, commen
 | `MEDIA_ROOT` | Dossier des images téléversées | `./media` |
 | `SERVE_MEDIA` | Django sert `/media/` (audit local en mode prod uniquement) | `False` |
 | `DEMO_*` | Comptes créés par `seed_demo` — **jamais lus par le code applicatif** | — |
+| `PEXELS_API_KEY`, `UNSPLASH_ACCESS_KEY` | Facultatives : crédits Pexels, photos Unsplash (`fetch_photos.py`) | — |
 
 ## 4. Données de démonstration
 
 ```bash
-python manage.py seed_demo            # idempotent
-python manage.py seed_demo --reset    # repart d'un catalogue vierge
+python scripts/fetch_photos.py        # 1. photos libres de droits → media/demo/ (+ CREDITS.md)
+python manage.py seed_demo            # 2. catalogue, photothèque, comptes
+python manage.py seed_demo --reset    #    repart d'un catalogue vierge
 ```
+
+**Photos** : `scripts/fetch_photos.py` télécharge des photos Pexels (sans clé) et, si `UNSPLASH_ACCESS_KEY` est
+défini, des photos Unsplash via l'API officielle. Chaque fichier est vérifié (HTTP, type, Pillow, largeur) ; les
+auteurs sont listés dans [`CREDITS.md`](CREDITS.md) et en légende discrète sur le site. Au seed, un traitement
+Pillow unifie l'ambiance (légère désaturation + contraste ; hero en noir et blanc granuleux) puis le site génère
+les déclinaisons WebP (`srcset`). Sans photo disponible, un visuel illustré de secours est utilisé : aucune
+image cassée. Les photos illustrent l'univers et ne représentent pas forcément le produit exact ; chaque fiche
+contient aussi des visuels par coloris.
 
 Crée 5 disciplines, 5 types, **34 produits / 227 SKU** (dont 20 sous le seuil d'alerte) avec visuels générés,
 tableaux de tailles, 2 guides techniques liés aux produits, avis, paliers club (5/10/20 articles → −10/−15/−20 %),

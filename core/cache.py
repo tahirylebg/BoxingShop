@@ -3,6 +3,8 @@ from django.conf import settings
 from django.core.cache import cache
 
 VERSION_KEY = "catalog:version"
+# À incrémenter quand la forme des données mises en cache change (déploiement de code).
+SCHEMA = 2
 
 
 def catalog_version():
@@ -22,7 +24,7 @@ def bump_catalog_version(*args, **kwargs):
 
 def cached(key, builder, timeout=None):
     """Mémorise builder() sous une clé versionnée (toute modification du catalogue l'invalide)."""
-    full_key = f"{key}:v{catalog_version()}"
+    full_key = f"{key}:s{SCHEMA}:v{catalog_version()}"
     value = cache.get(full_key)
     if value is None:
         value = builder()

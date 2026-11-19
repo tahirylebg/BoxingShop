@@ -19,6 +19,8 @@ class Guide(SEOFields):
         "catalog.Category", blank=True, related_name="guides", verbose_name="types de produit concernés",
         help_text="Le guide sera proposé sur toutes les fiches de ces types.",
     )
+    photo = models.ForeignKey("core.Photo", null=True, blank=True, on_delete=models.SET_NULL, related_name="+",
+                              verbose_name="photo de couverture")
     reading_minutes = models.PositiveSmallIntegerField("temps de lecture (min)", default=5)
     is_published = models.BooleanField("publié", default=True)
     published_at = models.DateField("date de publication")

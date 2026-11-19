@@ -5,7 +5,7 @@ from .cache import bump_catalog_version
 WATCHED = [
     "catalog.Discipline", "catalog.Category", "catalog.Product", "catalog.Variant", "catalog.ProductImage",
     "catalog.Review", "catalog.SizeChart", "catalog.SizeChartRow", "content.Guide", "core.ShippingSettings",
-    "core.PageMeta",
+    "core.PageMeta", "core.Photo", "core.HomeSettings",
 ]
 
 

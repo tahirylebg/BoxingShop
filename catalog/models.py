@@ -15,6 +15,8 @@ class Discipline(SEOFields):
     tagline = models.CharField("accroche", max_length=160, blank=True)
     description = models.TextField(blank=True)
     position = models.PositiveSmallIntegerField(default=0)
+    photo = models.ForeignKey("core.Photo", null=True, blank=True, on_delete=models.SET_NULL, related_name="+",
+                              verbose_name="photo (mosaïque d'accueil)")
 
     class Meta:
         ordering = ["position", "name"]
@@ -225,6 +227,7 @@ class ProductImage(models.Model):
         "couleur associée", max_length=40, blank=True, help_text="Affichée quand cette couleur est sélectionnée."
     )
     position = models.PositiveSmallIntegerField(default=0)
+    credit = models.CharField("crédit photo", max_length=160, blank=True, help_text="Ex. Ron Lach · Pexels")
     width = models.PositiveIntegerField(default=0, editable=False)
     height = models.PositiveIntegerField(default=0, editable=False)
     renditions = models.JSONField(default=dict, editable=False, help_text="{largeur: chemin WebP}")
@@ -235,6 +238,9 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return self.alt
+
+    def rendition_folder(self):
+        return f"products/webp/{self.product_id}"
 
     def save(self, *args, **kwargs):
         from .images import build_renditions
