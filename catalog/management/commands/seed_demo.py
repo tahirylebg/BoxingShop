@@ -14,6 +14,7 @@ from datetime import date, timedelta
 from decimal import Decimal
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
@@ -88,6 +89,7 @@ class Command(BaseCommand):
             admin, client = self._accounts(creds)
             self._orders(client, products)
 
+        cache.clear()  # les données mises en cache pointent vers les fichiers du seed précédent
         low = Variant.objects.low_stock().count()
         self.stdout.write(self.style.SUCCESS(
             f"OK : {len(products)} produits, {Variant.objects.count()} SKU ({low} sous le seuil), "

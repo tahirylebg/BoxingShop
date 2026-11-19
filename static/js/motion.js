@@ -1,5 +1,7 @@
 // Mouvement sobre : révélation au défilement (IntersectionObserver) et loupe qui suit le curseur.
 // Amélioration progressive : sans JS, tout le contenu est visible et la galerie zoome au centre.
+// html.js : seul cas où un état caché (.reveal) peut s'appliquer ; sans JS tout reste visible.
+document.documentElement.classList.add("js");
 const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // Compteurs du hero : 0 -> valeur au chargement. La valeur finale est déjà dans le HTML (sans JS ni mouvement).
