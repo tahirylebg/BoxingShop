@@ -46,6 +46,19 @@ class Category(SEOFields):
         verbose_name_plural = "types de produit"
         ordering = ["position", "name"]
 
+    @property
+    def image(self):
+        """Image de tuile : la photo de rayon si son fichier existe, sinon la photo principale du produit
+        en stock le plus vendu du rayon (sous-rayons compris)."""
+        from django.core.files.storage import default_storage
+
+        if self.photo_id and self.photo.renditions and default_storage.exists(self.photo.image.name):
+            return self.photo
+        product = (Product.objects.filter(category_id__in=self.descendant_ids(), is_active=True,
+                                          variants__is_active=True, variants__stock__gt=0)
+                   .order_by("-sales_count", "pk").first())
+        return product.images.order_by("position", "id").first() if product else None
+
     def __str__(self):
         return f"{self.parent} › {self.name}" if self.parent_id else self.name
 

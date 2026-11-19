@@ -561,7 +561,8 @@ main + .campaign, .campaign--after-grid { margin-top: 72px; }
 .type-tile__media { position: relative; display: block; aspect-ratio: 1; background: var(--color-surface-sunken); border-radius: 2px; overflow: hidden; }
 .type-tile__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 500ms var(--ease-out); }
 .type-tile:hover .type-tile__media img { transform: scale(1.05); }
-.type-tile__legend { position: absolute; left: 0; right: 0; bottom: 0; padding: 2.5rem 12px 10px; background: linear-gradient(to top, rgb(13 13 13 / 0.6), transparent); color: var(--color-text-inverse); font-family: var(--font-data); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Titres d'affiche : ni ombre ni filtre ; translateZ force un lissage en niveaux de gris (pas de franges ClearType) */
+.section__head h2, .type-tile__name { text-shadow: none; filter: none; transform: translateZ(0); }
 .type-tile__name { font-family: var(--font-display); font-size: var(--text-title-sm); line-height: var(--leading-display); text-transform: uppercase; }
 .type-tile:hover .type-tile__name { color: var(--color-accent); }
 

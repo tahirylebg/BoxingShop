@@ -24,16 +24,9 @@ from .models import HomeSettings
 
 
 def _type_tiles():
-    """Pour chaque type racine : sa photo de rayon et une légende « CODE · COLORIS · RAYON » (meilleure vente)."""
-    from catalog.models import Variant
-
-    tiles = []
-    for c in Category.objects.filter(parent__isnull=True).select_related("photo"):
-        v = (Variant.objects.filter(product__category_id__in=c.descendant_ids(), product__is_active=True, is_active=True)
-             .order_by("-product__sales_count", "pk").first())
-        legend = " · ".join(x for x in ((v.sku.split("-")[1] if v and v.sku.count("-") else ""), v.color if v else "", c.name) if x)
-        tiles.append({"category": c, "image": c.photo, "legend": legend})
-    return tiles
+    """Une tuile par rayon racine, toujours illustrée par une photo réelle (Category.image)."""
+    return [{"category": c, "image": c.image}
+            for c in Category.objects.filter(parent__isnull=True).select_related("photo")]
 
 
 @require_GET

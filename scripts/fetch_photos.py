@@ -67,7 +67,7 @@ PHOTOS = [
     # Rayons (accueil « Rayon par rayon ») : une photo centrée sur l'objet, rangée dans media/demo/categories/
     ("cat-gants", "pexels", "6739945", "Paire de gants de boxe en cuir posée sur une étagère", None),
     ("cat-protections", "pexels", "7289917", "Boxeur portant un casque de protection, gants levés", None),
-    ("cat-tenues", "pexels", "7005124", "Boxeur en short de boxe rouge et blanc", None),
+    ("cat-tenues", "pexels", "4398908", "Short de boxe rouge porté dans la salle", None),
     ("cat-bandages", "pexels", "9944002", "Main protégée par une bande de boxe blanche", None),
     ("cat-materiel", "pexels", "4162449", "Sac de frappe noir suspendu dans une salle", None),
     # Photos produit par couleur (media/demo/products/) : objet visible, couleur vérifiée à l'œil

@@ -37,7 +37,7 @@ from orders.models import Invoice, Order, OrderItem, StripeEvent
 CATEGORY_WIDTHS = (400, 800, 1200)
 CATEGORY_PHOTOS = {"gants": "cat-gants", "protections": "cat-protections", "tenues": "cat-tenues",
                    "bandages-soins": "cat-bandages", "materiel-de-club": "cat-materiel"}
-CATEGORY_FOCUS = {"cat-tenues": 0.82, "cat-protections": 0.3, "cat-materiel": 0.45}  # hauteur du centre d'intérêt
+CATEGORY_FOCUS = {"cat-tenues": 0.95, "cat-protections": 0.3, "cat-materiel": 0.45}  # hauteur du centre d'intérêt
 
 
 def square_crop(raw, focus_y=0.5):
@@ -77,9 +77,9 @@ class Command(BaseCommand):
             self._settings()
             self.photos = self._photo_library()
             self._home()
-            self._category_photos()
             disciplines = self._disciplines()
             categories = self._categories()
+            self._category_photos()  # après la création des rayons (sinon l'update ne touche rien)
             charts = self._size_charts(categories)
             products = self._products(disciplines, categories, charts)
             self._guides(products, categories)

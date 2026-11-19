@@ -34,7 +34,7 @@ Les photos illustrent l'univers de la boutique ; elles ne représentent pas néc
 | `px-kimono` | Jeune pratiquant en kimono de jiu-jitsu | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/7988389/) |
 | `cat-gants` | Paire de gants de boxe en cuir posée sur une étagère | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/6739945/) |
 | `cat-protections` | Boxeur portant un casque de protection, gants levés | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/7289917/) |
-| `cat-tenues` | Boxeur en short de boxe rouge et blanc | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/7005124/) |
+| `cat-tenues` | Short de boxe rouge porté dans la salle | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/4398908/) |
 | `cat-bandages` | Main protégée par une bande de boxe blanche | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/9944002/) |
 | `cat-materiel` | Sac de frappe noir suspendu dans une salle | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/4162449/) |
 | `prod-gants-rouges-1` | Paire de gants de boxe rouges suspendus | Contributeur Pexels | [Pexels](https://www.pexels.com/photo/10689269/) |
