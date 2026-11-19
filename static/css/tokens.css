@@ -78,6 +78,8 @@
   --color-surface-sunken-strong: var(--p-concrete-300);
   --color-surface-inverse: var(--p-ink-900);
   --color-scrim: var(--p-scrim);
+  --color-rule-faint: rgb(13 13 13 / 0.12);
+  --color-rule-control: rgb(13 13 13 / 0.25);
   --color-veil: var(--p-veil);
 
   /* Texte */

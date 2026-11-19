@@ -1,9 +1,19 @@
-{# Grille produit 2 / 4 colonnes. La carte CTA finale comble la dernière rangée (voir .grid-cta dans main.css). #}
-<ul class="product-grid">
+{# Grille produit. cta_* : carte « Tout voir » ; fill_guide : carte éditoriale qui comble la dernière rangée (cachée si la rangée est complète). #}
+{% load shop %}
+<ul class="product-grid{% if fill_guide %} product-grid--catalog{% endif %}">
   {% for product in products %}
     <li{% if reveal %} data-reveal{% endif %}>{% if priority_first and forloop.first %}{% include "catalog/_card.html" with priority=True %}{% else %}{% include "catalog/_card.html" with eager=forloop.counter %}{% endif %}</li>
   {% endfor %}
-  {% if cta_url %}
+  {% if fill_guide %}
+    <li class="grid-fill">
+      <a class="fill-card" href="{{ fill_guide.get_absolute_url }}">
+        {% if fill_guide.photo %}<span class="fill-card__media">{% responsive_img fill_guide.photo sizes="(min-width: 64em) 50vw, 100vw" alt="" %}</span>{% endif %}
+        <span class="fill-card__kicker">Guide · {{ fill_guide.reading_minutes }} min</span>
+        <span class="fill-card__title">{{ fill_guide.title }}</span>
+        <span class="fill-card__go">Lire le guide <span class="tile__arrow" aria-hidden="true">→</span></span>
+      </a>
+    </li>
+  {% elif cta_url %}
     <li class="grid-cta"><a href="{{ cta_url }}"><span class="grid-cta__kicker">{{ cta_kicker|default:"Catalogue complet" }}</span><span class="grid-cta__label">{{ cta_label|default:"Tout voir" }}</span><span class="grid-cta__arrow" aria-hidden="true">→</span></a></li>
   {% endif %}
 </ul>

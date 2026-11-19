@@ -7,15 +7,41 @@
     {% else %}
       <span class="card__placeholder" aria-hidden="true"><svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="3"><path d="M30 64V36a24 24 0 0 1 24-24h12a24 24 0 0 1 24 24v30a26 26 0 0 1-26 26H52a22 22 0 0 1-22-22z"/><path d="M38 92v16h40V92"/></svg></span>
     {% endif %}
-    <div class="card__badges">
-      {% if product.range_tier == "competition" %}<span class="badge badge--leather">Compétition</span>{% elif product.range_tier == "pro" %}<span class="badge badge--leather">Pro</span>{% endif %}
-      {% if product.total_stock is not None and product.total_stock <= 0 %}<span class="badge badge--ink">Épuisé</span>{% endif %}
-    </div>
+    {% if product.range_tier == "competition" %}<span class="card__tier">Compétition</span>{% elif product.range_tier == "pro" %}<span class="card__tier">Pro</span>{% endif %}
+    {% if product.quick %}
+      <form class="quick-add" method="post" action="{% url 'cart:add' %}" data-add-to-cart>
+        {% csrf_token %}<input type="hidden" name="product" value="{{ product.pk }}">
+        <p class="quick-add__label">Ajout rapide{% if product.quick_color %} · {{ product.quick_color }}{% endif %}</p>
+        <div class="quick-add__opts">
+          {% for q in product.quick %}
+            <button class="quick-add__opt" type="submit" name="variant" value="{{ q.id }}"{% if not q.in_stock %} disabled{% endif %}>
+              {% if q.label %}{{ q.label }}{% else %}Ajouter au panier{% endif %}<span class="visually-hidden"> : ajouter {{ product.name }} au panier{% if not q.in_stock %} (épuisé){% endif %}</span>
+            </button>
+          {% endfor %}
+        </div>
+      </form>
+    {% endif %}
   </div>
   <div class="card__body">
+    {% if product.range_tier != "standard" or product.is_low or product.is_new %}
+      <p class="card__flags">
+        {% if product.range_tier == "competition" %}<span class="flag flag--pro">Compétition</span>{% elif product.range_tier == "pro" %}<span class="flag flag--pro">Pro</span>{% endif %}
+        {% if product.is_low %}<span class="flag flag--low">Stock faible</span>{% endif %}
+        {% if product.is_new %}<span class="flag">Nouveau</span>{% endif %}
+      </p>
+    {% endif %}
     <h3 class="card__title"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3>
-    <p class="card__cat">{{ product.category.name }} · {{ product.discipline.short_name|default:product.discipline.name }}</p>
-    <p class="price">{% if product.min_price %}<span class="visually-hidden">À partir de </span>{{ product.min_price|money }}{% endif %}</p>
+    <p class="card__cat">{{ product.category.name }}</p>
+    <div class="card__foot">
+      <p class="price">{% if product.min_price %}<span class="visually-hidden">À partir de </span>{{ product.min_price|money }}{% endif %}</p>
+      {% if product.swatches|length > 1 %}
+        <p class="swatches">
+          <span class="visually-hidden">Coloris : {% for c in product.swatches %}{{ c.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% if product.swatches_more %} et {{ product.swatches_more }} autre(s){% endif %}</span>
+          {% for c in product.swatches %}<svg class="swatch-dot" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="6" fill="{{ c.hex }}"/></svg>{% endfor %}
+          {% if product.swatches_more %}<span class="swatches__more" aria-hidden="true">+{{ product.swatches_more }}</span>{% endif %}
+        </p>
+      {% endif %}
+    </div>
   </div>
 </article>
 {% endwith %}{% endwith %}

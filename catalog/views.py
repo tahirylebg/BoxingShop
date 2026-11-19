@@ -8,6 +8,8 @@ from django.views.decorators.http import require_GET, require_POST
 
 from core.ratelimit import ratelimit
 
+from .cards import decorate
+
 from content.models import Guide
 
 from .filters import CatalogFilter, listing_queryset
@@ -23,7 +25,8 @@ def _listing(request, *, title, intro="", kicker="Catalogue", discipline=None, c
     flt = CatalogFilter(request.GET, discipline=discipline, category=category)
     page = Paginator(flt.queryset(), PER_PAGE).get_page(request.GET.get("page"))
     context = {
-        "title": title, "intro": intro, "kicker": kicker, "filter": flt, "page": page, "products": page.object_list,
+        "title": title, "intro": intro, "kicker": kicker, "filter": flt, "page": page,
+        "products": decorate(page.object_list), "fill_guide": _fill_guide(category),
         "discipline": discipline, "category": category, "crumbs": crumbs, "meta_obj": meta_obj,
         "breadcrumb_ld": breadcrumb_jsonld(request, crumbs),
         # pages filtrées : on évite l'indexation de milliers de combinaisons
@@ -32,7 +35,62 @@ def _listing(request, *, title, intro="", kicker="Catalogue", discipline=None, c
     # Requête fetch() du filtrage dynamique : on ne renvoie que la zone de résultats.
     if request.headers.get("X-Requested-With") == "fetch":
         return render(request, "catalog/_results.html", context)
+    context["hero"] = _hero(flt, discipline, category)
     return render(request, "catalog/listing.html", context)
+
+
+def _fill_guide(category):
+    """Guide éditorial qui comble la dernière rangée incomplète de la grille."""
+    guides = Guide.objects.filter(is_published=True).select_related("photo")
+    if category:
+        match = guides.filter(categories__in=category.descendant_ids() + [category.root.pk]).first()
+        if match:
+            return match
+    return guides.filter(topic="gants").first() or guides.first()
+
+
+def _hero(flt, discipline, category):
+    """Bandeau d'en-tête : photo, chiffres clés et sous-catégories (discipline, type ou boutique)."""
+    from django.db.models import Max, Min
+
+    from core.models import HomeSettings
+
+    base = flt.base_queryset()
+    stats = Variant.objects.filter(product__in=base, is_active=True).aggregate(
+        wmin=Min("weight_oz"), wmax=Max("weight_oz"), pmin=Min("price"))
+    figures = [f"{base.count()} produits"]
+    if stats["wmin"]:
+        figures.append(f"{stats['wmin']}–{stats['wmax']} oz" if stats["wmax"] != stats["wmin"] else f"{stats['wmin']} oz")
+    if stats["pmin"] is not None:
+        figures.append("dès " + f"{stats['pmin']:.2f}".replace(".", ",") + " €")
+    photo = None
+    if discipline:
+        photo = discipline.photo
+    if photo is None:
+        images = ProductImage.objects.filter(product__in=base).exclude(credit="Visuel Boxing Shop")
+        photo = images.order_by("position", "id").first()
+    if photo is None:
+        home = HomeSettings.objects.select_related("hero_photo").first()
+        photo = home.hero_photo if home else None
+    # Sous-catégories défilables
+    cat_ids = set(base.values_list("category_id", flat=True))
+    subnav = []
+    if discipline:
+        for top in Category.objects.filter(parent__isnull=True).prefetch_related("children"):
+            for c in [top, *top.children.all()]:
+                if c.pk in cat_ids or (c is top and any(ch.pk in cat_ids for ch in top.children.all())):
+                    subnav.append((c.name, f"{discipline.get_absolute_url()}{c.slug}/", category and category.pk == c.pk))
+    else:
+        parent = category.root if category else None
+        if parent and not parent.children.exists():
+            parent = None  # type sans sous-catégories : on propose les autres types
+        pool = parent.children.all() if parent else Category.objects.filter(parent__isnull=True)
+        if parent:
+            subnav.append((f"Tout {parent.name.lower()}", parent.get_absolute_url(), category.pk == parent.pk))
+        for c in pool:
+            subnav.append((c.name, c.get_absolute_url(), bool(category and category.pk == c.pk)))
+    index = f"{discipline.position + 1:02d} / Discipline" if discipline else ("Équipement" if category else "Boutique")
+    return {"photo": photo, "figures": figures, "subnav": subnav, "index": index}
 
 
 @require_GET
@@ -134,6 +192,7 @@ def product_view(request, discipline_slug, category_slug, product_slug):
     related = list(
         listing_queryset().filter(category=product.category).exclude(pk=product.pk).order_by("-sales_count")[:4]
     )
+    related = decorate(related)
     crumbs = [
         (product.discipline.name, product.discipline.get_absolute_url()),
         (product.category.name, f"{product.discipline.get_absolute_url()}{product.category.slug}/"),

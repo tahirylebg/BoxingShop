@@ -11,13 +11,9 @@
     <button class="btn btn--ghost" type="submit" data-sort-submit>OK</button>
   </form>
 </div>
-{% with chips=filter.active_chips %}{% if chips %}
-  <div class="active-filters" aria-label="Filtres actifs">
-    {% for label, url in chips %}<a href="{{ request.path }}{{ url }}" data-filter-link aria-label="Retirer le filtre {{ label }}">{{ label }}</a>{% endfor %}
-  </div>
-{% endif %}{% endwith %}
+<template data-active-src>{% include "catalog/_active_filters.html" %}</template>
 {% if products %}
-  {% if page.has_next %}{% include "catalog/_grid.html" with priority_first=True %}{% else %}{% url 'content:guides' as guides_url %}{% include "catalog/_grid.html" with priority_first=True cta_url=guides_url cta_kicker="Besoin d'aide ?" cta_label="Bien choisir" %}{% endif %}
+  {% include "catalog/_grid.html" with priority_first=True fill_guide=fill_guide %}
   {% if page.has_other_pages %}
     <nav class="pagination" aria-label="Pagination">
       {% if page.has_previous %}<a href="{% query_replace page=page.previous_page_number %}" data-filter-link aria-label="Page précédente">←</a>{% endif %}

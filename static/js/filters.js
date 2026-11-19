@@ -4,10 +4,47 @@ const form = document.querySelector("[data-filter-form]");
 const results = document.querySelector("[data-results]");
 
 if (form && results) {
-  const details = form.querySelector("[data-filter-details]");
+  const aside = document.querySelector("[data-filters]");
+  const slot = aside?.querySelector("[data-active-slot]");
+  const fab = document.querySelector("[data-filters-open]");
+  const submit = form.querySelector("[data-filter-submit]");
   const mobile = window.matchMedia("(max-width: 63.99em)");
-  if (details && mobile.matches) details.open = false;
-  form.querySelector("[data-filter-submit]")?.setAttribute("hidden", "");
+  // Desktop : filtrage instantané, le bouton est inutile. Mobile : il ferme le tiroir (« Voir N produits »).
+  const syncSubmit = () => submit?.toggleAttribute("hidden", !mobile.matches);
+  syncSubmit();
+  mobile.addEventListener("change", syncSubmit);
+
+  // Tiroir plein écran (mobile). Sans JS : ancre #filtres + :target.
+  const openDrawer = () => {
+    aside.classList.add("is-open");
+    document.documentElement.classList.add("has-filters-open");
+    aside.querySelector("summary, input")?.focus();
+  };
+  const closeDrawer = () => {
+    aside.classList.remove("is-open");
+    document.documentElement.classList.remove("has-filters-open");
+    fab?.focus();
+  };
+  fab?.addEventListener("click", (event) => { event.preventDefault(); openDrawer(); });
+  aside?.querySelector("[data-filters-close]")?.addEventListener("click", (event) => { event.preventDefault(); closeDrawer(); });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && aside?.classList.contains("is-open")) closeDrawer();
+  });
+
+  // Filtres actifs (en haut de la sidebar), compteurs par section, bouton flottant et total.
+  const syncChrome = () => {
+    const src = results.querySelector("template[data-active-src]");
+    if (slot && src) slot.replaceChildren(src.content.cloneNode(true));
+    form.querySelectorAll(".filter-group").forEach((group) => {
+      const n = group.querySelectorAll("input:checked").length;
+      const badge = group.querySelector("[data-group-count]");
+      if (badge) { badge.textContent = n; badge.hidden = n === 0; }
+    });
+    const active = form.querySelectorAll("input[type=checkbox]:checked").length;
+    if (fab) fab.textContent = active ? `Filtrer (${active})` : "Filtrer";
+    const total = results.querySelector("[data-results-count] strong")?.textContent || "0";
+    if (submit) submit.textContent = `Voir ${total} produit${Number(total) > 1 ? "s" : ""}`;
+  };
 
   let controller = null;
 
@@ -48,6 +85,7 @@ if (form && results) {
       if (push) window.history.pushState({ filters: true }, "", url);
       syncForm(url);
       bindResults();
+      syncChrome();
     } catch (error) {
       if (error.name !== "AbortError") window.location.href = url; // repli : navigation classique
     } finally {
@@ -59,6 +97,13 @@ if (form && results) {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     load(buildUrl());
+    if (aside?.classList.contains("is-open")) closeDrawer();
+  });
+  slot?.addEventListener("click", (event) => {
+    const link = event.target.closest("a[data-filter-link]");
+    if (!link || event.metaKey || event.ctrlKey || event.shiftKey) return;
+    event.preventDefault();
+    load(link.href);
   });
 
   results.addEventListener("change", (event) => {

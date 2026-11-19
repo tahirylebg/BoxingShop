@@ -50,6 +50,19 @@ def markup_toc(text):
             for line in str(text or "").splitlines() if line.strip().startswith("## ")]
 
 
+@register.filter
+def checked_count(options):
+    """Nombre d'options cochées dans un groupe de filtres [(valeur, libellé, n, coché)]."""
+    return sum(1 for o in options if o[3])
+
+
+@register.filter
+def title_split(text):
+    """« Boxe anglaise » -> ("Boxe", "anglaise") : le dernier mot est mis en valeur dans les héros."""
+    words = str(text or "").split()
+    return (" ".join(words[:-1]), words[-1]) if len(words) > 1 else ("", words[0] if words else "")
+
+
 def _inline(text):
     """Texte déjà échappé → applique uniquement **gras**."""
     return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text)

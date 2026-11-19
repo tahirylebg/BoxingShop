@@ -61,6 +61,7 @@ class Command(BaseCommand):
             products = self._products(disciplines, categories, charts)
             self._guides(products, categories)
             self._reviews(products)
+            self._age_catalog()
             admin, client = self._accounts(creds)
             self._orders(client, products)
 
@@ -239,6 +240,16 @@ class Command(BaseCommand):
             guide.save(update_fields=["photo"])
             guide.products.set([products[s] for s in g["products"]])
             guide.categories.set([categories[s] for s in g["categories"]])
+
+    def _age_catalog(self):
+        """Le catalogue de démo n'est pas « tout neuf » : seuls 5 produits gardent le badge Nouveau."""
+        from datetime import timedelta
+
+        from django.utils import timezone
+
+        fresh = list(Product.objects.order_by("-id")
+                     .values_list("pk", flat=True)[:5])
+        Product.objects.exclude(pk__in=fresh).update(created_at=timezone.now() - timedelta(days=120))
 
     def _reviews(self, products):
         for slug, author, rating, title, body in data.REVIEWS:

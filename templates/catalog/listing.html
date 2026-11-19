@@ -8,47 +8,79 @@
 {% block head_extra %}{% jsonld breadcrumb_ld %}{% endblock %}
 {% block scripts %}<script type="module" src="{% static 'js/filters.js' %}"></script>{% endblock %}
 {% block content %}
-<div class="container">
-  <header class="catalog-head">
+{% with parts=title|title_split %}
+<header class="listing-hero">
+  {% if hero.photo %}<div class="listing-hero__media">{% responsive_img hero.photo sizes="100vw" alt="" loading="eager" fetchpriority="high" %}</div>{% endif %}
+  <div class="container listing-hero__content">
     {% include "partials/breadcrumb.html" %}
-    <p class="kicker mt-5">{{ kicker }}</p>
-    <h1>{{ title }}</h1>
-    {% if intro %}<p class="lead muted">{{ intro }}</p>{% endif %}
-  </header>
+    <p class="listing-hero__index">{{ hero.index }}</p>
+    <h1 class="listing-hero__title">{% if parts.0 %}{{ parts.0 }} {% endif %}<em>{{ parts.1 }}</em></h1>
+    {% if intro %}<p class="listing-hero__intro">{{ intro }}</p>{% endif %}
+    <p class="listing-hero__figures">{% for f in hero.figures %}<span>{{ f }}</span>{% endfor %}</p>
+  </div>
+  {% if hero.photo.credit and hero.photo.credit != "Visuel Boxing Shop" %}<p class="listing-hero__credit photo-credit">Photo : {% firstof hero.photo.credit_line hero.photo.credit %}</p>{% endif %}
+</header>
+{% endwith %}
 
+{% if hero.subnav %}
+  <nav class="subnav" aria-label="Sous-catégories">
+    <ul class="container subnav__list">
+      {% for label, url, current in hero.subnav %}<li><a class="chip-link" href="{{ url }}"{% if current %} aria-current="page"{% endif %}>{{ label }}</a></li>{% endfor %}
+    </ul>
+  </nav>
+{% endif %}
+
+<div class="container">
   <div class="catalog-layout">
-    <aside class="filters" aria-label="Filtres">
-      <form method="get" action="{{ request.path }}" data-filter-form>
-        <details open data-filter-details>
-          <summary class="btn btn--ghost filters__toggle">Filtrer les produits</summary>
+    <aside class="filters" id="filtres" aria-labelledby="filters-title" data-filters>
+      <div class="filters__head">
+        <h2 class="filters__title" id="filters-title">Filtres</h2>
+        <a class="filters__close" href="#resultats" data-filters-close aria-label="Fermer les filtres">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+        </a>
+      </div>
+      <div class="filters__scroll">
+        <div class="filters__active" data-active-slot>{% include "catalog/_active_filters.html" %}</div>
+        <form method="get" action="{{ request.path }}" data-filter-form>
           {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
           {% if request.GET.tri %}<input type="hidden" name="tri" value="{{ filter.sort }}" data-sort-mirror>{% endif %}
           {% for key, legend, style, options in filter.groups %}
-            <fieldset>
-              <legend>{{ legend }}</legend>
-              {% if style == "chips" %}
-                <div class="chips">
+            {% with n_active=options|checked_count %}
+            <details class="filter-group" open>
+              <summary class="filter-group__summary">
+                <span>{{ legend }}</span>
+                <span class="filter-group__count" data-group-count{% if not n_active %} hidden{% endif %}>{{ n_active }}</span>
+                <svg class="filter-group__chevron" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+              </summary>
+              <fieldset>
+                <legend class="visually-hidden">{{ legend }}</legend>
+                {% if style == "chips" %}
+                  <div class="pill-grid">
+                    {% for value, label, n, checked in options %}
+                      <label class="pill"><input type="checkbox" name="{{ key }}" value="{{ value }}"{% if checked %} checked{% endif %}><span>{{ label }}</span></label>
+                    {% endfor %}
+                  </div>
+                {% else %}
                   {% for value, label, n, checked in options %}
-                    <label class="chip"><input type="checkbox" name="{{ key }}" value="{{ value }}"{% if checked %} checked{% endif %}><span>{{ label }}</span></label>
+                    <label class="check"><input type="checkbox" name="{{ key }}" value="{{ value }}"{% if checked %} checked{% endif %}>{% if key == "matiere" %}<span class="mat mat--{{ value }}" aria-hidden="true"></span>{% endif %}<span class="check__label">{{ label }}</span>{% if n %}<small class="check__count">{{ n }}</small>{% endif %}</label>
                   {% endfor %}
-                </div>
-              {% else %}
-                {% for value, label, n, checked in options %}
-                  <label class="check"><input type="checkbox" name="{{ key }}" value="{{ value }}"{% if checked %} checked{% endif %}><span>{{ label }}</span>{% if n %}<small>{{ n }}</small>{% endif %}</label>
-                {% endfor %}
-              {% endif %}
-            </fieldset>
+                {% endif %}
+              </fieldset>
+            </details>
+            {% endwith %}
           {% endfor %}
-          <fieldset>
-            <legend>Disponibilité</legend>
-            <label class="check"><input type="checkbox" name="dispo" value="1"{% if filter.in_stock %} checked{% endif %}><span>En stock uniquement</span></label>
-          </fieldset>
+          <details class="filter-group" open>
+            <summary class="filter-group__summary"><span>Disponibilité</span><span class="filter-group__count" data-group-count{% if not filter.in_stock %} hidden{% endif %}>1</span><svg class="filter-group__chevron" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></summary>
+            <fieldset>
+              <legend class="visually-hidden">Disponibilité</legend>
+              <label class="check"><input type="checkbox" name="dispo" value="1"{% if filter.in_stock %} checked{% endif %}><span class="check__label">En stock uniquement</span></label>
+            </fieldset>
+          </details>
           <div class="filters__actions">
-            <button class="btn" type="submit" data-filter-submit>Appliquer les filtres</button>
-            <a class="btn btn--ghost" href="{{ request.path }}">Réinitialiser</a>
+            <button class="btn btn--block" type="submit" data-filter-submit>Voir <span data-results-total>{{ page.paginator.count }}</span> produit{{ page.paginator.count|pluralize }}</button>
           </div>
-        </details>
-      </form>
+        </form>
+      </div>
     </aside>
 
     <div class="results" id="resultats" data-results>
@@ -56,4 +88,6 @@
     </div>
   </div>
 </div>
+
+<a class="filters-fab" href="#filtres" data-filters-open>Filtrer{% with n=filter.active_chips|length %}{% if n %} ({{ n }}){% endif %}{% endwith %}</a>
 {% endblock %}

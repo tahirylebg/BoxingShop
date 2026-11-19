@@ -1,0 +1,6 @@
+{% with chips=filter.active_chips %}{% if chips %}
+<div class="active-filters" aria-label="Filtres actifs">
+  {% for label, url in chips %}<a href="{{ request.path }}{{ url }}" data-filter-link aria-label="Retirer le filtre {{ label }}">{{ label }}</a>{% endfor %}
+  <a class="active-filters__clear" href="{{ request.path }}" data-filter-link>Tout effacer</a>
+</div>
+{% endif %}{% endwith %}

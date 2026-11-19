@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_GET
 
 from catalog.filters import listing_queryset
+from catalog.cards import decorate
 from catalog.models import SizeChart
 from catalog.views import chart_columns
 from catalog.seo import breadcrumb_jsonld
@@ -34,7 +35,7 @@ def guide_list(request):
 @require_GET
 def guide_detail(request, slug):
     guide = get_object_or_404(Guide.objects.filter(is_published=True).select_related("photo"), slug=slug)
-    products = listing_queryset().filter(guides=guide).order_by("-sales_count")[:4]
+    products = decorate(listing_queryset().filter(guides=guide).order_by("-sales_count")[:4])
     chart = SizeChart.objects.filter(category__in=guide.categories.all()).prefetch_related("rows").first()
     chart_rows = list(chart.rows.all()) if chart else []
     published = Guide.objects.filter(is_published=True).select_related("photo")

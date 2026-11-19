@@ -6,6 +6,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_GET, require_POST
 
 from catalog.filters import listing_queryset
+from catalog.cards import decorate
 from catalog.models import Category, Discipline
 from content.models import Guide
 
@@ -38,7 +39,7 @@ def _type_tiles():
 def home(request):
     def build():
         return {
-            "best_sellers": list(listing_queryset().order_by("-sales_count")[:7]),  # + carte « Tout voir » = 2 rangées pleines
+            "best_sellers": decorate(listing_queryset().order_by("-sales_count")[:7]),  # + carte « Tout voir » = 2 rangées pleines
             "types": _type_tiles(),
             "guides": list(Guide.objects.filter(is_published=True).select_related("photo")[:3]),
             "disciplines": list(Discipline.objects.select_related("photo")),
