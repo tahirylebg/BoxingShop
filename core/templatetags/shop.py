@@ -183,3 +183,17 @@ def swatch(hex_color):
     color = hex_color if re.fullmatch(r"#[0-9A-Fa-f]{6}", hex_color or "") else "#0D0D0D"
     return format_html('<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">'
                        '<rect x="0.5" y="0.5" width="31" height="31" fill="{}"/></svg>', conditional_escape(color))
+
+
+@register.filter
+def variant_image(variant):
+    """Photo de la couleur de la déclinaison (repli : première image du produit)."""
+    images = list(variant.product.images.all())
+    return next((i for i in images if i.color == variant.color), images[0] if images else None)
+
+
+@register.filter
+def variant_meta(variant):
+    """« Blanc · 10 oz » / « Noir · M » : libellé client, sans SKU."""
+    option = f"{variant.weight_oz} oz" if variant.weight_oz else (variant.size or "")
+    return " · ".join(x for x in (variant.color, option) if x)

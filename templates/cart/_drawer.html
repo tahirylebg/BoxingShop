@@ -1,14 +1,52 @@
-<div class="drawer__body" data-cart-total-count="{{ quote.item_count }}">
+{% load shop %}
+<div class="drawer__meta" data-cart-total-count="{{ quote.item_count }}">
+  {% if not quote.is_empty %}{% include "cart/_shipping_meter.html" %}{% endif %}
+</div>
+<div class="drawer__body">
   {% if quote.is_empty %}
-    {% url 'catalog:shop' as shop_url %}{% include "partials/empty_state.html" with icon="bag" heading="h3" title="Votre panier est vide" text="Gants, protections, tenues : choisissez votre équipement." cta_url=shop_url cta_label="Voir l'équipement" %}
+    <div class="drawer-empty">
+      <svg class="drawer-empty__icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 15h28l-2 27H12z"/><path d="M18 19v-6a6 6 0 0 1 12 0v6"/></svg>
+      <h3 class="drawer-empty__title">Votre panier est vide</h3>
+      <p class="drawer-empty__text">Gants, protections, tenues : trouvez l'équipement de votre discipline.</p>
+      {% if gloves_url %}<a class="btn btn--blood btn--block drawer-empty__cta" href="{{ gloves_url }}">Découvrir les gants</a>{% endif %}
+      {% if empty_categories %}
+        <ul class="drawer-empty__chips" aria-label="Autres rayons">
+          {% for c in empty_categories %}<li><a class="drawer-chip" href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>{% endfor %}
+        </ul>
+      {% endif %}
+    </div>
   {% else %}
     {% include "cart/_lines.html" with prefix="d" %}
+    {% if suggestions %}
+      <section class="upsell" aria-labelledby="upsell-title">
+        <h3 class="upsell__title" id="upsell-title">Complétez votre équipement</h3>
+        <ul class="upsell__rail">
+          {% for s in suggestions %}
+            <li class="upsell__item">
+              <a class="upsell__media" href="{{ s.product.get_absolute_url }}" tabindex="-1" aria-hidden="true">{% if s.image %}{% responsive_img s.image sizes="120px" alt="" %}{% endif %}</a>
+              <p class="upsell__name"><a href="{{ s.product.get_absolute_url }}">{{ s.product.name }}</a></p>
+              <div class="upsell__foot">
+                <span class="upsell__price">{{ s.variant.price|money }}</span>
+                <form method="post" action="{% url 'cart:add' %}" data-add-to-cart>
+                  {% csrf_token %}<input type="hidden" name="product" value="{{ s.product.pk }}">
+                  <button class="upsell__add" type="submit" name="variant" value="{{ s.variant.pk }}" data-focus="add-{{ s.variant.pk }}" aria-label="Ajouter {{ s.product.name }} ({{ s.variant.label }}) au panier"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M8 3v10" stroke="currentColor" stroke-width="1.75"/></svg></button>
+                </form>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endif %}
   {% endif %}
 </div>
 {% if not quote.is_empty %}
   <div class="drawer__foot">
     {% include "cart/_totals.html" %}
-    <a class="btn btn--blood btn--lg btn--block" href="{% url 'orders:checkout' %}">Commander</a>
-    <a class="btn btn--ghost btn--block" href="{% url 'cart:detail' %}">Voir le panier / code promo</a>
+    <a class="btn btn--blood checkout-btn" href="{% url 'orders:checkout' %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="1.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+      <span>Commander</span>
+    </a>
+    <a class="drawer__cart-link" href="{% url 'cart:detail' %}">Voir le panier</a>
+    {% include "partials/pay_logos.html" %}
   </div>
 {% endif %}

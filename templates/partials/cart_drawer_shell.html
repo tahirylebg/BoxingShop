@@ -1,9 +1,13 @@
-<dialog class="cart-drawer" id="cart-drawer" aria-labelledby="cart-drawer-title" data-drawer-url="{% url 'cart:drawer' %}">
+<dialog class="cart-drawer" id="cart-drawer" aria-labelledby="cart-drawer-title" data-drawer-url="{% url 'cart:drawer' %}" data-add-url="{% url 'cart:add' %}">
   <div class="drawer__head">
-    <h2 id="cart-drawer-title">Panier</h2>
-    <button class="icon-btn" type="button" data-drawer-close aria-label="Fermer le panier">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>
+    <h2 class="drawer__title" id="cart-drawer-title">Panier <span class="drawer__count" data-drawer-count></span></h2>
+    <button class="drawer__close" type="button" data-drawer-close aria-label="Fermer le panier">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
     </button>
   </div>
   <div class="drawer__content" data-drawer-content aria-live="polite"></div>
+  <div class="toast" data-toast role="status" hidden>
+    <span data-toast-text></span>
+    <button class="toast__undo" type="button" data-toast-undo>Annuler</button>
+  </div>
 </dialog>

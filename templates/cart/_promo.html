@@ -1,0 +1,16 @@
+{% load shop %}<form method="post" action="{% url 'cart:promo' %}" class="promo">
+  {% csrf_token %}{% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+  {% if quote.promo_code %}
+    <p class="promo__applied">
+      <span class="promo-chip"><span class="mono">{{ quote.promo_code }}</span>{% if quote.promo_discount %}<span class="promo-chip__off">−{{ quote.promo_discount|money }}</span>{% endif %}
+        <button type="submit" name="action" value="remove" aria-label="Retirer le code {{ quote.promo_code }}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.75" fill="none"/></svg></button>
+      </span>
+    </p>
+  {% else %}
+    <label class="promo__label" for="promo{{ prefix }}">Code promo</label>
+    <div class="input-group">
+      <input id="promo{{ prefix }}" name="code" autocomplete="off" maxlength="30" placeholder="Ex. GANTS10">
+      <button type="submit" name="action" value="apply">Appliquer</button>
+    </div>
+  {% endif %}
+</form>

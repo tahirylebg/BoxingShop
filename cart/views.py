@@ -2,6 +2,7 @@ from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.http import JsonResponse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_GET, require_POST
@@ -16,8 +17,38 @@ def _is_fetch(request):
     return request.headers.get("X-Requested-With") == "fetch"
 
 
+def _suggestions(quote, limit=3):
+    """« Complétez votre équipement » : meilleures ventes en stock, d'abord dans les rayons absents du panier."""
+    in_cart = {line.variant.product_id for line in quote.lines}
+    cart_categories = {line.variant.product.category_id for line in quote.lines}
+    candidates = (Product.objects.active().exclude(pk__in=in_cart)
+                  .filter(variants__is_active=True, variants__stock__gt=0).distinct()
+                  .select_related("category").prefetch_related("images").order_by("-sales_count")[:24])
+    ranked = sorted(candidates, key=lambda p: p.category_id in cart_categories)
+    out = []
+    for product in ranked[:limit]:
+        variant = product.variants.filter(is_active=True, stock__gt=0).order_by("price", "pk").first()
+        images = list(product.images.all())
+        image = next((i for i in images if variant and i.color == variant.color), images[0] if images else None)
+        out.append({"product": product, "variant": variant, "image": image})
+    return out
+
+
+def _drawer_context(quote):
+    from catalog.models import Category
+
+    tops = list(Category.objects.filter(parent__isnull=True).order_by("position", "pk")) if quote.is_empty else []
+    gloves = next((c for c in tops if c.slug == "gants"), None)
+    return {
+        "quote": quote,
+        "suggestions": [] if quote.is_empty else _suggestions(quote),
+        "gloves_url": gloves.get_absolute_url() if gloves else "",
+        "empty_categories": [c for c in tops if c.slug != "gants"][:3],
+    }
+
+
 def _drawer_html(request, quote):
-    return render_to_string("cart/_drawer.html", {"quote": quote}, request=request)
+    return render_to_string("cart/_drawer.html", _drawer_context(quote), request=request)
 
 
 def _respond(request, *, ok=True, message="", fallback="cart:detail"):
@@ -30,6 +61,9 @@ def _respond(request, *, ok=True, message="", fallback="cart:detail"):
         quote_for(request)  # met à jour le compteur du header en session
     if message:
         (messages.success if ok else messages.error)(request, message)
+    nxt = request.POST.get("next", "")
+    if nxt and url_has_allowed_host_and_scheme(nxt, {request.get_host()}, require_https=request.is_secure()):
+        return redirect(nxt)  # ex. code promo saisi depuis le récapitulatif du checkout
     return redirect(fallback)
 
 
@@ -41,7 +75,7 @@ def detail(request):
 
 @require_GET
 def drawer(request):
-    return render(request, "cart/_drawer.html", {"quote": quote_for(request)})
+    return render(request, "cart/_drawer.html", _drawer_context(quote_for(request)))
 
 
 def _resolve_variant(product, data):

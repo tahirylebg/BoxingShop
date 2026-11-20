@@ -3,20 +3,23 @@
   {% for line in quote.lines %}
     {% with v=line.variant p=line.variant.product %}
     <li class="line-item">
-      <span class="line-item__media">{% if p.images.all.0 %}{% responsive_img p.images.all.0 sizes="80px" alt="" %}{% endif %}</span>
-      <div>
+      <a class="line-item__media" href="{{ p.get_absolute_url }}?sku={{ v.sku }}" tabindex="-1" aria-hidden="true">{% with img=v|variant_image %}{% if img %}{% responsive_img img sizes="96px" alt="" %}{% endif %}{% endwith %}</a>
+      <div class="line-item__info">
         <p class="line-item__title"><a href="{{ p.get_absolute_url }}?sku={{ v.sku }}">{{ p.name }}</a></p>
-        <p class="line-item__meta">{{ v.label }} · {{ v.sku }}</p>
+        <p class="line-item__meta">{{ v|variant_meta }}</p>
         {% if line.quantity > v.stock %}<p class="stock-note stock-note--low">Plus que {{ v.stock }} en stock</p>{% elif v.is_low_stock %}<p class="stock-note stock-note--low">Stock faible</p>{% endif %}
-        <form class="qty-form" method="post" action="{% url 'cart:update' line.item_id %}" data-cart-line>
-          {% csrf_token %}
-          <label class="visually-hidden" for="qty-{{ prefix }}{{ line.item_id }}">Quantité pour {{ p.name }}</label>
-          <input id="qty-{{ prefix }}{{ line.item_id }}" type="number" name="quantity" value="{{ line.quantity }}" min="0" max="99" inputmode="numeric">
-          <button class="btn-link" type="submit" name="action" value="update">Modifier</button>
-          <button class="btn-link" type="submit" name="action" value="remove">Retirer<span class="visually-hidden"> {{ p.name }}</span></button>
-        </form>
       </div>
-      <p class="price">{{ line.total|money }}</p>
+      <p class="line-item__price">{{ line.total|money }}</p>
+      <form class="line-item__actions" method="post" action="{% url 'cart:update' line.item_id %}" data-cart-line
+            data-undo-product="{{ p.pk }}" data-undo-variant="{{ v.pk }}" data-undo-qty="{{ line.quantity }}" data-undo-name="{{ p.name }}">
+        {% csrf_token %}
+        <div class="qty" role="group" aria-label="Quantité pour {{ p.name }}">
+          <button class="qty__btn" type="submit" name="quantity" value="{{ line.quantity|add:'-1' }}" data-focus="dec-{{ line.item_id }}" aria-label="Retirer un {{ p.name }}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9" stroke="currentColor" stroke-width="1.75"/></svg></button>
+          <output class="qty__value" aria-label="Quantité">{{ line.quantity }}</output>
+          <button class="qty__btn" type="submit" name="quantity" value="{{ line.quantity|add:'1' }}" data-focus="inc-{{ line.item_id }}" aria-label="Ajouter un {{ p.name }}"{% if line.quantity >= v.stock or line.quantity >= 99 %} disabled{% endif %}><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9M8 3.5v9" stroke="currentColor" stroke-width="1.75"/></svg></button>
+        </div>
+        <button class="line-item__remove" type="submit" name="action" value="remove" aria-label="Retirer {{ p.name }} du panier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13M10 11v5.5M14 11v5.5"/></svg></button>
+      </form>
     </li>
     {% endwith %}
   {% endfor %}

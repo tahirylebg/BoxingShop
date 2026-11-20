@@ -2,7 +2,7 @@
 {% load static shop %}
 {% block title %}Livraison & paiement | Boxing Shop{% endblock %}
 {% block robots %}<meta name="robots" content="noindex">{% endblock %}
-{% block scripts %}<script type="module" src="{% static 'js/address-autocomplete.js' %}"></script>{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'js/address-autocomplete.js' %}?v={{ ASSET_V }}"></script><script type="module" src="{% static 'js/checkout.js' %}?v={{ ASSET_V }}"></script>{% endblock %}
 {% block content %}
 <div class="container">
   <header class="page-head">
@@ -12,7 +12,7 @@
       <p class="mt-3">Commande sans compte possible. Déjà client ? <a href="{% url 'accounts:login' %}?next={% url 'orders:checkout' %}">Connectez-vous</a> pour retrouver vos adresses et vos tarifs club.</p>
     {% endif %}
   </header>
-  <div class="two-col">
+  <div class="two-col checkout-layout">
     <form method="post" class="form-grid form-grid--2" novalidate>
       {% csrf_token %}
       {% if form.non_field_errors %}<div class="span-2">{{ form.non_field_errors }}</div>{% endif %}
@@ -46,19 +46,37 @@
         <p class="field-help mt-3">Vous allez être redirigé vers la page de paiement sécurisée Stripe (carte bancaire, Apple Pay, Google Pay). Vos données de carte ne transitent jamais par nos serveurs.</p>
       </div>
     </form>
-    <aside class="panel stack" aria-labelledby="recap-title">
-      <h2 id="recap-title">Votre commande</h2>
-      <ul class="line-items">
-        {% for line in quote.lines %}
-          <li class="line-item">
-            {% responsive_img line.variant.product.images.all.0 sizes="80px" alt="" %}
-            <div><p class="line-item__title">{{ line.variant.product.name }}</p><p class="line-item__meta">{{ line.variant.label }} · × {{ line.quantity }}</p></div>
-            <p class="price">{{ line.total|money }}</p>
-          </li>
-        {% endfor %}
-      </ul>
-      {% include "cart/_totals.html" %}
-      <a class="btn-link" href="{% url 'cart:detail' %}">Modifier le panier</a>
+    <aside class="order-summary" aria-labelledby="recap-title">
+      <details class="order-summary__details" open data-order-summary>
+        <summary class="order-summary__toggle">
+          <span class="order-summary__toggle-label"><span class="order-summary__show">Afficher le récapitulatif</span><span class="order-summary__hide">Masquer le récapitulatif</span></span>
+          <span class="order-summary__toggle-total">{{ quote.total|money }}</span>
+          <svg class="order-summary__chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.75"/></svg>
+        </summary>
+        <div class="order-summary__card">
+          <div class="order-summary__head">
+            <h2 class="order-summary__title" id="recap-title">Votre commande</h2>
+            <a class="edit-link" href="{% url 'cart:detail' %}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>Modifier le panier</a>
+          </div>
+          <ul class="line-items line-items--summary">
+            {% for line in quote.lines %}
+              {% with v=line.variant p=line.variant.product %}
+              <li class="line-item">
+                <span class="line-item__media">{% with img=v|variant_image %}{% if img %}{% responsive_img img sizes="96px" alt="" %}{% endif %}{% endwith %}<span class="line-item__badge" aria-label="Quantité {{ line.quantity }}">{{ line.quantity }}</span></span>
+                <div class="line-item__info"><p class="line-item__title">{{ p.name }}</p><p class="line-item__meta">{{ v|variant_meta }}</p></div>
+                <p class="line-item__price">{{ line.total|money }}</p>
+              </li>
+              {% endwith %}
+            {% endfor %}
+          </ul>
+          {% url 'orders:checkout' as checkout_url %}{% include "cart/_promo.html" with next=checkout_url prefix="-checkout" %}
+          {% include "cart/_shipping_meter.html" %}
+          <div class="order-summary__foot">
+            {% include "cart/_totals.html" %}
+            {% include "partials/pay_logos.html" %}
+          </div>
+        </div>
+      </details>
     </aside>
   </div>
 </div>
